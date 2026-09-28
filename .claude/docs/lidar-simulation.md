@@ -75,6 +75,5 @@ A/B はどの条件でも平均 375 mm 以上（別物体を拾う）。円半�
 
 ## 実機へつなぐとき
 
-`IHeartInputSource` 実装で `HokuyoUrgSensor`（または URG-Unity）→ `BackgroundSubtractionTracker(CircleFitTracker)`
-（必要なら `SmoothedTracker` で包む）→ `RectCoordinateMapper` を合成する。Tracking 層のクラスはシミュレーションと
-共通なので変更不要。背景学習の操作（ハートを外してキー押下）を現場手順に入れること。
+Tracking 層のクラスはシミュレーションと共通なので変更不要。足りないのはセンサー実装と合成点と校正操作で、
+作業の順序と内容は [lidar-integration.md](lidar-integration.md) の「実機接続の作業手順」に従う。

@@ -94,4 +94,4 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
 - LiDAR シミュレーション（`LidarSimScene`）を追加。UST-20LX 相当のレイキャスト点群＋白色ノイズで、検出手法 A〜E を真値と比較できる。シーンは `Tools > Undertale LiDAR > Build LiDAR Sim Scene`（`Assets/Editor/LidarSimSceneBuilder.cs`）で生成する。
 - ゲームの流れ（game-flow.md）を最低限実装。シーン・弾アセット・難易度別 Timeline は
   `Tools > Undertale LiDAR > Rebuild Game Setup`（`Assets/Editor/GameSetupBuilder.cs`）で生成する（上書き注意）。
-- 未実装: LiDAR 入力、スコア計算式（`ScoreKeeper` は仮の式）、弾の寿命。
+- 未実装: LiDAR 入力（実機接続の作業手順は [.claude/docs/lidar-integration.md](.claude/docs/lidar-integration.md)）、スコア計算式（`ScoreKeeper` は仮の式）、弾の寿命。
