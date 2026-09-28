@@ -12,17 +12,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 124d6d088d7d6f14cb07904eeabcc034, type: 3}
   m_Name: LidarSettings
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Config.LidarSettings
+  HostName: 192.168.6.114
+  TcpPort: 10940
   PortName: COM3
   BaudRate: 115200
-  StartStep: 44
-  EndStep: 725
-  FrontStep: 384
-  AngularResolution: 1024
-  MinRangeM: 0.02
-  MaxRangeM: 4
+  StartStep: 0
+  EndStep: 1080
+  FrontStep: 540
+  AngularResolution: 1440
+  MinRangeM: 0.06
+  MaxRangeM: 20
   PollIntervalMs: 25
-  ClusterRadiusM: 0.1
+  ClusterRadiusM: 0.08
   MinClusterPoints: 3
+  BackgroundMarginM: 0.05
+  BackgroundFrames: 20
+  HeartRadiusM: 0.04
+  FitIterations: 5
   PhysicalMin: {x: -0.3, y: 0.3}
   PhysicalMax: {x: 0.3, y: 0.9}
   RotationDeg: 0

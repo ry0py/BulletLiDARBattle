@@ -12,7 +12,10 @@
 - `HokuyoUrgSensor`（シリアル / URG-04LX 用, `URG_SERIAL_ENABLED` 時のみ有効）は USB 機を使う場合の
   フォールバックとして残す。UST-20LX には使えない（シリアル専用）。
 
-現状足りないのは「センサー実装」「合成点」「背景校正の操作」の 3 つ。Tracking / Mapping 層は変更不要。
+手順 1（センサー実装）は実装済み（`HokuyoEthernetSensor` / `ScipScanParser`）。実機確認は
+`Tools > LiDAR Battle > Build LiDAR Live Scene` で `LidarLiveScene` を生成して再生する（`LidarLiveView`: 点群＋検出マーカー、`B` で背景学習）。
+残りは「合成点」「背景校正の操作（ゲーム側）」。Tracking / Mapping 層は変更不要。
+センサーは同時 1 接続のみ。UrgBenriPlus 等で接続中だと Unity から繋がらない。
 
 ## 実機接続の作業手順（この順に作る）
 

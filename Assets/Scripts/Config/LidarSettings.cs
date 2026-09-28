@@ -5,12 +5,16 @@ namespace LidarBattle.Config
     /// <summary>
     /// LiDAR の接続・検出・キャリブレーションを 1 アセットに集約する設定 (DRY の集約点)。
     /// コードを再ビルドせずに現場で調整できるよう、すべて外部化する。
-    /// 既定値は Hokuyo URG-04LX の代表値。機種/設置に合わせて Inspector で調整する。
+    /// 機種/設置に合わせて Inspector で調整する (UST-20LX の値は docs/lidar-integration.md)。
     /// </summary>
     [CreateAssetMenu(fileName = "LidarSettings", menuName = "LiDAR Battle/Lidar Settings")]
     public sealed class LidarSettings : ScriptableObject
     {
-        [Header("Serial 接続 (Hokuyo 実機)")]
+        [Header("Ethernet 接続 (UST 系)")]
+        [Tooltip("センサーの IP アドレス")] public string HostName = "192.168.0.10";
+        public int TcpPort = 10940;
+
+        [Header("Serial 接続 (URG-04LX 等)")]
         [Tooltip("シリアルポート名。例: Windows=COM3, macOS=/dev/tty.usbmodem*")]
         public string PortName = "COM3";
         public int BaudRate = 115200;
@@ -31,6 +35,10 @@ namespace LidarBattle.Config
         [Header("検出 (Tracking)")]
         [Tooltip("同一クラスタとみなす半径 [m]")] public float ClusterRadiusM = 0.10f;
         [Tooltip("ハートと判定する最小点数")] public int MinClusterPoints = 3;
+        [Tooltip("背景よりこれ以上手前なら前景 [m]")] public float BackgroundMarginM = 0.05f;
+        [Tooltip("背景学習に使うスキャン枚数")] public int BackgroundFrames = 20;
+        [Tooltip("ハートを円とみなしたときの半径 [m] (スキャン面の高さでの断面幅の半分程度)")] public float HeartRadiusM = 0.040f;
+        public int FitIterations = 5;
 
         [Header("キャリブレーション (Mapping: 物理[m] → 正規化0..1)")]
         [Tooltip("ハートが動く物理範囲の最小座標 [m]")] public Vector2 PhysicalMin = new Vector2(-0.3f, 0.3f);

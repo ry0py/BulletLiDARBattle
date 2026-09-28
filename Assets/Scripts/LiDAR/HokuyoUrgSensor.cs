@@ -110,40 +110,8 @@ namespace LidarBattle.LiDAR
         private void RequestAndParse(string gd)
         {
             _port.Write(gd + "\n");
-
-            _port.ReadLine();              // コマンドエコー
-            string status = _port.ReadLine(); // ステータス(+sum)
-            if (status.Length < 2 || status[0] != '0' || status[1] != '0')
-            {
-                ReadUntilBlank();          // 異常時はブロック末尾まで読み捨て
-                return;
-            }
-            _port.ReadLine();              // タイムスタンプ(+sum)
-
-            _backScan.Clear();
-            int step = _settings.StartStep;
-            float twoPiOverRes = (Mathf.PI * 2f) / _settings.AngularResolution;
-
-            // データ行: 各行末はチェックサム 1 文字。空行で終端。
-            string line;
-            string carry = string.Empty; // 3 文字境界が行をまたぐ場合の繰り越し
-            while (!string.IsNullOrEmpty(line = _port.ReadLine()))
-            {
-                string data = carry + line.Substring(0, line.Length - 1); // 末尾 sum を除去
-                int usable = data.Length - (data.Length % 3);
-                carry = data.Substring(usable);
-                for (int i = 0; i < usable; i += 3)
-                {
-                    int mm = Decode3(data[i], data[i + 1], data[i + 2]);
-                    float distM = mm * 0.001f;
-                    if (distM >= _settings.MinRangeM && distM <= _settings.MaxRangeM)
-                    {
-                        float angle = (step - _settings.FrontStep) * twoPiOverRes;
-                        _backScan.Add(new LidarMeasurement(angle, distM));
-                    }
-                    step++;
-                }
-            }
+            _port.ReadLine(); // コマンドエコー
+            if (!ScipScanParser.ReadDistanceResponse(_port.ReadLine, _settings, _backScan)) return;
 
             lock (_swapLock)
             {
@@ -152,20 +120,11 @@ namespace LidarBattle.LiDAR
             }
         }
 
-        private void ReadUntilBlank()
-        {
-            while (!string.IsNullOrEmpty(_port.ReadLine())) { }
-        }
-
         private void SendCommand(string cmd)
         {
             _port.Write(cmd + "\n");
-            ReadUntilBlank(); // エコー + ステータス + 空行
+            ScipScanParser.ReadUntilBlank(_port.ReadLine); // エコー + ステータス + 空行
         }
-
-        /// <summary>SCIP 2.0 の 3 文字エンコードを 18bit 距離[mm]へデコードする。</summary>
-        private static int Decode3(char a, char b, char c)
-            => ((a - 0x30) << 12) | ((b - 0x30) << 6) | (c - 0x30);
 #else
         // URG_SERIAL_ENABLED 未定義時のスタブ。既定ビルドのコンパイルを保証する。
         // 開発時は MockLidarSensor を使用すること。
