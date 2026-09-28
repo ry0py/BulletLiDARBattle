@@ -438,7 +438,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7ee5c2bf7524c04c9af1c936a613521, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Flow.DifficultyOption
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Flow.DifficultyOption
   _difficulty: 1
   _soul: {fileID: 1893904991}
   _size: {x: 2, y: 1.2}
@@ -472,7 +472,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 96b6f7c2f91049f41a384ba4d72dc235, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Input.KeyboardInputSource
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Input.KeyboardInputSource
   _board: {fileID: 1544997614}
   _speed: 3
 --- !u!4 &140774188
@@ -960,7 +960,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5287fdb61ac20fb4f9d68117f3715826, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Flow.SelectFlow
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Flow.SelectFlow
   _dialogue: {fileID: 1718862242}
   _openingLines:
   - "\u4ECA\u65E5\u306F\u6765\u3066\u304F\u308C\u3066\u3042\u308A\u304C\u3068\u3046\u3002"
@@ -1047,7 +1047,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c44c338dbdb8cda46b721f8f41ec6915, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.BattleClock
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.BattleClock
   _director: {fileID: 0}
   _slowScale: 0.3
 --- !u!4 &856310722
@@ -1125,7 +1125,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7ee5c2bf7524c04c9af1c936a613521, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Flow.DifficultyOption
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Flow.DifficultyOption
   _difficulty: 2
   _soul: {fileID: 1893904991}
   _size: {x: 2, y: 1.2}
@@ -1645,7 +1645,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb98f53cf25f1c24da7aac1de28e112e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.BulletBoard
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.BulletBoard
   _size: {x: 12, y: 3}
 --- !u!4 &1544997615
 Transform:
@@ -1785,7 +1785,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 16b51e3099703924b858e14a5204ce22, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.UI.DialogueBox
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.DialogueBox
   _label: {fileID: 268799510}
   _music: {fileID: 0}
   _blip: {fileID: 0}
@@ -2060,7 +2060,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcf5f7edb8516b94895440950c71d48f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.SoulController
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.SoulController
   _inputSource: {fileID: 140774187}
   _board: {fileID: 1544997614}
   _clock: {fileID: 856310721}
@@ -2719,7 +2719,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d7ee5c2bf7524c04c9af1c936a613521, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Flow.DifficultyOption
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Flow.DifficultyOption
   _difficulty: 0
   _soul: {fileID: 1893904991}
   _size: {x: 2, y: 1.2}

@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-namespace UndertaleLiDAR.UI
+namespace LidarBattle.UI
 {
     /// <summary>クリップの間だけセリフを表示する。</summary>
     public class DialogueClip : PlayableAsset, ITimelineClipAsset

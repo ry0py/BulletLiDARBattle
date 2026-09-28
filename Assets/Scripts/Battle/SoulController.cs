@@ -1,7 +1,7 @@
-using UndertaleLiDAR.Input;
+using LidarBattle.Input;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>SOUL の移動・当たり判定サイズ・被弾後の無敵時間。</summary>
     public class SoulController : MonoBehaviour

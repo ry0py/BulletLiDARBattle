@@ -1,9 +1,9 @@
 using UnityEngine;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>弾の種類（見た目と当たり判定の大きさ）。</summary>
-    [CreateAssetMenu(menuName = "Undertale LiDAR/Bullet Type")]
+    [CreateAssetMenu(menuName = "LiDAR Battle/Bullet Type")]
     public class BulletType : ScriptableObject
     {
         [SerializeField] private Sprite _sprite;

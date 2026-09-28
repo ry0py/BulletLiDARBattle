@@ -11,7 +11,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
   m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
   _bulletType: {fileID: 11400000, guid: dc1f70eb479379f4792d7ac68f13a3a2, type: 2}
   _pattern: {fileID: 11400000, guid: c07c61ed8bcbb584fa2226879982cb5f, type: 2}
   _position: {x: 0.1, y: 1.15}
@@ -29,7 +29,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0be7b67e31615b347a2f5e43467a5059, type: 3}
   m_Name: Shots 3
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.ShotTrack
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotTrack
   m_Version: 3
   m_AnimClip: {fileID: 0}
   m_Locked: 0
@@ -190,7 +190,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0be7b67e31615b347a2f5e43467a5059, type: 3}
   m_Name: Shots
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.ShotTrack
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotTrack
   m_Version: 3
   m_AnimClip: {fileID: 0}
   m_Locked: 0
@@ -420,7 +420,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
   m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
   _bulletType: {fileID: 11400000, guid: dc1f70eb479379f4792d7ac68f13a3a2, type: 2}
   _pattern: {fileID: 11400000, guid: c07c61ed8bcbb584fa2226879982cb5f, type: 2}
   _position: {x: 0.9, y: 1.15}
@@ -438,7 +438,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
   m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
   _bulletType: {fileID: 11400000, guid: 10cff2dbb2b90a9408dcddcac0b5f75a, type: 2}
   _pattern: {fileID: 11400000, guid: ec4be870d5b81c549ba8e8ce7b636fd3, type: 2}
   _position: {x: 0.5, y: 1.15}
@@ -456,7 +456,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
   m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
   _bulletType: {fileID: 11400000, guid: 10cff2dbb2b90a9408dcddcac0b5f75a, type: 2}
   _pattern: {fileID: 11400000, guid: 92af7f447a1013b49ae684f603dc6d8e, type: 2}
   _position: {x: 0.5, y: 1.15}
@@ -498,7 +498,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 134ab054d1646f54eaa0ee33f5abf28b, type: 3}
   m_Name: DialogueClip
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.UI.DialogueClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.DialogueClip
   _text: "\u3088\u3051\u3089\u308C\u308B\u304B\u306A\uFF1F"
 --- !u!114 &1600320910144374176
 MonoBehaviour:
@@ -511,7 +511,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 34fa981e8f711e44d83e8cec0a05ed0c, type: 3}
   m_Name: Dialogue
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.UI.DialogueTrack
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.DialogueTrack
   m_Version: 3
   m_AnimClip: {fileID: 0}
   m_Locked: 0
@@ -741,7 +741,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 134ab054d1646f54eaa0ee33f5abf28b, type: 3}
   m_Name: DialogueClip
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.UI.DialogueClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.DialogueClip
   _text: "\u3042\u3068\u5C11\u3057\uFF01"
 --- !u!114 &5364836739928837610
 MonoBehaviour:
@@ -754,7 +754,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
   m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
   _bulletType: {fileID: 11400000, guid: 10cff2dbb2b90a9408dcddcac0b5f75a, type: 2}
   _pattern: {fileID: 11400000, guid: 743ffb3ac9317894b930bc389c14e5c5, type: 2}
   _position: {x: 0.5, y: 1.15}
@@ -772,7 +772,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 134ab054d1646f54eaa0ee33f5abf28b, type: 3}
   m_Name: DialogueClip
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.UI.DialogueClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.DialogueClip
   _text: "\u672C\u6C17\u3067\u3044\u304F\u3088\uFF01"
 --- !u!114 &7407500018193174476
 MonoBehaviour:
@@ -785,7 +785,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0be7b67e31615b347a2f5e43467a5059, type: 3}
   m_Name: Shots 2
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.ShotTrack
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotTrack
   m_Version: 3
   m_AnimClip: {fileID: 0}
   m_Locked: 0
@@ -877,7 +877,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
   m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
   _bulletType: {fileID: 11400000, guid: 10cff2dbb2b90a9408dcddcac0b5f75a, type: 2}
   _pattern: {fileID: 11400000, guid: 8292062e4e5c7a94699b697f79829770, type: 2}
   _position: {x: 0.5, y: 1.15}

@@ -1,6 +1,6 @@
 using System;
 
-namespace UndertaleLiDAR.LiDAR
+namespace LidarBattle.LiDAR
 {
     /// <summary>
     /// 2D LiDAR センサーの抽象 (ISP: 接続/切断/最新スキャン取得のみ)。

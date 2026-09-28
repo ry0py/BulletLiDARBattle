@@ -1,5 +1,5 @@
 using System;
-using UndertaleLiDAR.Config;
+using LidarBattle.Config;
 using UnityEngine;
 
 // 実機シリアル通信は System.IO.Ports に依存する。既定ビルドを壊さないため、
@@ -10,7 +10,7 @@ using System.IO.Ports;
 using System.Threading;
 #endif
 
-namespace UndertaleLiDAR.LiDAR
+namespace LidarBattle.LiDAR
 {
     /// <summary>
     /// Hokuyo URG 系 2D LiDAR を SCIP 2.0 (Serial/USB 仮想COM) で駆動する実機実装。

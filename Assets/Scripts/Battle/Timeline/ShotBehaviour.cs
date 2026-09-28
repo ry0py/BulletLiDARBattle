@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Playables;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>クリップ再生中、経過時間から「今までに撃つべき回数」を求めて足りない分を撃つ。</summary>
     public class ShotBehaviour : PlayableBehaviour

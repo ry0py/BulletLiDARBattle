@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>
     /// デバッグ用: 当たり判定/グレイズ範囲の Gizmo、被弾/グレイズのログ、操作キー。

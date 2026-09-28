@@ -1,6 +1,6 @@
 using UnityEngine.Timeline;
 
-namespace UndertaleLiDAR.UI
+namespace LidarBattle.UI
 {
     /// <summary>バトル中のセリフを並べるトラック。バインド先は DialogueBox。</summary>
     [TrackColor(0.3f, 0.6f, 1f)]

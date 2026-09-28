@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Playables;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>
     /// バトル内の時間。一時停止は全体、スローは弾と Timeline だけに効かせる（SOUL は通常速度で動ける）。

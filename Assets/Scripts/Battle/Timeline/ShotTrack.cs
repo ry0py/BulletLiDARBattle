@@ -1,6 +1,6 @@
 using UnityEngine.Timeline;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>弾を撃つトラック。バインド先に BulletSystem を指定し、ShotClip を並べる。</summary>
     [TrackColor(1f, 0.3f, 0.3f)]

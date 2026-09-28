@@ -1,8 +1,8 @@
-using UndertaleLiDAR.Battle;
+using LidarBattle.Battle;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace UndertaleLiDAR.Input
+namespace LidarBattle.Input
 {
     /// <summary>矢印キー / WASD で SOUL を動かす。速度はワールド単位で指定し、盤面サイズで正規化する。</summary>
     public class KeyboardInputSource : MonoBehaviour, IHeartInputSource

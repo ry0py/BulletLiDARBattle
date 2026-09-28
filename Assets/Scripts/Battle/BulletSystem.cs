@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>撃たれた後の弾をすべて管理する（移動・画面外消去・被弾/グレイズ判定・全消去）。</summary>
     public class BulletSystem : MonoBehaviour

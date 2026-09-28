@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Playables;
 
-namespace UndertaleLiDAR.UI
+namespace LidarBattle.UI
 {
     public class DialogueBehaviour : PlayableBehaviour
     {

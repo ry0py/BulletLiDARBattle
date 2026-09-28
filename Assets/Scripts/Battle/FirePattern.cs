@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     public enum ShotShape { Ring, Aimed, Spiral, Random }
     public enum MoveType { Linear, Accelerate, Curve, SineWave, Homing }
@@ -10,7 +10,7 @@ namespace UndertaleLiDAR.Battle
     /// 飛ばし方（撃ち方＋飛び方）。種類は enum で選び、使うパラメータだけ設定する。
     /// 角度はすべて度数法で、0° = 右、反時計回り。
     /// </summary>
-    [CreateAssetMenu(menuName = "Undertale LiDAR/Fire Pattern")]
+    [CreateAssetMenu(menuName = "LiDAR Battle/Fire Pattern")]
     public class FirePattern : ScriptableObject
     {
         [Header("撃ち方")]

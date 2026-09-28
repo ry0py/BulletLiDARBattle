@@ -1,7 +1,7 @@
-using UndertaleLiDAR.LiDAR;
+using LidarBattle.LiDAR;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Tracking
+namespace LidarBattle.Tracking
 {
     /// <summary>
     /// 手法 E (デコレータ): 任意の検出器の出力に指数移動平均をかけ、直前位置から大きく飛ぶ結果や

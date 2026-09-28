@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using UndertaleLiDAR.LiDAR;
+using LidarBattle.LiDAR;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Tracking
+namespace LidarBattle.Tracking
 {
     /// <summary>角度順の連続点をまとめた 1 区間 (物体候補)。</summary>
     public readonly struct ScanSegment

@@ -1,25 +1,25 @@
 using System;
-using UndertaleLiDAR.Sim;
+using LidarBattle.Sim;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.UI;
 
-namespace UndertaleLiDAR.EditorTools
+namespace LidarBattle.EditorTools
 {
     /// <summary>
     /// LiDAR シミュレーション検証シーン (LidarSimScene) を生成する。
     /// 1 unit = 1 m。センサー (UST-20LX 相当) を原点に上向きで置き、ハート＋手・壁・置物をコライダとして配置する。
     /// スプライトは Rebuild Game Setup が生成した Assets/Art を再利用する。
-    /// batchmode: Unity.exe -batchmode -quit -projectPath . -executeMethod UndertaleLiDAR.EditorTools.LidarSimSceneBuilder.Build
+    /// batchmode: Unity.exe -batchmode -quit -projectPath . -executeMethod LidarBattle.EditorTools.LidarSimSceneBuilder.Build
     /// 既存の同名シーンは上書きする。
     /// </summary>
     public static class LidarSimSceneBuilder
     {
         private const string ScenePath = "Assets/Scenes/LidarSimScene.unity";
 
-        [MenuItem("Tools/Undertale LiDAR/Build LiDAR Sim Scene")]
+        [MenuItem("Tools/LiDAR Battle/Build LiDAR Sim Scene")]
         public static void Build()
         {
             if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;

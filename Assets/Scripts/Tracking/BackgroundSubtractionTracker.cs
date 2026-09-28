@@ -1,7 +1,7 @@
-using UndertaleLiDAR.LiDAR;
+using LidarBattle.LiDAR;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Tracking
+namespace LidarBattle.Tracking
 {
     /// <summary>
     /// 背景差分 (デコレータ): ハート無しの状態で step ごとの背景距離を学習し、背景より手前の点だけを

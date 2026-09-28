@@ -223,7 +223,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 96b6f7c2f91049f41a384ba4d72dc235, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Input.KeyboardInputSource
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Input.KeyboardInputSource
   _board: {fileID: 1155154227}
   _speed: 3
 --- !u!4 &39269877
@@ -270,7 +270,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 504c4f6abbd044249adcadb1bf94b241, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.ScoreKeeper
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ScoreKeeper
   _bullets: {fileID: 89928263}
   _baseScore: 1000
   _hitPenalty: 100
@@ -286,7 +286,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 35c9dd31dd3b7e04b96482eb40676df2, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.BulletSystem
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.BulletSystem
   _clock: {fileID: 1256943461}
   _board: {fileID: 1155154227}
   _soul: {fileID: 1727921524}
@@ -338,7 +338,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 16b51e3099703924b858e14a5204ce22, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.UI.DialogueBox
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.DialogueBox
   _label: {fileID: 1410717771}
   _music: {fileID: 0}
   _blip: {fileID: 0}
@@ -645,7 +645,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 804cd460a88890c409437892d6cf3674, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Flow.BattleFlow
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Flow.BattleFlow
   _director: {fileID: 1983254437}
   _timelines:
   - {fileID: 11400000, guid: 5ee7ae7724cd6e24188ac1f58079f781, type: 2}
@@ -842,7 +842,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fb98f53cf25f1c24da7aac1de28e112e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.BulletBoard
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.BulletBoard
   _size: {x: 5, y: 3.2}
 --- !u!4 &1155154228
 Transform:
@@ -889,7 +889,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c44c338dbdb8cda46b721f8f41ec6915, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.BattleClock
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.BattleClock
   _director: {fileID: 1983254437}
   _slowScale: 0.3
 --- !u!4 &1256943462
@@ -1157,7 +1157,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dcf5f7edb8516b94895440950c71d48f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.SoulController
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.SoulController
   _inputSource: {fileID: 39269876}
   _board: {fileID: 1155154227}
   _clock: {fileID: 1256943461}
@@ -1358,7 +1358,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7af748ce838ba3c4fa3654a0c9a7a4e7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.BattleDebug
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.BattleDebug
   _clock: {fileID: 1256943461}
   _bullets: {fileID: 89928263}
   _soul: {fileID: 1727921524}
@@ -1636,7 +1636,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: af2a8eef2d7c72824d795923992639a7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.HitFeedback
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.HitFeedback
   _bullets: {fileID: 89928263}
   _camera: {fileID: 513489010}
   _overlay: {fileID: 1700000004}
@@ -1655,7 +1655,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 08609f7c02d6b719cab2a00666b1ad1a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.ScoreView
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ScoreView
   _score: {fileID: 89928262}
   _label: {fileID: 902321694}
 --- !u!1660057539 &9223372036854775807

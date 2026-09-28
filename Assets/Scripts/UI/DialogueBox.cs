@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace UndertaleLiDAR.UI
+namespace LidarBattle.UI
 {
     /// <summary>
-    /// Undertale 風のタイプライター表示。1 行を 1 文字ずつ送る。
+    /// タイプライター表示。1 行を 1 文字ずつ送る。
     /// 表示専用であり、バトル進行ロジックは持たない (SRP)。
     /// </summary>
     [RequireComponent(typeof(RectTransform))]
@@ -15,7 +15,7 @@ namespace UndertaleLiDAR.UI
         [SerializeField] private TMP_Text _label;
         [Tooltip("1 秒あたりの表示文字数")]
         [SerializeField] private float _charsPerSecond = 30f;
-        [Tooltip("Undertale 風に各行頭へ付ける接頭辞")]
+        [Tooltip("各行頭へ付ける接頭辞")]
         [SerializeField] private string _linePrefix = "* ";
 
         private Coroutine _typing;

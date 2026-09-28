@@ -2,16 +2,16 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace UndertaleLiDAR.UI
+namespace LidarBattle.UI
 {
     /// <summary>
-    /// 同梱した日本語フォント (Resources/UndertaleJP) から TMP の動的フォントを生成し、
+    /// 同梱した日本語フォント (Resources/JapaneseFont) から TMP の動的フォントを生成し、
     /// シーン内の全 TMP_Text に適用する。動的フォントなので必要な字だけ実行時にラスタライズされ、
     /// 数千字を事前ベイクせずに日本語が表示できる。シーンや既存アセットは編集しない。
     /// </summary>
     public static class JapaneseFontApplier
     {
-        private const string FontResourceName = "UndertaleJP";
+        private const string FontResourceName = "JapaneseFont";
         private static TMP_FontAsset _cached;
 
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
@@ -46,7 +46,7 @@ namespace UndertaleLiDAR.UI
             if (src == null)
             {
                 Debug.LogWarning($"[JapaneseFontApplier] Resources/{FontResourceName} が見つかりません。" +
-                                 "日本語フォントを Assets/Resources/UndertaleJP.ttc に配置してください。");
+                                 "日本語フォントを Assets/Resources/JapaneseFont.ttc に配置してください。");
                 return null;
             }
             _cached = TMP_FontAsset.CreateFontAsset(src); // 動的 SDF フォント

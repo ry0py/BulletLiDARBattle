@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using UndertaleLiDAR.LiDAR;
+using LidarBattle.LiDAR;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Tracking
+namespace LidarBattle.Tracking
 {
     /// <summary>
     /// 円当てはめ: LiDAR はハートの「手前の表面」しか見えないため、表面点の重心は真の中心よりセンサー側に

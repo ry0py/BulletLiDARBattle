@@ -49,7 +49,7 @@
 - 破棄が必要な資源（SerialPort/Thread）は `OnDestroy`/`OnDisable` で確実に解放する。
 
 ## 命名・スタイル
-- 名前空間は `UndertaleLiDAR.<層>`。1 ファイル 1 主要型、ファイル名＝型名。
+- 名前空間は `LidarBattle.<層>`。1 ファイル 1 主要型、ファイル名＝型名。
 - private フィールドは `_camelCase`、`[SerializeField] private` で Inspector 公開。
 - public はパスカルケース。インターフェースは `I` 接頭辞。
 - XML doc コメントは「なぜ」を中心に簡潔に。自明な「何を」は書かない。

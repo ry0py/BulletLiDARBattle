@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>弾 1 発の状態。自分では何もせず、BulletSystem が読み書きする。</summary>
     public sealed class Bullet

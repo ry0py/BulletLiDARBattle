@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace UndertaleLiDAR.LiDAR
+namespace LidarBattle.LiDAR
 {
     /// <summary>
     /// 実機なしで上位層 (Tracking/Mapping/Battle) を開発・デモするためのモック。

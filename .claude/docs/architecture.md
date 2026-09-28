@@ -7,7 +7,7 @@
     │  手で動かす
     ▼
 ┌──────────────────────────────────────────────────────────────┐
-│ Hardware 層 (UndertaleLiDAR.LiDAR)                            │
+│ Hardware 層 (LidarBattle.LiDAR)                            │
 │   ILidarSensor ── HokuyoUrgSensor (実機 / SCIP 2.0)          │
 │              └─── MockLidarSensor (マウス駆動 / 開発用)       │
 │   出力: LidarScan（極座標 measurement の配列）               │
@@ -15,21 +15,21 @@
     │  LidarScan
     ▼
 ┌──────────────────────────────────────────────────────────────┐
-│ Tracking 層 (UndertaleLiDAR.Tracking)                        │
+│ Tracking 層 (LidarBattle.Tracking)                        │
 │   IHeartTracker ── NearestClusterTracker                     │
 │   出力: 物理 XY 座標 (メートル, Vector2) ＋ 検出成否         │
 └──────────────────────────────────────────────────────────────┘
     │  物理 Vector2
     ▼
 ┌──────────────────────────────────────────────────────────────┐
-│ Mapping 層 (UndertaleLiDAR.Mapping)                          │
+│ Mapping 層 (LidarBattle.Mapping)                          │
 │   ICoordinateMapper ── RectCoordinateMapper                  │
 │   出力: 正規化座標 (0..1, Vector2)  ※盤面非依存             │
 └──────────────────────────────────────────────────────────────┘
     │  正規化 Vector2
     ▼
 ┌──────────────────────────────────────────────────────────────┐
-│ Input 層 (UndertaleLiDAR.Input)                              │
+│ Input 層 (LidarBattle.Input)                              │
 │   IHeartInputSource ── KeyboardInputSource                   │
 │                   └─── (LiDAR 入力源: 未実装・上3層を合成)   │
 │   出力: 目標位置の正規化座標 (0..1)                          │
@@ -37,7 +37,7 @@
     │  正規化 Vector2
     ▼
 ┌──────────────────────────────────────────────────────────────┐
-│ Battle 層 (UndertaleLiDAR.Battle)                            │
+│ Battle 層 (LidarBattle.Battle)                            │
 │   SoulController ── 正規化座標を BulletBoard 内の実座標へ     │
 │   BulletBoard ──── 盤面の矩形境界（唯一の座標基準）         │
 │   BattleClock ──── 一時停止・スロー                          │
@@ -74,7 +74,7 @@
 - これにより Battle 層は **入力源を一切知らずに**動く（OCP: 入力源追加は新クラスのみ）。
 
 ### Battle 層
-- Undertale 弾幕の本体。`BulletBoard` が座標の唯一の基準（SOUL も弾もこの矩形内）。
+- 弾幕ゲームの本体。`BulletBoard` が座標の唯一の基準（SOUL も弾もこの矩形内）。
 - 弾の発射は Timeline、発射後の管理は `BulletSystem`。詳細は [bullet-system.md](bullet-system.md)。
 - 全体をまとめる司令役クラスは置かず、参照は Inspector で直接つなぐ。
 

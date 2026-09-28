@@ -1,7 +1,7 @@
-using UndertaleLiDAR.Battle;
+using LidarBattle.Battle;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Flow
+namespace LidarBattle.Flow
 {
     /// <summary>難易度の選択肢。SOUL が枠内に holdSeconds 居続けたら選択済みになる。外れたらリセット。</summary>
     public class DifficultyOption : MonoBehaviour

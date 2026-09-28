@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace UndertaleLiDAR.Sim
+namespace LidarBattle.Sim
 {
     /// <summary>
     /// 真値となるハート。マウス追従か Lissajous 自動移動で範囲内を動く。

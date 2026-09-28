@@ -1,7 +1,7 @@
-using UndertaleLiDAR.LiDAR;
+using LidarBattle.LiDAR;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Tracking
+namespace LidarBattle.Tracking
 {
     /// <summary>
     /// スキャンからハート (物体) の物理位置を 1 点に特定する抽象。

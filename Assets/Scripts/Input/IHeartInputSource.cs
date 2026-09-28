@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UndertaleLiDAR.Input
+namespace LidarBattle.Input
 {
     /// <summary>
     /// SOUL の入力源。キーボードでも LiDAR でも「盤面の正規化座標 (0〜1) での目標位置」を返す形に揃え、

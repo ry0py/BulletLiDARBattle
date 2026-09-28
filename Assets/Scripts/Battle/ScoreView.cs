@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>現在のスコアと被弾回数を画面に出す。値が変わったときだけ文字列を作る（毎フレームの GC を避ける）。</summary>
     public class ScoreView : MonoBehaviour

@@ -1,12 +1,12 @@
 using System.Collections;
-using UndertaleLiDAR.Battle;
-using UndertaleLiDAR.UI;
+using LidarBattle.Battle;
+using LidarBattle.UI;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 using UnityEngine.Timeline;
 
-namespace UndertaleLiDAR.Flow
+namespace LidarBattle.Flow
 {
     /// <summary>バトルシーンの進行: 難易度の Timeline を再生 → 制限時間で終了 → エンディング会話 → 選択シーンへ。</summary>
     public class BattleFlow : MonoBehaviour

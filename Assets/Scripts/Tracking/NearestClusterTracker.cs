@@ -1,7 +1,7 @@
-using UndertaleLiDAR.LiDAR;
+using LidarBattle.LiDAR;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Tracking
+namespace LidarBattle.Tracking
 {
     /// <summary>
     /// 「最も近い点」を核に、半径内の点を 1 クラスタとみなし重心を返すシンプルな検出器。

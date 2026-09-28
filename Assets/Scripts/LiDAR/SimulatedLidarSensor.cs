@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace UndertaleLiDAR.LiDAR
+namespace LidarBattle.LiDAR
 {
     /// <summary>
     /// シミュレータの機種仕様とノイズ。既定値は Hokuyo UST-20LX

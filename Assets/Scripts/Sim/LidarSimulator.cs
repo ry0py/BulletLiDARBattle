@@ -1,7 +1,7 @@
-using UndertaleLiDAR.LiDAR;
+using LidarBattle.LiDAR;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Sim
+namespace LidarBattle.Sim
 {
     /// <summary>
     /// シミュレーション用センサーの合成点。Transform の +X を正面として毎フレーム

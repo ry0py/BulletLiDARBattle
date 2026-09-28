@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using UndertaleLiDAR.LiDAR;
+using LidarBattle.LiDAR;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Tracking
+namespace LidarBattle.Tracking
 {
     /// <summary>
     /// 手法 B: 隣接点距離で区間分割し、幅がハート相当の区間のうち最も近いものの重心を返す。

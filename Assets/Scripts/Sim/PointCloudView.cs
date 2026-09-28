@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using UndertaleLiDAR.LiDAR;
+using LidarBattle.LiDAR;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Sim
+namespace LidarBattle.Sim
 {
     /// <summary>
     /// スキャン点群を小さな四角形の集合メッシュとして Game ビューに描く。

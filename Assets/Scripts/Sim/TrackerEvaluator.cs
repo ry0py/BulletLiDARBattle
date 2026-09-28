@@ -1,11 +1,11 @@
 using System.Text;
 using TMPro;
-using UndertaleLiDAR.LiDAR;
-using UndertaleLiDAR.Tracking;
+using LidarBattle.LiDAR;
+using LidarBattle.Tracking;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-namespace UndertaleLiDAR.Sim
+namespace LidarBattle.Sim
 {
     /// <summary>
     /// 複数の検出手法を同じスキャンに同時に適用し、真値 (HeartTarget) との誤差を集計・表示する。

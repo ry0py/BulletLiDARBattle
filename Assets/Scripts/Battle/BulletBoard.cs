@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>弾幕の枠。transform の位置を中心とした矩形で、正規化座標 (0〜1) とワールド座標を変換する。</summary>
     public class BulletBoard : MonoBehaviour

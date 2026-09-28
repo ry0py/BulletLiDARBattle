@@ -18,7 +18,7 @@
 
 ### 手順 1: UST-20LX 用センサー `HokuyoEthernetSensor : ILidarSensor`
 
-- 置き場所: `Assets/Scripts/LiDAR/HokuyoEthernetSensor.cs`（名前空間 `UndertaleLiDAR.LiDAR`）。
+- 置き場所: `Assets/Scripts/LiDAR/HokuyoEthernetSensor.cs`（名前空間 `LidarBattle.LiDAR`）。
 - 通信: `System.Net.Sockets.TcpClient` で `LidarSettings.HostName : 10940` に接続。
   受信は専用スレッド、`TryGetLatestScan` でフロント/バックの `LidarScan` を交換する（`HokuyoUrgSensor` と同じ構造）。
 - プロトコル（下記「SCIP 2.0 の要点」）: 接続 → `BM` → `GD0000108000` を `PollIntervalMs`（25 ms）ごとに送り、
@@ -33,7 +33,7 @@
 
 ### 手順 2: 合成点 `LidarInputSource : MonoBehaviour, IHeartInputSource`
 
-- 置き場所: `Assets/Scripts/Input/LidarInputSource.cs`（名前空間 `UndertaleLiDAR.Input`）。
+- 置き場所: `Assets/Scripts/Input/LidarInputSource.cs`（名前空間 `LidarBattle.Input`）。
 - `[SerializeField] LidarSettings _settings` を受け取り、`Awake` で結線する（具象の `new` はここだけ）:
   1. センサー: `HokuyoEthernetSensor(_settings)`。実機が無いときは `MockLidarSensor` に切替できる bool を 1 つ持つ。
   2. 検出器: `new BackgroundSubtractionTracker(new CircleFitTracker(ClusterRadiusM, MinClusterPoints, HeartRadiusM, FitIterations), 1440, BackgroundMarginM)`。

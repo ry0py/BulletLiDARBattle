@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>被弾数・グレイズ数を数えてスコアにする。計算式は仮。</summary>
     public class ScoreKeeper : MonoBehaviour

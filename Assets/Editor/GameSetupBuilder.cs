@@ -1,10 +1,10 @@
 using System;
 using System.IO;
 using TMPro;
-using UndertaleLiDAR.Battle;
-using UndertaleLiDAR.Flow;
-using UndertaleLiDAR.Input;
-using UndertaleLiDAR.UI;
+using LidarBattle.Battle;
+using LidarBattle.Flow;
+using LidarBattle.Input;
+using LidarBattle.UI;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -15,11 +15,11 @@ using UnityEngine.Timeline;
 using UnityEngine.UI;
 using Object = UnityEngine.Object;
 
-namespace UndertaleLiDAR.EditorTools
+namespace LidarBattle.EditorTools
 {
     /// <summary>
     /// 最低限動くゲーム一式（スプライト・弾アセット・難易度別 Timeline・選択/バトルシーン）を生成する。
-    /// batchmode: Unity.exe -batchmode -quit -projectPath . -executeMethod UndertaleLiDAR.EditorTools.GameSetupBuilder.Build
+    /// batchmode: Unity.exe -batchmode -quit -projectPath . -executeMethod LidarBattle.EditorTools.GameSetupBuilder.Build
     /// 既存の同名アセット・シーンは上書きする。
     /// </summary>
     public static class GameSetupBuilder
@@ -32,7 +32,7 @@ namespace UndertaleLiDAR.EditorTools
 
         private static Sprite _square, _circle, _heart;
 
-        [MenuItem("Tools/Undertale LiDAR/Rebuild Game Setup")]
+        [MenuItem("Tools/LiDAR Battle/Rebuild Game Setup")]
         public static void Build()
         {
             if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -300,7 +300,7 @@ namespace UndertaleLiDAR.EditorTools
 
         private static DialogueBox MakeDialogueBox(Transform canvas)
         {
-            // 白い枠の内側に黒い面を重ねて Undertale 風の会話ボックスにする。
+            // 白い枠の内側に黒い面を重ねて会話ボックスにする。
             var box = MakeRect("DialogueBox", canvas, new Vector2(0.2f, 1f), new Vector2(0.8f, 1f),
                 new Vector2(0f, -280f), new Vector2(0f, -40f));
             box.gameObject.AddComponent<Image>().color = Color.white;

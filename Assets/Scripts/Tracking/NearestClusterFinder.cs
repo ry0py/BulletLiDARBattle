@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using UndertaleLiDAR.LiDAR;
+using LidarBattle.LiDAR;
 using UnityEngine;
 
-namespace UndertaleLiDAR.Tracking
+namespace LidarBattle.Tracking
 {
     /// <summary>
     /// 「最も近い点を核に、半径内の点を 1 クラスタとみなす」処理の唯一の実装 (DRY)。

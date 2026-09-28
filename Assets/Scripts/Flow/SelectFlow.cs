@@ -1,9 +1,9 @@
 using System.Collections;
-using UndertaleLiDAR.UI;
+using LidarBattle.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace UndertaleLiDAR.Flow
+namespace LidarBattle.Flow
 {
     /// <summary>選択シーンの進行: オープニング会話 → 難易度選択 → バトルシーンへ。</summary>
     public class SelectFlow : MonoBehaviour

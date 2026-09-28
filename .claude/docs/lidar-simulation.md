@@ -5,7 +5,7 @@ Hardware 層の差し替え（`ILidarSensor`）だけで成立させ、Tracking 
 
 ## シーンの作り方
 
-`Tools > Undertale LiDAR > Build LiDAR Sim Scene`（`Assets/Editor/LidarSimSceneBuilder.cs`）で
+`Tools > LiDAR Battle > Build LiDAR Sim Scene`（`Assets/Editor/LidarSimSceneBuilder.cs`）で
 `Assets/Scenes/LidarSimScene.unity` を生成する（上書き注意）。スプライトは Rebuild Game Setup が作る
 `Assets/Art` を使うので、無ければ先にそちらを実行する。
 

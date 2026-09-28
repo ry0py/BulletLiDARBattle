@@ -147,7 +147,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d0ddfd024fdd2514e8144c5da0520524, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Sim.TrackerEvaluator
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Sim.TrackerEvaluator
   _simulator: {fileID: 1708533003}
   _heart: {fileID: 655042019}
   _label: {fileID: 585761919}
@@ -755,7 +755,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa10334e1c06c914db33a1aa7e0b25a1, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Sim.HeartTarget
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Sim.HeartTarget
   _mode: 0
   _areaMin: {x: -0.4, y: 0.2}
   _areaMax: {x: 0.4, y: 0.95}
@@ -967,7 +967,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b66f8916995593347b6a9d4ccf34788e, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Sim.PointCloudView
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Sim.PointCloudView
   _pointSizeM: 0.008
   _color: {r: 0, g: 1, b: 1, a: 1}
 --- !u!23 &925454089
@@ -1466,7 +1466,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a085b72da0fd8de4eb392a27a54e7f6f, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Sim.LidarSimulator
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Sim.LidarSimulator
   _spec:
     Steps: 1081
     FrontStep: 540

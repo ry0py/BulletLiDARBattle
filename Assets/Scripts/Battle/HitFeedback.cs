@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>
     /// 被弾したと分かるように、カメラを短く揺らし、画面全体を赤くフラッシュする。

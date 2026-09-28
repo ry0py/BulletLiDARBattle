@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.Timeline;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
     /// <summary>「どの弾を・どう飛ばすか・どこから・どの間隔で」を持つクリップ。クリップの長さ＝撃ち続ける時間。</summary>
     public class ShotClip : PlayableAsset, ITimelineClipAsset
