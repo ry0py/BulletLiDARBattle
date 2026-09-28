@@ -337,7 +337,7 @@ namespace UndertaleLiDAR.EditorTools
             inner.localScale = new Vector3(size.x, size.y, 1f);
         }
 
-        private static Transform MakeSpriteObject(string name, Transform parent, Sprite sprite, Color color, int order)
+        internal static Transform MakeSpriteObject(string name, Transform parent, Sprite sprite, Color color, int order)
         {
             var go = new GameObject(name);
             go.transform.SetParent(parent, false);
@@ -348,7 +348,7 @@ namespace UndertaleLiDAR.EditorTools
             return go.transform;
         }
 
-        private static RectTransform MakeRect(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
+        internal static RectTransform MakeRect(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
             Vector2 offsetMin, Vector2 offsetMax)
         {
             var rect = new GameObject(name, typeof(RectTransform)).GetComponent<RectTransform>();
@@ -360,7 +360,7 @@ namespace UndertaleLiDAR.EditorTools
             return rect;
         }
 
-        private static TextMeshProUGUI MakeText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax,
+        internal static TextMeshProUGUI MakeText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax,
             Vector2 offsetMin, Vector2 offsetMax, float fontSize)
         {
             var rect = MakeRect(name, parent, anchorMin, anchorMax, offsetMin, offsetMax);
@@ -413,7 +413,7 @@ namespace UndertaleLiDAR.EditorTools
         }
 
         /// <summary>private な [SerializeField] を名前で設定する。</summary>
-        private static void Set(Object target, params (string name, object value)[] props)
+        internal static void Set(Object target, params (string name, object value)[] props)
         {
             var so = new SerializedObject(target);
             foreach (var (name, value) in props)
