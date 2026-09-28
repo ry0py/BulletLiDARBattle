@@ -14,7 +14,7 @@ BulletSystem（撃った後のすべて）
   ├ 弾ごとの FirePattern を読んで動かす
   ├ 弾ごとの BulletType を読んで当たり判定の大きさを知る
   ├ 被弾・グレイズの判定とイベント通知
-  └ 盤面外の消去・全弾消去・弾数
+  └ 盤面外の消去・全弾消去
 
 Bullet … 状態を持つだけ（位置・角度・速さ・経過時間・BulletType/FirePattern への参照）
 ```
@@ -37,7 +37,9 @@ Bullet … 状態を持つだけ（位置・角度・速さ・経過時間・Bul
 | `ShotTrack` / `ShotClip` / `ShotBehaviour` | Timeline | 発射のタイミングと組み合わせを決める |
 | `BattleClock` | MonoBehaviour | 一時停止・スロー。Timeline の再生速度も合わせる |
 | `SoulController` | MonoBehaviour | SOUL の移動・判定半径・被弾後の無敵時間 |
-| `BattleDebug` | MonoBehaviour | Gizmo・弾数表示・イベントログ・デバッグキー |
+| `ScoreKeeper` / `ScoreView` | MonoBehaviour | 被弾・グレイズを数えてスコアにする / スコアと被弾回数を画面に出す |
+| `HitFeedback` | MonoBehaviour | 被弾時のカメラ振動と画面の赤フラッシュ（見た目だけ） |
+| `BattleDebug` | MonoBehaviour | Gizmo・イベントログ・デバッグキー |
 
 ## 撃ち方と飛び方（FirePattern）
 
@@ -91,7 +93,6 @@ switch に分岐を 1 つ足す。Inspector には全パラメータが並ぶが
 ## デバッグ（BattleDebug）
 
 - Gizmo: SOUL の当たり判定（赤。無敵中はマゼンタ）、グレイズ範囲（黄）、各弾の判定半径（緑）。
-- 画面に現在の弾数を表示する（TextMeshPro）。
 - 被弾・グレイズを Console にログ出力する。
 - キー: P = 一時停止、Tab = スロー、X = 全弾消去。
 

@@ -26,7 +26,6 @@ namespace UndertaleLiDAR.Battle
         private float _accumulator;
 
         public IReadOnlyList<Bullet> Active => _active;
-        public int ActiveCount => _active.Count;
 
         private void Awake()
         {

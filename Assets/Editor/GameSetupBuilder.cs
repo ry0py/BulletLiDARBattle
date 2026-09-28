@@ -215,10 +215,22 @@ namespace UndertaleLiDAR.EditorTools
             var score = bullets.gameObject.AddComponent<ScoreKeeper>();
             Set(score, ("_bullets", bullets));
 
-            var countLabel = MakeText(common.Canvas, "BulletCount", new Vector2(0f, 0f), new Vector2(0f, 0f),
-                new Vector2(20f, 20f), new Vector2(420f, 80f), 32f);
+            // 左下にスコアと被弾回数（2 行）。
+            var scoreLabel = MakeText(common.Canvas, "ScoreLabel", new Vector2(0f, 0f), new Vector2(0f, 0f),
+                new Vector2(20f, 20f), new Vector2(420f, 140f), 32f);
+            var scoreView = scoreLabel.gameObject.AddComponent<ScoreView>();
+            Set(scoreView, ("_score", score), ("_label", scoreLabel));
+
             var debug = new GameObject("BattleDebug").AddComponent<BattleDebug>();
-            Set(debug, ("_clock", common.Clock), ("_bullets", bullets), ("_soul", common.Soul), ("_countLabel", countLabel));
+            Set(debug, ("_clock", common.Clock), ("_bullets", bullets), ("_soul", common.Soul));
+
+            // 被弾フィードバック: 画面全体を覆う透明な Image（Canvas の最後 = 最前面）とカメラ振動。
+            var flash = MakeRect("HitFlash", common.Canvas, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero);
+            var flashImage = flash.gameObject.AddComponent<Image>();
+            flashImage.color = new Color(1f, 0f, 0f, 0f);
+            flashImage.raycastTarget = false;
+            var feedback = new GameObject("HitFeedback").AddComponent<HitFeedback>();
+            Set(feedback, ("_bullets", bullets), ("_camera", common.Camera), ("_overlay", flashImage));
 
             var flow = new GameObject("BattleFlow").AddComponent<BattleFlow>();
             Set(flow, ("_director", director), ("_timelines", timelines), ("_clock", common.Clock), ("_bullets", bullets),
@@ -234,6 +246,7 @@ namespace UndertaleLiDAR.EditorTools
             public SoulController Soul;
             public DialogueBox Dialogue;
             public Transform Canvas;
+            public Transform Camera;
         }
 
         /// <summary>両シーン共通: カメラ・ライト・時間・枠・SOUL・キーボード入力・会話ボックス。</summary>
@@ -278,7 +291,11 @@ namespace UndertaleLiDAR.EditorTools
 
             var dialogue = MakeDialogueBox(canvasGo.transform);
 
-            return new Common { Clock = clock, Board = board, Soul = soul, Dialogue = dialogue, Canvas = canvasGo.transform };
+            return new Common
+            {
+                Clock = clock, Board = board, Soul = soul, Dialogue = dialogue,
+                Canvas = canvasGo.transform, Camera = camera.transform,
+            };
         }
 
         private static DialogueBox MakeDialogueBox(Transform canvas)

@@ -1,11 +1,10 @@
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 namespace UndertaleLiDAR.Battle
 {
     /// <summary>
-    /// デバッグ用: 当たり判定/グレイズ範囲の Gizmo、弾数表示、被弾/グレイズのログ、操作キー。
+    /// デバッグ用: 当たり判定/グレイズ範囲の Gizmo、被弾/グレイズのログ、操作キー。
     /// P = 一時停止、Tab = スロー、X = 全弾消去。
     /// </summary>
     public class BattleDebug : MonoBehaviour
@@ -13,10 +12,7 @@ namespace UndertaleLiDAR.Battle
         [SerializeField] private BattleClock _clock;
         [SerializeField] private BulletSystem _bullets;
         [SerializeField] private SoulController _soul;
-        [SerializeField] private TMP_Text _countLabel;
         [SerializeField] private bool _logEvents = true;
-
-        private int _shownCount = -1;
 
         private void OnEnable()
         {
@@ -33,19 +29,10 @@ namespace UndertaleLiDAR.Battle
         private void Update()
         {
             var keyboard = Keyboard.current;
-            if (keyboard != null)
-            {
-                if (keyboard.pKey.wasPressedThisFrame) _clock.SetPaused(!_clock.IsPaused);
-                if (keyboard.tabKey.wasPressedThisFrame) _clock.SetSlow(!_clock.IsSlow);
-                if (keyboard.xKey.wasPressedThisFrame) _bullets.ClearAll();
-            }
-
-            // 弾数が変わった時だけ文字列を作る（毎フレームの GC を避ける）。
-            if (_countLabel != null && _bullets.ActiveCount != _shownCount)
-            {
-                _shownCount = _bullets.ActiveCount;
-                _countLabel.text = $"Bullets: {_shownCount}";
-            }
+            if (keyboard == null) return;
+            if (keyboard.pKey.wasPressedThisFrame) _clock.SetPaused(!_clock.IsPaused);
+            if (keyboard.tabKey.wasPressedThisFrame) _clock.SetSlow(!_clock.IsSlow);
+            if (keyboard.xKey.wasPressedThisFrame) _bullets.ClearAll();
         }
 
         private void OnHit(Bullet b)
