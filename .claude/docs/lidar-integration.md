@@ -8,7 +8,7 @@ SCIP 2.0 は仕様が凍結されており、接続・背景除去・物体検�
 - 対象: **HOKUYO UST-10LX**（Ethernet, ポート 10940）。他機種は弾かれる。
 - 提供物: `SCIPClient`（内部）/ `SCIPScanPlane`（public）。`SCIPInputModules.prefab` を置くだけで動く。
 - セットアップ:
-  1. `SCIPInputModules.prefab` をシーンに配置（UnityMCP の `manage_gameobject` で配置）。
+  1. `SCIPInputModules.prefab` をシーンに配置。
   2. Play 中に `C` キーで設定 UI を開き、IP/位置/角度/スケールと背景（ClampDistances）を校正。
   3. 再度 `C` で閉じると PlayerPrefs に保存。`SCIPClient` と `SCIPScanPlane` の `playerPrefsKey` は一致させる。
 - 連携点: 当プロジェクトは `SCIPScanPlane.ObjectLocalPositions`（**センサー座標系メートル**の検出物体配列）を
