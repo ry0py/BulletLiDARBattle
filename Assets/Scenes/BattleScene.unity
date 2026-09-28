@@ -205,6 +205,7 @@ GameObject:
   m_Component:
   - component: {fileID: 39269877}
   - component: {fileID: 39269876}
+  - component: {fileID: 139269876}
   m_Layer: 0
   m_Name: Input
   m_TagString: Untagged
@@ -212,6 +213,20 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &139269876
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 39269875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8932f89c20f04b5f81334a7bd6ecfd10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Input.LidarInputSource
+  _settings: {fileID: 11400000, guid: 5a45cd1803929df4d9c2e92f15113c25, type: 2}
+  _fallback: {fileID: 39269876}
 --- !u!114 &39269876
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1158,7 +1173,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcf5f7edb8516b94895440950c71d48f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.SoulController
-  _inputSource: {fileID: 39269876}
+  _inputSource: {fileID: 139269876}
   _board: {fileID: 1155154227}
   _clock: {fileID: 1256943461}
   _halfSize: 0.15

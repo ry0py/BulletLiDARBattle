@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 124d6d088d7d6f14cb07904eeabcc034, type: 3}
   m_Name: LidarSettings
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Config.LidarSettings
+  UseLidar: 1
   HostName: 192.168.6.114
   TcpPort: 10940
   PortName: COM3
@@ -29,8 +30,8 @@ MonoBehaviour:
   BackgroundFrames: 20
   HeartRadiusM: 0.04
   FitIterations: 5
-  PhysicalMin: {x: -0.3, y: 0.3}
-  PhysicalMax: {x: 0.3, y: 0.9}
-  RotationDeg: 0
+  PhysicalMin: {x: -0.3, y: 0.2}
+  PhysicalMax: {x: 0.3, y: 0.6}
+  RotationDeg: -90
   InvertX: 0
   InvertY: 0

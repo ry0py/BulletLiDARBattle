@@ -46,10 +46,10 @@
 
 | 層 | 名前空間 | 役割 | 主要な型 |
 |----|----------|------|----------|
-| Hardware | `LidarBattle.LiDAR` | センサーから生スキャン取得 | `ILidarSensor`, `LidarScan`, `HokuyoUrgSensor`, `MockLidarSensor`, `SimulatedLidarSensor`（Physics2D レイキャスト） |
+| Hardware | `LidarBattle.LiDAR` | センサーから生スキャン取得 | `ILidarSensor`, `LidarScan`, `HokuyoEthernetSensor`, `HokuyoUrgSensor`, `MockLidarSensor`, `SimulatedLidarSensor`（Physics2D レイキャスト） |
 | Tracking | `LidarBattle.Tracking` | スキャンからハート位置を検出 | `IHeartTracker`, `NearestClusterFinder`, `ScanSegmenter`, `NearestClusterTracker`, `SegmentCentroidTracker`, `BackgroundSubtractionTracker`（デコレータ）, `CircleFitTracker`, `SmoothedTracker`（デコレータ） |
 | Mapping | `LidarBattle.Mapping` | 物理座標 → 正規化盤面座標 | `ICoordinateMapper`, `RectCoordinateMapper` |
-| Input | `LidarBattle.Input` | SOUL の入力源を抽象化 | `IHeartInputSource`, `KeyboardInputSource` |
+| Input | `LidarBattle.Input` | SOUL の入力源を抽象化 | `IHeartInputSource`, `KeyboardInputSource`, `LidarInputSource` |
 | Battle | `LidarBattle.Battle` | 弾幕ゲーム本体 | `SoulController`, `BulletBoard`, `BattleClock`, `BulletSystem`, `Bullet`, `BulletType`（弾の種類）, `FirePattern`（飛ばし方）, `ShotTrack`/`ShotClip`（Timeline 発射）, `ScoreKeeper`, `BattleDebug` |
 | Flow | `LidarBattle.Flow` | ゲームの進行（会話→難易度選択→バトル→結果） | `SelectFlow`, `DifficultyOption`, `BattleFlow`, `GameSession` |
 | UI | `LidarBattle.UI` | 会話表示・日本語フォント | `DialogueBox`, `DialogueTrack`/`DialogueClip`（Timeline セリフ）, `JapaneseFontApplier` |
@@ -90,8 +90,9 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
 
 - Unity 6 プロジェクト。URP/2D/Input System/Timeline/URG-Unity 導入済み。
 - Battle/Input 層を bullet-system.md の方針で作り直した（Timeline 発射・BulletSystem 集約・キーボード入力）。
-- LiDAR 入力は未接続。`IHeartInputSource` の実装を足して接続する予定。
+- LiDAR 入力は `LidarInputSource`（UST-20LX, Ethernet）で接続済み。繋がらないときはキーボードにフォールバック。
+  実機の点群確認は `Tools > LiDAR Battle > Build LiDAR Live Scene`。
 - LiDAR シミュレーション（`LidarSimScene`）を追加。UST-20LX 相当のレイキャスト点群＋白色ノイズで、検出手法 A〜E を真値と比較できる。シーンは `Tools > LiDAR Battle > Build LiDAR Sim Scene`（`Assets/Editor/LidarSimSceneBuilder.cs`）で生成する。
 - ゲームの流れ（game-flow.md）を最低限実装。シーン・弾アセット・難易度別 Timeline は
   `Tools > LiDAR Battle > Rebuild Game Setup`（`Assets/Editor/GameSetupBuilder.cs`）で生成する（上書き注意）。
-- 未実装: LiDAR 入力（実機接続の作業手順は [.claude/docs/lidar-integration.md](.claude/docs/lidar-integration.md)）、スコア計算式（`ScoreKeeper` は仮の式）、弾の寿命。
+- 未実装: スコア計算式（`ScoreKeeper` は仮の式）、弾の寿命。

@@ -31,13 +31,16 @@ namespace LidarBattle.Mapping
             _invertY = invertY;
         }
 
-        public Vector2 ToNormalized(Vector2 physicalM)
-        {
-            // 取付回転の補正 (原点まわりに -rotation 回転)。
-            Vector2 r = new Vector2(
+        /// <summary>取付回転だけを補正した物理座標[m]。PhysicalMin/Max はこの座標系で測る。</summary>
+        public Vector2 ToAligned(Vector2 physicalM)
+            => new Vector2(
                 physicalM.x * _cos + physicalM.y * _sin,
                 -physicalM.x * _sin + physicalM.y * _cos);
 
+        public Vector2 ToNormalized(Vector2 physicalM)
+        {
+            Vector2 r = ToAligned(physicalM);
+            // min > max (負のサイズ) なら自然に反転する。
             float nx = (r.x - _min.x) / _size.x;
             float ny = (r.y - _min.y) / _size.y;
             if (_invertX) nx = 1f - nx;

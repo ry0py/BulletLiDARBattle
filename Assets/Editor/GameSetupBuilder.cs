@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using TMPro;
 using LidarBattle.Battle;
+using LidarBattle.Config;
 using LidarBattle.Flow;
 using LidarBattle.Input;
 using LidarBattle.UI;
@@ -249,7 +250,7 @@ namespace LidarBattle.EditorTools
             public Transform Camera;
         }
 
-        /// <summary>両シーン共通: カメラ・ライト・時間・枠・SOUL・キーボード入力・会話ボックス。</summary>
+        /// <summary>両シーン共通: カメラ・ライト・時間・枠・SOUL・入力 (LiDAR / キーボード)・会話ボックス。</summary>
         private static Common BuildCommon(Vector2 boardCenter, Vector2 boardSize, Vector2 soulStart)
         {
             var camera = new GameObject("Main Camera").AddComponent<Camera>();
@@ -269,8 +270,13 @@ namespace LidarBattle.EditorTools
             Set(board, ("_size", boardSize));
             MakeFrame(board.transform, boardSize, 0.08f, 0);
 
-            var input = new GameObject("Input").AddComponent<KeyboardInputSource>();
-            Set(input, ("_board", board), ("_speed", 3f));
+            // LiDAR が使えないときはキーボードにフォールバックする。
+            var keyboard = new GameObject("Input").AddComponent<KeyboardInputSource>();
+            Set(keyboard, ("_board", board), ("_speed", 3f));
+            var input = keyboard.gameObject.AddComponent<LidarInputSource>();
+            var lidarSettings = AssetDatabase.LoadAssetAtPath<LidarSettings>("Assets/Settings/LidarSettings.asset")
+                ?? throw new InvalidOperationException("Assets/Settings/LidarSettings.asset がありません。");
+            Set(input, ("_settings", lidarSettings), ("_fallback", keyboard));
 
             var soul = new GameObject("Soul").AddComponent<SoulController>();
             soul.transform.position = soulStart;

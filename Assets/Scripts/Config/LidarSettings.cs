@@ -10,6 +10,8 @@ namespace LidarBattle.Config
     [CreateAssetMenu(fileName = "LidarSettings", menuName = "LiDAR Battle/Lidar Settings")]
     public sealed class LidarSettings : ScriptableObject
     {
+        [Tooltip("false ならゲームは LiDAR に接続せずキーボードで動かす")] public bool UseLidar = true;
+
         [Header("Ethernet 接続 (UST 系)")]
         [Tooltip("センサーの IP アドレス")] public string HostName = "192.168.0.10";
         public int TcpPort = 10940;
@@ -41,9 +43,9 @@ namespace LidarBattle.Config
         public int FitIterations = 5;
 
         [Header("キャリブレーション (Mapping: 物理[m] → 正規化0..1)")]
-        [Tooltip("ハートが動く物理範囲の最小座標 [m]")] public Vector2 PhysicalMin = new Vector2(-0.3f, 0.3f);
-        [Tooltip("ハートが動く物理範囲の最大座標 [m]")] public Vector2 PhysicalMax = new Vector2(0.3f, 0.9f);
-        [Tooltip("センサー取付の回転補正 [deg]")] public float RotationDeg = 0f;
+        [Tooltip("画面の左下に対応する物理座標 [m] (回転補正後)。実行中に [1] で記録できる")] public Vector2 PhysicalMin = new Vector2(-0.3f, 0.3f);
+        [Tooltip("画面の右上に対応する物理座標 [m] (回転補正後)。実行中に [2] で記録できる")] public Vector2 PhysicalMax = new Vector2(0.3f, 0.9f);
+        [Tooltip("センサー取付の回転補正 [deg]。センサーが盤面の下辺から上を向くなら -90")] public float RotationDeg = 0f;
         public bool InvertX = false;
         public bool InvertY = false;
     }

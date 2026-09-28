@@ -14,7 +14,10 @@
 
 手順 1（センサー実装）は実装済み（`HokuyoEthernetSensor` / `ScipScanParser`）。実機確認は
 `Tools > LiDAR Battle > Build LiDAR Live Scene` で `LidarLiveScene` を生成して再生する（`LidarLiveView`: 点群＋検出マーカー、`B` で背景学習）。
-残りは「合成点」「背景校正の操作（ゲーム側）」。Tracking / Mapping 層は変更不要。
+手順 2・3 も実装済み: `LidarInputSource`（Select/Battle 両シーンの SOUL 入力）。接続できない / `UseLidar=false` なら
+`KeyboardInputSource` にフォールバックする（Mock 切替の代わり）。接続と背景はシーンをまたいで static に保持する。
+キー: `B` 背景学習 / `1` 今のハート位置を画面左下 (`PhysicalMin`) / `2` 右上 (`PhysicalMax`) / `F1` 状態表示。
+`PhysicalMin/Max` は `RotationDeg` 補正後の座標で、min > max なら反転になる（`Invert*` は不要）。
 センサーは同時 1 接続のみ。UrgBenriPlus 等で接続中だと Unity から繋がらない。
 
 ## 実機接続の作業手順（この順に作る）
@@ -60,7 +63,7 @@
 
 1. センサーを盤面の手前側に、プレイヤーが奥側に立つ向きで固定する（手はハートより奥で持つ）。
 2. Unity を起動し、ハートを視野から外して `B` を押す（背景校正）。
-3. ハートを盤面の左下・右上に置き、`PhysicalMin` / `PhysicalMax` と `InvertX/Y` を合わせる。
+3. ハートを画面の左下に当たる位置で `1`、右上で `2` を押す（エディタなら Ctrl+S でアセットに保存）。
 4. 画面の SOUL がハートに追従することを確認して展示開始。
 
 ### 実機で調整する項目
