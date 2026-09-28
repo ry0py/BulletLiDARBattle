@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace UndertaleLiDAR.LiDAR
+namespace LidarBattle.LiDAR
 {
     /// <summary>1 点の計測値 (極座標)。センサー固有単位を排し、角度[rad]・距離[m]で保持する。</summary>
     public readonly struct LidarMeasurement

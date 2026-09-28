@@ -1,13 +1,13 @@
 using UnityEngine;
 
-namespace UndertaleLiDAR.Config
+namespace LidarBattle.Config
 {
     /// <summary>
     /// LiDAR の接続・検出・キャリブレーションを 1 アセットに集約する設定 (DRY の集約点)。
     /// コードを再ビルドせずに現場で調整できるよう、すべて外部化する。
     /// 既定値は Hokuyo URG-04LX の代表値。機種/設置に合わせて Inspector で調整する。
     /// </summary>
-    [CreateAssetMenu(fileName = "LidarSettings", menuName = "UndertaleLiDAR/Lidar Settings")]
+    [CreateAssetMenu(fileName = "LidarSettings", menuName = "LiDAR Battle/Lidar Settings")]
     public sealed class LidarSettings : ScriptableObject
     {
         [Header("Serial 接続 (Hokuyo 実機)")]

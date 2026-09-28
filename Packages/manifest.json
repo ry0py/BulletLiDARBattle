@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "com.coplaydev.unity-mcp": "https://github.com/CoplayDev/unity-mcp.git?path=/MCPForUnity#main",
     "com.mediafrontjapan.urg-unity": "https://github.com/MediaFrontJapan/URG-Unity.git?path=/Packages/com.mediafrontjapan.urg-unity",
     "com.unity.2d.animation": "13.0.2",
     "com.unity.2d.aseprite": "3.0.1",

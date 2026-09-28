@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UndertaleLiDAR.Mapping
+namespace LidarBattle.Mapping
 {
     /// <summary>
     /// 物理座標 [m] を正規化座標 (0..1) へ変換する抽象。

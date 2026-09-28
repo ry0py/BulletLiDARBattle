@@ -1,47 +1,37 @@
 using UnityEngine;
 
-namespace UndertaleLiDAR.Battle
+namespace LidarBattle.Battle
 {
-    /// <summary>
-    /// 弾幕の盤面 (Undertale の四角い枠)。SOUL も弾もこの矩形のローカル座標
-    /// (中心原点) で動く。座標の唯一の基準点であり、サイズ・正規化変換を一元管理する (DRY/SRP)。
-    /// </summary>
-    [RequireComponent(typeof(RectTransform))]
-    public sealed class BulletBoard : MonoBehaviour
+    /// <summary>弾幕の枠。transform の位置を中心とした矩形で、正規化座標 (0〜1) とワールド座標を変換する。</summary>
+    public class BulletBoard : MonoBehaviour
     {
-        private RectTransform _rect;
-        public RectTransform Rect => _rect != null ? _rect : (_rect = (RectTransform)transform);
+        [SerializeField] private Vector2 _size = new(4f, 3f);
 
-        /// <summary>盤面のサイズ (px, UI ローカル)。</summary>
-        public Vector2 Size => Rect.rect.size;
+        public Vector2 Size => _size;
+        public Vector2 Min => (Vector2)transform.position - _size * 0.5f;
 
-        /// <summary>中心原点のローカル矩形。</summary>
-        public Rect LocalRect
+        public Vector2 NormalizedToWorld(Vector2 normalized) => Min + normalized * _size;
+        public Vector2 WorldToNormalized(Vector2 world) => (world - Min) / _size;
+
+        /// <summary>中心から padding だけ内側に収める（SOUL の見た目が枠からはみ出さないように）。</summary>
+        public Vector2 Clamp(Vector2 world, float padding)
         {
-            get
-            {
-                Vector2 s = Size;
-                return new Rect(-s.x * 0.5f, -s.y * 0.5f, s.x, s.y);
-            }
+            var min = Min + Vector2.one * padding;
+            var max = Min + _size - Vector2.one * padding;
+            return new Vector2(Mathf.Clamp(world.x, min.x, max.x), Mathf.Clamp(world.y, min.y, max.y));
         }
 
-        /// <summary>正規化 (0..1) → 盤面ローカル座標。padding で縁に SOUL 半径ぶんの余白を確保。</summary>
-        public Vector2 NormalizedToLocal(Vector2 normalized, float padding)
+        public bool IsOutside(Vector2 world, float margin)
         {
-            Vector2 s = Size;
-            float halfW = Mathf.Max(0f, s.x * 0.5f - padding);
-            float halfH = Mathf.Max(0f, s.y * 0.5f - padding);
-            return new Vector2(
-                Mathf.Lerp(-halfW, halfW, normalized.x),
-                Mathf.Lerp(-halfH, halfH, normalized.y));
+            var min = Min - Vector2.one * margin;
+            var max = Min + _size + Vector2.one * margin;
+            return world.x < min.x || world.x > max.x || world.y < min.y || world.y > max.y;
         }
 
-        /// <summary>ローカル座標が盤面内 (+margin) にあるか。</summary>
-        public bool ContainsLocal(Vector2 local, float margin)
+        private void OnDrawGizmos()
         {
-            Vector2 s = Size;
-            return Mathf.Abs(local.x) <= s.x * 0.5f + margin
-                && Mathf.Abs(local.y) <= s.y * 0.5f + margin;
+            Gizmos.color = Color.white;
+            Gizmos.DrawWireCube(transform.position, _size);
         }
     }
 }

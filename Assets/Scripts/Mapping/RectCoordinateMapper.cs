@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UndertaleLiDAR.Mapping
+namespace LidarBattle.Mapping
 {
     /// <summary>
     /// 矩形キャリブレーションによる物理[m] → 正規化(0..1) 変換。
