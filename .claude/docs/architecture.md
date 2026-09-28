@@ -30,9 +30,9 @@
     ▼
 ┌──────────────────────────────────────────────────────────────┐
 │ Input 層 (UndertaleLiDAR.Input)                              │
-│   IHeartInputSource ── LidarInputSource (上3層を合成)        │
-│                   └─── KeyboardInputSource (フォールバック)  │
-│   出力: 正規化座標 (0..1) ＋ 有効フラグ                      │
+│   IHeartInputSource ── KeyboardInputSource                   │
+│                   └─── (LiDAR 入力源: 未実装・上3層を合成)   │
+│   出力: 目標位置の正規化座標 (0..1)                          │
 └──────────────────────────────────────────────────────────────┘
     │  正規化 Vector2
     ▼
@@ -40,10 +40,9 @@
 │ Battle 層 (UndertaleLiDAR.Battle)                            │
 │   SoulController ── 正規化座標を BulletBoard 内の実座標へ     │
 │   BulletBoard ──── 盤面の矩形境界（唯一の座標基準）         │
-│   BulletSpawner ── IBulletPattern で弾を生成                 │
-│   Bullet ───────── 衝突時に Health へダメージ               │
-│   Health ───────── HP 管理・イベント発火                     │
-│   BattleManager ── 上記を組み立て・状態遷移を統括（合成点） │
+│   BattleClock ──── 一時停止・スロー                          │
+│   Timeline(ShotClip) ─ いつ・何を・どう撃つか               │
+│   BulletSystem ─── 撃った後の弾の移動・判定・イベント        │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -67,21 +66,22 @@
 - キャリブレーション（物理スキャン範囲の min/max）はここ **だけ** が保持（DRY）。
 
 ### Input 層
-- 唯一の責務: 「SOUL を動かす正規化座標を毎フレーム供給する」抽象 `IHeartInputSource`。
-- `LidarInputSource` は Hardware+Tracking+Mapping を **合成するだけ**で、自前のロジックを持たない。
-- `KeyboardInputSource` は LiDAR が無い/未検出時のフォールバック（Input System 使用）。
+- 唯一の責務: 「SOUL の目標位置（正規化座標）を毎フレーム供給する」抽象 `IHeartInputSource`。
+  キーボードのような相対入力も、今の位置に移動量を足して目標位置として返す。
+- `KeyboardInputSource` は Input System で矢印キー / WASD を読む。
+- LiDAR 入力源は、Hardware+Tracking+Mapping を **合成するだけ**のクラスとして追加する予定。
 - これにより Battle 層は **入力源を一切知らずに**動く（OCP: 入力源追加は新クラスのみ）。
 
 ### Battle 層
 - Undertale 弾幕の本体。`BulletBoard` が座標の唯一の基準（SOUL も弾もこの矩形内）。
-- `IBulletPattern` で弾幕パターンを差し替え可能（OCP）。新パターン＝新クラス、既存は不変更。
-- `BattleManager` が依存を組み立てる **唯一の合成ルート**（Composition Root）。
+- 弾の発射は Timeline、発射後の管理は `BulletSystem`。詳細は [bullet-system.md](bullet-system.md)。
+- 全体をまとめる司令役クラスは置かず、参照は Inspector で直接つなぐ。
 
 ## 依存性注入の方針
 
 - MonoBehaviour 同士の参照は Inspector 注入（`[SerializeField]`）を基本とする。
-- 非 MonoBehaviour（センサー実装・トラッカー・マッパー）は `BattleManager` か
-  各 InputSource の `Awake` で生成・結線する。具象の `new` は合成点に閉じ込める。
+- 非 MonoBehaviour（センサー実装・トラッカー・マッパー）は、それを使う
+  InputSource の `Awake` で生成・結線する。具象の `new` は合成点に閉じ込める。
 - `LidarSettings`（ScriptableObject）で接続情報とキャリブレーションを外部化し、
   コード再ビルド無しで現場調整できるようにする。
 
@@ -91,6 +91,6 @@
 - 抽象（interface）は「差し替えが現実に起きる所」にだけ置いた:
   - センサー（実機⇔モック）… 必須
   - 入力源（LiDAR⇔キーボード）… 必須（デモ・デバッグ）
-  - 弾幕パターン … バトル拡張の中心
+- 弾幕の撃ち方・飛び方は interface にせず enum ＋ switch にした（KISS。種類は 1 ファイルで見渡せる）。
 - トラッカー/マッパーも interface 化したが、実装は各 1 つ。差し替え予定が無ければ
   将来 interface を畳んでも良い（過剰な抽象を増やさない方針）。

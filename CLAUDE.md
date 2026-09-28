@@ -13,6 +13,13 @@ Undertale のバトルシーン（弾幕パート）を **実機の物理ハー�
 
 つまり「マウス/キーボードの代わりに、現実のハートを動かして弾幕を避ける」体験を作る。
 
+## ゲーム仕様（工大祭展示）
+
+- 流れ: 最初にテキスト表示 → 1 分間弾幕を避け続ける → 終了時にスコアを表示。
+- 難易度: **Easy / Mid / Hard**。
+- **デスなし**。グレイズで加点し、被弾数に応じてスコア倍率が下がる。
+- スコアは会場でスプレッドシートに記録する。ゲーム側での保存・ランキング機能は作らない（YAGNI）。
+
 ## 技術スタック
 
 - Unity **6000.3.4f1**（Unity 6）
@@ -21,7 +28,6 @@ Undertale のバトルシーン（弾幕パート）を **実機の物理ハー�
 - UI: **uGUI (com.unity.ugui)** ＋ TextMeshPro
 - LiDAR 連携: **URG-Unity (MediaFrontJapan)** … `com.mediafrontjapan.urg-unity`
   （UST-10LX を SCIP で接続・物体検出。実機の主経路）
-- Editor 自動化: **MCP for Unity (CoplayDev)** … `http://127.0.0.1:8080/mcp`
 
 ## 設計原則（厳守）
 
@@ -31,7 +37,7 @@ Undertale のバトルシーン（弾幕パート）を **実機の物理ハー�
 - **SOLID** — ハードウェア層・検出層・変換層・ゲーム層をインターフェースで分離する。
   特に LiDAR 実機への依存は `ILidarSensor` の背後に隔離し、実機が無くても開発できること。
 - **DRY** — 座標変換・キャリブレーション・定数は 1 箇所に集約。重複ロジック禁止。
-- **KISS** — 標準的な弾幕/HP ロジックを過度なパターンで飾らない。素直に書く。
+- **KISS** — 標準的な弾幕/スコアロジックを過度なパターンで飾らない。素直に書く。
 - **YAGNI** — 「将来必要かも」で作らない。今の体験に必要な最小限のみ実装する。
 
 ## アーキテクチャ（4 層 + 設定）
@@ -43,55 +49,43 @@ Undertale のバトルシーン（弾幕パート）を **実機の物理ハー�
 | Hardware | `UndertaleLiDAR.LiDAR` | センサーから生スキャン取得 | `ILidarSensor`, `LidarScan`, `HokuyoUrgSensor`, `MockLidarSensor` |
 | Tracking | `UndertaleLiDAR.Tracking` | スキャンからハート位置を検出 | `IHeartTracker`, `NearestClusterTracker` |
 | Mapping | `UndertaleLiDAR.Mapping` | 物理座標 → 正規化盤面座標 | `ICoordinateMapper`, `RectCoordinateMapper` |
-| Input | `UndertaleLiDAR.Input` | SOUL の入力源を抽象化 | `IHeartInputSource`, `ScanPlaneInputSource`(urg-unity), `LidarInputSource`, `KeyboardInputSource`, `FallbackInputSource` |
-| Battle | `UndertaleLiDAR.Battle` | 弾幕ゲーム本体 | `SoulController`, `BulletBoard`, `Health`, `Bullet`, `BulletSpawner`, `IBulletPattern`, `BattleManager` |
-| Config | `UndertaleLiDAR.Config` | 接続/キャリブレーション設定 | `LidarSettings` (ScriptableObject) |
+| Input | `UndertaleLiDAR.Input` | SOUL の入力源を抽象化 | `IHeartInputSource`, `KeyboardInputSource` |
+| Battle | `UndertaleLiDAR.Battle` | 弾幕ゲーム本体 | `SoulController`, `BulletBoard`, `BattleClock`, `BulletSystem`, `Bullet`, `BulletType`（弾の種類）, `FirePattern`（飛ばし方）, `ShotTrack`/`ShotClip`（Timeline 発射）, `BattleDebug` |
+| Config | `UndertaleLiDAR.Config` | 接続/キャリブレーションの設定 | `LidarSettings` |
 
 詳細は [.claude/docs/architecture.md](.claude/docs/architecture.md)。
+弾幕システム（Battle 層の弾まわり）の設計は [.claude/docs/bullet-system.md](.claude/docs/bullet-system.md) に従う。
+ゲーム全体の流れ（開始〜難易度選択〜バトル〜結果）は [.claude/docs/game-flow.md](.claude/docs/game-flow.md)。
 
 ## ディレクトリ規約
 
 - C# スクリプト: `Assets/Scripts/<層名>/` （上表の名前空間と一致させる）
 - Prefab: `Assets/Prefabs/`
 - シーン: `Assets/Scenes/`（メインは `BattleScene`）
-- 設定アセット: `Assets/Settings/`（`LidarSettings` の `.asset` 等）
-- ScriptableObject 定義クラス: `Assets/Scripts/Config/`
+- 設定アセット: `Assets/Settings/`（`LidarSettings` や `BulletType`/`FirePattern` の `.asset` 等）
+- ScriptableObject 定義クラス: `Assets/Scripts/Config/`（弾幕用の `BulletType`/`FirePattern` は例外で
+  `Assets/Scripts/Battle/`。理由は bullet-system.md）
+- Timeline: 弾幕の発射タイミングは Timeline アセットで作る（`ShotTrack` に `ShotClip` を並べる）
 
-## Unity Editor 操作のルール（MCP）
+## Unity Editor 操作のルール
 
-シーン構築・GameObject/Prefab 作成・UI 配置・コンポーネント設定は
-**手書き YAML を避け、必ず MCP for Unity 経由**で行う。手順とツールは
-[.claude/docs/mcp-unity-workflow.md](.claude/docs/mcp-unity-workflow.md) と
-`unity-mcp-skill` を参照。
-
-接続確認: `/unity-check`（`.claude/commands/unity-check.md`）。
-
-**MCP 未接続時は作業しない（厳守）**: UnityMCP ツールがセッションに出ていない場合、
-シーン/Prefab/UI/GameObject/コンポーネント等の Editor 構築作業は**一切行わない**。
-回避目的で Editor 拡張やシーンビルダー（過去の `BattleSceneBuilder` のようなもの）を
-新規作成して代替することも**禁止**。まず下記手順で接続を回復してから作業する。
-- UnityMCP は **user スコープ**に登録済み（`~/.claude.json` の top-level `mcpServers`）。
-  これによりドライブレターの大文字小文字（`c:` / `C:`）に関係なく全セッションでロードされる。
-- 出ていない時の回復: Unity Editor が起動済み・ポート 8080 が LISTENING を確認 →
-  **新セッションを開始**（VSCode 拡張は `Ctrl+Shift+P`→「Developer: Reload Window」または
-  ＋で新規チャット。MCP ツールはセッション開始時のみロードされ、起動済みセッションには
-  後から反映されない）→ `/mcp` に `UnityMCP` が Connected で出ることを確認 → `/unity-check`。
+MCP は使わない。シーン/Prefab/アセットの編集は、直接ファイル編集（YAML を含む）で行ってよい。
+YAML を直接編集する場合は、Unity Editor で該当シーンを開いたまま上書きしないよう注意し、
+削除した GameObject/Component の `fileID` への参照が残らないようにする。
 
 ## コード作業の鉄則
 
-1. **スクリプトは `create_script`（MCP）または直接ファイル書き込みで作成**する。どちらでも
-   起動中の Unity が自動コンパイルする。
-2. 編集後は **コンパイル完了を待ち**（`mcpforunity://editor/state` の `is_compiling==false`）、
-   **`read_console` でエラー確認**してから次へ進む。
+1. スクリプトは直接ファイル書き込みで作成する。起動中の Unity が自動コンパイルする。
+2. 編集後は Unity のコンソールでコンパイルエラーが無いことを確認してから次へ進む。
 3. MonoBehaviour は「層をまたぐ依存」を直接 `new` せず、インターフェース型のフィールド＋
-   Inspector 注入（または `BattleManager` での合成）で受け取る（DIP）。
+   Inspector 注入で受け取る（DIP）。
 4. `Update()` で重い処理・GC アロケーションを避ける（スキャンは別スレッド/バッファ再利用）。
+5. 弾は MonoBehaviour にしない。弾の更新は `BulletSystem` に集約する（bullet-system.md）。
 
-## 現状（2026-06-22 時点）
+## 現状（2026-09-28 時点）
 
-- 新規 Unity 6 プロジェクト。URP/2D/Input System/MCP/URG-Unity 導入済み。
-- C# アーキテクチャ実装済み（`Assets/Scripts/`）。urg-unity 連携（`ScanPlaneInputSource`）済み。
-- シーン/UI/Prefab は UnityMCP（`manage_scene`/`manage_gameobject`/`manage_prefabs`/`manage_ui`/
-  `manage_components` 等）で構築する。MCP 未接続時は構築作業を行わない（上記ルール参照）。
-- 実機の主経路は URG-Unity（UST-10LX）。Play 中 `C` キーで IP/位置/角度を校正。
-  実機なしは BattleManager の `InputMode=Mock`（マウス操作）で確認可。
+- Unity 6 プロジェクト。URP/2D/Input System/Timeline/URG-Unity 導入済み。
+- Battle/Input 層を bullet-system.md の方針で作り直した（Timeline 発射・BulletSystem 集約・キーボード入力）。
+- LiDAR 入力は未接続。Hardware/Tracking/Mapping 層は残っており、`IHeartInputSource` の実装を足して接続する予定。
+- `BattleScene` は旧スクリプトの Missing Script が残っており、新クラスでの組み直しが必要。
+- 未実装: スコア（`ScoreKeeper`、`BulletSystem.Hit`/`Grazed` を購読）、弾の寿命。

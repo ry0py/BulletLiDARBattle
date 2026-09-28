@@ -6,11 +6,12 @@
 
 ### S — 単一責任
 - 1 クラス = 1 責務。Hardware 層クラスにゲームロジックを書かない、等（層境界＝責任境界）。
-- 「〜Manager」が肥大化したら分割の合図。`BattleManager` は **結線と状態遷移**のみ。
+- 「〜Manager」「〜System」が肥大化したら分割の合図。
 
 ### O — 開放/閉鎖
 - 拡張は **新クラス追加**で行い、既存クラスは編集しない。
-  - 新しい弾幕 → `IBulletPattern` 実装を 1 つ追加。`BulletSpawner` は触らない。
+  - 新しい弾幕 → Timeline にクリップを並べる（コード変更なし）。撃ち方・飛び方の種類追加は
+    `FirePattern` の enum と switch に 1 つずつ足す（KISS を優先した例外。bullet-system.md）。
   - 新しい入力 → `IHeartInputSource` 実装を追加。`SoulController` は触らない。
 
 ### L — リスコフ置換
@@ -22,8 +23,8 @@
   キャリブレーションやゲーム用 API を混ぜない。
 
 ### D — 依存性逆転
-- 上位層は下位層の **interface** に依存する。具象生成は合成点（`BattleManager` /
-  各 InputSource の `Awake`）に閉じ込める。MonoBehaviour 参照は `[SerializeField]` で注入。
+- 上位層は下位層の **interface** に依存する。具象生成は合成点（各 InputSource の `Awake`）に閉じ込める。
+  MonoBehaviour 参照は `[SerializeField]` で注入。
 
 ## DRY
 - 座標変換は `Mapping` 層に一本化。Battle 側で物理単位の再計算を書かない。
