@@ -176,17 +176,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2ed1e337f8de8bc40a5e8dfe05b3bc64, type: 3}
---- !u!114 &140623779 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 9031935810646733333, guid: 2ed1e337f8de8bc40a5e8dfe05b3bc64, type: 3}
-  m_PrefabInstance: {fileID: 140623778}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f3618ed80a67cb4d8c67231a6daff8f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &245998037
 GameObject:
   m_ObjectHideFlags: 0
@@ -428,7 +417,6 @@ GameObject:
   - component: {fileID: 751910021}
   - component: {fileID: 751910020}
   - component: {fileID: 751910023}
-  - component: {fileID: 751910019}
   m_Layer: 0
   m_Name: Soul
   m_TagString: Untagged
@@ -436,20 +424,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &751910019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 751910018}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22991aa72fa721042b824be4cf31eba9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.Health
-  _maxHp: 20
-  _invulnerableSeconds: 0.5
 --- !u!114 &751910020
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -519,8 +493,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcf5f7edb8516b94895440950c71d48f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.SoulController
+  _inputSource: {fileID: 0}
   _board: {fileID: 960383682}
-  _radius: 8
+  _clock: {fileID: 0}
+  _halfSize: 0.1
+  _hitRadius: 0.05
+  _grazeRadius: 0.25
+  _invincibleDuration: 1
 --- !u!1 &831371717
 GameObject:
   m_ObjectHideFlags: 0
@@ -786,6 +765,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fb98f53cf25f1c24da7aac1de28e112e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.BulletBoard
+  _size: {x: 4, y: 3}
 --- !u!114 &960383683
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1127,9 +1107,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1911443995}
   - component: {fileID: 1911443994}
-  - component: {fileID: 1911443993}
-  - component: {fileID: 1911443992}
-  - component: {fileID: 1911443991}
   m_Layer: 0
   m_Name: BattleSystems
   m_TagString: Untagged
@@ -1137,65 +1114,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1911443991
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1911443990}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 832ef1c1343e5704c8d89b54bcc5840c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.BattleDirector
-  _encounter: {fileID: 11400000, guid: 29ef4f5e2992725439e11facdd87ac83, type: 2}
-  _dialogue: {fileID: 1655627685}
-  _spawner: {fileID: 1911443993}
-  _soul: {fileID: 751910023}
-  _health: {fileID: 751910019}
-  _music: {fileID: 1911443994}
---- !u!114 &1911443992
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1911443990}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 39bbfe0d9b95f654783bcdb984abbdfe, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.BattleManager
-  _settings: {fileID: 11400000, guid: 5a45cd1803929df4d9c2e92f15113c25, type: 2}
-  _inputMode: 0
-  _scanPlane: {fileID: 140623779}
-  _keyboardFallback: 1
-  _keyboardSpeed: 0.8
-  _soul: {fileID: 751910023}
-  _health: {fileID: 751910019}
-  _spawner: {fileID: 1911443993}
---- !u!114 &1911443993
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1911443990}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25d3791e6ce322747942197fcb6c6b84, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::UndertaleLiDAR.Battle.BulletSpawner
-  _board: {fileID: 960383682}
-  _soul: {fileID: 751910023}
-  _health: {fileID: 751910019}
-  _bulletPrefab: {fileID: 3792297785224390336, guid: db08180838b95c14c9453a435d17af70, type: 3}
-  _bulletRadius: 6
-  _bulletDamage: 3
-  _spawnInterval: 0.25
-  _bulletSpeed: 200
-  _active: 1
 --- !u!114 &1911443994
 MonoBehaviour:
   m_ObjectHideFlags: 0
