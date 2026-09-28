@@ -1,5 +1,6 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace UndertaleLiDAR.UI
 {
@@ -13,7 +14,13 @@ namespace UndertaleLiDAR.UI
         private const string FontResourceName = "UndertaleJP";
         private static TMP_FontAsset _cached;
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void Init()
+        {
+            // 最初のシーンだけでなく、以降に読み込むシーンにも適用する。
+            SceneManager.sceneLoaded += (_, _) => Apply();
+        }
+
         private static void Apply()
         {
             TMP_FontAsset jp = LoadJpFont();

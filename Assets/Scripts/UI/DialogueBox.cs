@@ -64,6 +64,23 @@ namespace UndertaleLiDAR.UI
             if (_label != null) _label.text = string.Empty;
         }
 
+        public void Hide()
+        {
+            Clear();
+            gameObject.SetActive(false);
+        }
+
+        /// <summary>ボタン操作なしで、各行を打ち終えてから holdSeconds 待って次へ進む。</summary>
+        public IEnumerator PlayAuto(IReadOnlyList<string> lines, float holdSeconds)
+        {
+            foreach (string line in lines)
+            {
+                Show(line);
+                while (IsTyping) yield return null;
+                yield return new WaitForSeconds(holdSeconds);
+            }
+        }
+
         /// <summary>
         /// 確定入力 (Z/Enter/Space) で呼ぶ。タイプ中なら即全文表示、
         /// 完了済みなら次の行へ、キューが空なら Finished を発火する。

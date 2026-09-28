@@ -1,0 +1,442 @@
+using System;
+using System.IO;
+using TMPro;
+using UndertaleLiDAR.Battle;
+using UndertaleLiDAR.Flow;
+using UndertaleLiDAR.Input;
+using UndertaleLiDAR.UI;
+using UnityEditor;
+using UnityEditor.SceneManagement;
+using UnityEngine;
+using UnityEngine.Playables;
+using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
+using UnityEngine.Timeline;
+using UnityEngine.UI;
+using Object = UnityEngine.Object;
+
+namespace UndertaleLiDAR.EditorTools
+{
+    /// <summary>
+    /// 最低限動くゲーム一式（スプライト・弾アセット・難易度別 Timeline・選択/バトルシーン）を生成する。
+    /// batchmode: Unity.exe -batchmode -quit -projectPath . -executeMethod UndertaleLiDAR.EditorTools.GameSetupBuilder.Build
+    /// 既存の同名アセット・シーンは上書きする。
+    /// </summary>
+    public static class GameSetupBuilder
+    {
+        private const string ArtDir = "Assets/Art";
+        private const string BulletDir = "Assets/Settings/Bullets";
+        private const string TimelineDir = "Assets/Timelines";
+        private const string SelectScenePath = "Assets/Scenes/SelectScene.unity";
+        private const string BattleScenePath = "Assets/Scenes/BattleScene.unity";
+
+        private static Sprite _square, _circle, _heart;
+
+        [MenuItem("Tools/Undertale LiDAR/Rebuild Game Setup")]
+        public static void Build()
+        {
+            if (!Application.isBatchMode && !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+            try
+            {
+                foreach (var dir in new[] { ArtDir, BulletDir, TimelineDir }) Directory.CreateDirectory(dir);
+
+                _square = MakeSprite("Square", 4, (x, y) => true);
+                _circle = MakeSprite("Circle", 32, (x, y) => Sq(x - 15.5f) + Sq(y - 15.5f) <= Sq(15.5f));
+                _heart = MakeSprite("Heart", 32, IsHeart);
+
+                var timelines = BuildTimelines();
+                BuildSelectScene();
+                BuildBattleScene(timelines);
+
+                EditorBuildSettings.scenes = new[]
+                {
+                    new EditorBuildSettingsScene(SelectScenePath, true),
+                    new EditorBuildSettingsScene(BattleScenePath, true),
+                };
+                AssetDatabase.SaveAssets();
+                Debug.Log("[GameSetupBuilder] 完了");
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                if (Application.isBatchMode) EditorApplication.Exit(1);
+            }
+        }
+
+        // ───────── 弾・Timeline ─────────
+
+        private static TimelineAsset[] BuildTimelines()
+        {
+            var white = MakeBulletType("White", Color.white);
+            var yellow = MakeBulletType("Yellow", new Color(1f, 0.9f, 0.2f));
+
+            var ring = MakePattern("Ring12", ("_shape", ShotShape.Ring), ("_count", 12), ("_speed", 2f));
+            var aimed3 = MakePattern("Aimed3", ("_shape", ShotShape.Aimed), ("_count", 3), ("_spread", 15f), ("_speed", 3f));
+            var aimed4 = MakePattern("Aimed4", ("_shape", ShotShape.Aimed), ("_count", 4), ("_spread", 12f), ("_speed", 3f));
+            var spiral = MakePattern("Spiral", ("_shape", ShotShape.Spiral), ("_count", 4), ("_spiralStep", 13f), ("_speed", 2.2f));
+            var rain = MakePattern("Rain", ("_shape", ShotShape.Random), ("_count", 1), ("_angle", -90f), ("_spread", 50f),
+                ("_move", MoveType.Accelerate), ("_speed", 1f), ("_acceleration", 2f), ("_maxSpeed", 5f));
+            var wave = MakePattern("Wave", ("_shape", ShotShape.Aimed), ("_count", 1), ("_move", MoveType.SineWave),
+                ("_speed", 2f), ("_amplitude", 0.4f), ("_frequency", 1.5f));
+            var curve = MakePattern("Curve", ("_shape", ShotShape.Ring), ("_count", 8), ("_move", MoveType.Curve),
+                ("_speed", 2f), ("_angularVelocity", 40f));
+            var homing = MakePattern("Homing", ("_shape", ShotShape.Aimed), ("_count", 1), ("_move", MoveType.Homing),
+                ("_speed", 2.2f), ("_turnRate", 60f));
+
+            var top = new Vector2(0.5f, 1.15f);
+            var topLeft = new Vector2(0.1f, 1.15f);
+            var topRight = new Vector2(0.9f, 1.15f);
+
+            var easy = MakeTimeline("Easy", tl =>
+            {
+                var t1 = tl.CreateTrack<ShotTrack>(null, "Shots");
+                Shot(t1, 3, 17, white, ring, top, 1.5f);
+                Shot(t1, 20, 20, white, aimed3, top, 1.2f);
+                Shot(t1, 40, 20, white, rain, top, 0.35f);
+                var d = tl.CreateTrack<DialogueTrack>(null, "Dialogue");
+                Say(d, 0, 3, "いくよ！");
+                Say(d, 20, 3, "まだまだ！");
+                Say(d, 45, 3, "あと少し！");
+            });
+
+            var medium = MakeTimeline("Medium", tl =>
+            {
+                var t1 = tl.CreateTrack<ShotTrack>(null, "Shots");
+                Shot(t1, 2, 18, white, spiral, top, 0.15f);
+                Shot(t1, 20, 20, white, aimed4, top, 0.8f);
+                Shot(t1, 40, 20, white, rain, top, 0.2f);
+                var t2 = tl.CreateTrack<ShotTrack>(null, "Shots 2");
+                Shot(t2, 10, 15, white, ring, top, 2.5f);
+                Shot(t2, 25, 15, yellow, wave, topLeft, 1f);
+                Shot(t2, 42, 16, white, curve, top, 2f);
+                var d = tl.CreateTrack<DialogueTrack>(null, "Dialogue");
+                Say(d, 0, 3, "いくよ！");
+                Say(d, 20, 3, "なかなかやるね");
+                Say(d, 45, 3, "あと少し！");
+            });
+
+            var hard = MakeTimeline("Hard", tl =>
+            {
+                var t1 = tl.CreateTrack<ShotTrack>(null, "Shots");
+                Shot(t1, 2, 23, white, spiral, top, 0.1f);
+                Shot(t1, 25, 15, yellow, homing, topLeft, 1.2f);
+                Shot(t1, 40, 20, white, rain, top, 0.12f);
+                var t2 = tl.CreateTrack<ShotTrack>(null, "Shots 2");
+                Shot(t2, 5, 53, white, aimed3, top, 0.9f);
+                var t3 = tl.CreateTrack<ShotTrack>(null, "Shots 3");
+                Shot(t3, 15, 20, white, curve, top, 1.5f);
+                Shot(t3, 35, 23, yellow, homing, topRight, 1.2f);
+                var d = tl.CreateTrack<DialogueTrack>(null, "Dialogue");
+                Say(d, 0, 3, "本気でいくよ！");
+                Say(d, 25, 3, "よけられるかな？");
+                Say(d, 50, 3, "あと少し！");
+            });
+
+            return new[] { easy, medium, hard };
+        }
+
+        private static BulletType MakeBulletType(string name, Color color)
+        {
+            var type = CreateAsset<BulletType>($"{BulletDir}/{name}.asset");
+            Set(type, ("_sprite", _circle), ("_color", color), ("_scale", 0.25f), ("_radius", 0.09f));
+            return type;
+        }
+
+        private static FirePattern MakePattern(string name, params (string, object)[] props)
+        {
+            var pattern = CreateAsset<FirePattern>($"{BulletDir}/{name}.asset");
+            Set(pattern, props);
+            return pattern;
+        }
+
+        private static TimelineAsset MakeTimeline(string name, Action<TimelineAsset> fill)
+        {
+            var timeline = CreateAsset<TimelineAsset>($"{TimelineDir}/{name}.playable");
+            fill(timeline);
+            timeline.durationMode = TimelineAsset.DurationMode.FixedLength;
+            timeline.fixedDuration = 60;
+            EditorUtility.SetDirty(timeline);
+            return timeline;
+        }
+
+        private static void Shot(ShotTrack track, double start, double duration, BulletType type, FirePattern pattern,
+            Vector2 position, float interval)
+        {
+            var clip = track.CreateClip<ShotClip>();
+            clip.start = start;
+            clip.duration = duration;
+            clip.displayName = pattern.name;
+            Set(clip.asset, ("_bulletType", type), ("_pattern", pattern), ("_position", position),
+                ("_interval", interval), ("_useFixedSeed", true), ("_seed", (int)(start * 100)));
+        }
+
+        private static void Say(DialogueTrack track, double start, double duration, string text)
+        {
+            var clip = track.CreateClip<DialogueClip>();
+            clip.start = start;
+            clip.duration = duration;
+            clip.displayName = text;
+            Set(clip.asset, ("_text", text));
+        }
+
+        // ───────── シーン ─────────
+
+        private static void BuildSelectScene()
+        {
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            var common = BuildCommon(new Vector2(0f, -2f), new Vector2(12f, 3f), new Vector2(0f, -3.1f));
+
+            var optionsRoot = new GameObject("Options");
+            var names = new[] { "Easy", "Medium", "Hard" };
+            var options = new DifficultyOption[names.Length];
+            for (int i = 0; i < names.Length; i++)
+                options[i] = MakeOption(optionsRoot.transform, (Difficulty)i, names[i], new Vector2(-4f + 4f * i, -2f), common.Soul);
+
+            var flow = new GameObject("SelectFlow").AddComponent<SelectFlow>();
+            Set(flow, ("_dialogue", common.Dialogue), ("_optionsRoot", optionsRoot), ("_options", options),
+                ("_battleSceneName", "BattleScene"));
+
+            EditorSceneManager.SaveScene(scene, SelectScenePath);
+        }
+
+        private static void BuildBattleScene(TimelineAsset[] timelines)
+        {
+            var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            var boardCenter = new Vector2(0f, -1.8f);
+            var common = BuildCommon(boardCenter, new Vector2(5f, 3.2f), boardCenter);
+
+            var director = new GameObject("Director").AddComponent<PlayableDirector>();
+            director.playOnAwake = false;
+            Set(common.Clock, ("_director", director));
+
+            var bullets = new GameObject("BulletSystem").AddComponent<BulletSystem>();
+            Set(bullets, ("_clock", common.Clock), ("_board", common.Board), ("_soul", common.Soul));
+
+            var score = bullets.gameObject.AddComponent<ScoreKeeper>();
+            Set(score, ("_bullets", bullets));
+
+            var countLabel = MakeText(common.Canvas, "BulletCount", new Vector2(0f, 0f), new Vector2(0f, 0f),
+                new Vector2(20f, 20f), new Vector2(420f, 80f), 32f);
+            var debug = new GameObject("BattleDebug").AddComponent<BattleDebug>();
+            Set(debug, ("_clock", common.Clock), ("_bullets", bullets), ("_soul", common.Soul), ("_countLabel", countLabel));
+
+            var flow = new GameObject("BattleFlow").AddComponent<BattleFlow>();
+            Set(flow, ("_director", director), ("_timelines", timelines), ("_clock", common.Clock), ("_bullets", bullets),
+                ("_score", score), ("_dialogue", common.Dialogue), ("_selectSceneName", "SelectScene"));
+
+            EditorSceneManager.SaveScene(scene, BattleScenePath);
+        }
+
+        private struct Common
+        {
+            public BattleClock Clock;
+            public BulletBoard Board;
+            public SoulController Soul;
+            public DialogueBox Dialogue;
+            public Transform Canvas;
+        }
+
+        /// <summary>両シーン共通: カメラ・ライト・時間・枠・SOUL・キーボード入力・会話ボックス。</summary>
+        private static Common BuildCommon(Vector2 boardCenter, Vector2 boardSize, Vector2 soulStart)
+        {
+            var camera = new GameObject("Main Camera").AddComponent<Camera>();
+            camera.tag = "MainCamera";
+            camera.orthographic = true;
+            camera.orthographicSize = 5f;
+            camera.clearFlags = CameraClearFlags.SolidColor;
+            camera.backgroundColor = Color.black;
+            camera.transform.position = new Vector3(0f, 0f, -10f);
+
+            new GameObject("Global Light 2D").AddComponent<Light2D>().lightType = Light2D.LightType.Global;
+
+            var clock = new GameObject("BattleClock").AddComponent<BattleClock>();
+
+            var board = new GameObject("BulletBoard").AddComponent<BulletBoard>();
+            board.transform.position = boardCenter;
+            Set(board, ("_size", boardSize));
+            MakeFrame(board.transform, boardSize, 0.08f, 0);
+
+            var input = new GameObject("Input").AddComponent<KeyboardInputSource>();
+            Set(input, ("_board", board), ("_speed", 3f));
+
+            var soul = new GameObject("Soul").AddComponent<SoulController>();
+            soul.transform.position = soulStart;
+            soul.transform.localScale = Vector3.one * 0.3f;
+            var soulRenderer = soul.gameObject.AddComponent<SpriteRenderer>();
+            soulRenderer.sprite = _heart;
+            soulRenderer.color = Color.red;
+            soulRenderer.sortingOrder = 20;
+            Set(soul, ("_inputSource", input), ("_board", board), ("_clock", clock),
+                ("_halfSize", 0.15f), ("_hitRadius", 0.06f), ("_grazeRadius", 0.3f));
+
+            var canvasGo = new GameObject("Canvas", typeof(RectTransform));
+            canvasGo.AddComponent<Canvas>().renderMode = RenderMode.ScreenSpaceOverlay;
+            var scaler = canvasGo.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1920f, 1080f);
+            scaler.matchWidthOrHeight = 0.5f;
+
+            var dialogue = MakeDialogueBox(canvasGo.transform);
+
+            return new Common { Clock = clock, Board = board, Soul = soul, Dialogue = dialogue, Canvas = canvasGo.transform };
+        }
+
+        private static DialogueBox MakeDialogueBox(Transform canvas)
+        {
+            // 白い枠の内側に黒い面を重ねて Undertale 風の会話ボックスにする。
+            var box = MakeRect("DialogueBox", canvas, new Vector2(0.2f, 1f), new Vector2(0.8f, 1f),
+                new Vector2(0f, -280f), new Vector2(0f, -40f));
+            box.gameObject.AddComponent<Image>().color = Color.white;
+            var inner = MakeRect("Inner", box, Vector2.zero, Vector2.one, new Vector2(6f, 6f), new Vector2(-6f, -6f));
+            inner.gameObject.AddComponent<Image>().color = Color.black;
+            var label = MakeText(inner, "Label", Vector2.zero, Vector2.one, new Vector2(30f, 20f), new Vector2(-30f, -20f), 44f);
+
+            var dialogue = box.gameObject.AddComponent<DialogueBox>();
+            Set(dialogue, ("_label", label));
+            return dialogue;
+        }
+
+        private static DifficultyOption MakeOption(Transform parent, Difficulty difficulty, string label, Vector2 position,
+            SoulController soul)
+        {
+            var size = new Vector2(2f, 1.2f);
+            var go = new GameObject(label);
+            go.transform.SetParent(parent, false);
+            go.transform.position = position;
+            MakeFrame(go.transform, size, 0.05f, 2);
+
+            var text = new GameObject("Label").AddComponent<TextMeshPro>();
+            text.transform.SetParent(go.transform, false);
+            text.rectTransform.sizeDelta = size;
+            text.text = label;
+            text.fontSize = 4f;
+            text.alignment = TextAlignmentOptions.Center;
+            text.sortingOrder = 5;
+
+            // 左端を原点にしたゲージ。pivot の x スケールを 0→1 にすると左から伸びる。
+            var pivot = new GameObject("GaugePivot").transform;
+            pivot.SetParent(go.transform, false);
+            pivot.localPosition = new Vector3(-size.x * 0.5f, -size.y * 0.5f + 0.1f, 0f);
+            pivot.localScale = new Vector3(0f, 1f, 1f);
+            var bar = MakeSpriteObject("Gauge", pivot, _square, Color.yellow, 6);
+            bar.localPosition = new Vector3(size.x * 0.5f, 0f, 0f);
+            bar.localScale = new Vector3(size.x, 0.12f, 1f);
+
+            var option = go.AddComponent<DifficultyOption>();
+            Set(option, ("_difficulty", difficulty), ("_soul", soul), ("_size", size), ("_gauge", pivot));
+            return option;
+        }
+
+        // ───────── 部品 ─────────
+
+        private static void MakeFrame(Transform parent, Vector2 size, float border, int order)
+        {
+            var outer = MakeSpriteObject("Frame", parent, _square, Color.white, order);
+            outer.localScale = new Vector3(size.x + border * 2f, size.y + border * 2f, 1f);
+            var inner = MakeSpriteObject("FrameInner", parent, _square, Color.black, order + 1);
+            inner.localScale = new Vector3(size.x, size.y, 1f);
+        }
+
+        private static Transform MakeSpriteObject(string name, Transform parent, Sprite sprite, Color color, int order)
+        {
+            var go = new GameObject(name);
+            go.transform.SetParent(parent, false);
+            var renderer = go.AddComponent<SpriteRenderer>();
+            renderer.sprite = sprite;
+            renderer.color = color;
+            renderer.sortingOrder = order;
+            return go.transform;
+        }
+
+        private static RectTransform MakeRect(string name, Transform parent, Vector2 anchorMin, Vector2 anchorMax,
+            Vector2 offsetMin, Vector2 offsetMax)
+        {
+            var rect = new GameObject(name, typeof(RectTransform)).GetComponent<RectTransform>();
+            rect.SetParent(parent, false);
+            rect.anchorMin = anchorMin;
+            rect.anchorMax = anchorMax;
+            rect.offsetMin = offsetMin;
+            rect.offsetMax = offsetMax;
+            return rect;
+        }
+
+        private static TextMeshProUGUI MakeText(Transform parent, string name, Vector2 anchorMin, Vector2 anchorMax,
+            Vector2 offsetMin, Vector2 offsetMax, float fontSize)
+        {
+            var rect = MakeRect(name, parent, anchorMin, anchorMax, offsetMin, offsetMax);
+            var text = rect.gameObject.AddComponent<TextMeshProUGUI>();
+            text.fontSize = fontSize;
+            text.color = Color.white;
+            text.alignment = TextAlignmentOptions.TopLeft;
+            return text;
+        }
+
+        private static Sprite MakeSprite(string name, int size, Func<int, int, bool> fill)
+        {
+            var texture = new Texture2D(size, size, TextureFormat.RGBA32, false);
+            for (int y = 0; y < size; y++)
+            for (int x = 0; x < size; x++)
+                texture.SetPixel(x, y, fill(x, y) ? Color.white : Color.clear);
+
+            string path = $"{ArtDir}/{name}.png";
+            File.WriteAllBytes(path, texture.EncodeToPNG());
+            Object.DestroyImmediate(texture);
+            AssetDatabase.ImportAsset(path);
+
+            var importer = (TextureImporter)AssetImporter.GetAtPath(path);
+            importer.textureType = TextureImporterType.Sprite;
+            importer.spriteImportMode = SpriteImportMode.Single;
+            importer.spritePixelsPerUnit = size;
+            importer.filterMode = FilterMode.Point;
+            importer.textureCompression = TextureImporterCompression.Uncompressed;
+            importer.alphaIsTransparency = true;
+            importer.SaveAndReimport();
+            return AssetDatabase.LoadAssetAtPath<Sprite>(path);
+        }
+
+        /// <summary>ハート曲線 (x²+y²−1)³ − x²y³ ≤ 0 で塗る。</summary>
+        private static bool IsHeart(int px, int py)
+        {
+            float x = (px - 15.5f) / 12f;
+            float y = (py - 13.5f) / 12f;
+            return Mathf.Pow(x * x + y * y - 1f, 3f) - x * x * y * y * y <= 0f;
+        }
+
+        private static float Sq(float v) => v * v;
+
+        private static T CreateAsset<T>(string path) where T : ScriptableObject
+        {
+            AssetDatabase.DeleteAsset(path);
+            var asset = ScriptableObject.CreateInstance<T>();
+            AssetDatabase.CreateAsset(asset, path);
+            return asset;
+        }
+
+        /// <summary>private な [SerializeField] を名前で設定する。</summary>
+        private static void Set(Object target, params (string name, object value)[] props)
+        {
+            var so = new SerializedObject(target);
+            foreach (var (name, value) in props)
+            {
+                var p = so.FindProperty(name) ?? throw new ArgumentException($"{target.GetType().Name}.{name} がありません");
+                switch (value)
+                {
+                    case Enum e: p.enumValueIndex = Convert.ToInt32(e); break;
+                    case int i: p.intValue = i; break;
+                    case float f: p.floatValue = f; break;
+                    case bool b: p.boolValue = b; break;
+                    case string s: p.stringValue = s; break;
+                    case Vector2 v: p.vector2Value = v; break;
+                    case Color c: p.colorValue = c; break;
+                    case Object o: p.objectReferenceValue = o; break;
+                    case Object[] array:
+                        p.arraySize = array.Length;
+                        for (int i = 0; i < array.Length; i++) p.GetArrayElementAtIndex(i).objectReferenceValue = array[i];
+                        break;
+                    default: throw new ArgumentException($"{name}: 未対応の型 {value?.GetType().Name}");
+                }
+            }
+            so.ApplyModifiedPropertiesWithoutUndo();
+        }
+    }
+}
