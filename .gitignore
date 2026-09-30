@@ -104,3 +104,6 @@ InitTestScene*.unity*
 
 # Auto-generated cache in Assets folder
 /[Aa]ssets/[Ss]ceneDependencyCache*
+# Unity CLI Loop (uLoop)
+/.uloop/outputs/
+/.uloop/tools.json
