@@ -49,7 +49,7 @@
 | Hardware | `LidarBattle.LiDAR` | センサーから生スキャン取得 | `ILidarSensor`, `LidarScan`, `HokuyoEthernetSensor`, `HokuyoUrgSensor`, `MockLidarSensor`, `SimulatedLidarSensor`（Physics2D レイキャスト） |
 | Tracking | `LidarBattle.Tracking` | スキャンからハート位置を検出 | `IHeartTracker`, `NearestClusterFinder`, `ScanSegmenter`, `NearestClusterTracker`, `SegmentCentroidTracker`, `BackgroundSubtractionTracker`（デコレータ）, `CircleFitTracker`, `SmoothedTracker`（デコレータ） |
 | Mapping | `LidarBattle.Mapping` | 物理座標 → 正規化盤面座標 | `ICoordinateMapper`, `RectCoordinateMapper` |
-| Input | `LidarBattle.Input` | SOUL の入力源を抽象化 | `IHeartInputSource`, `KeyboardInputSource`, `LidarInputSource` |
+| Input | `LidarBattle.Input` | SOUL の入力源を抽象化 | `IHeartInputSource`, `KeyboardInputSource`, `LidarInputSource`, `CameraInputSource` |
 | Battle | `LidarBattle.Battle` | 弾幕ゲーム本体 | `SoulController`, `BulletBoard`, `BattleClock`, `BulletSystem`, `Bullet`, `BulletType`（弾の種類）, `FirePattern`（飛ばし方）, `ShotTrack`/`ShotClip`（Timeline 発射）, `ScoreKeeper`, `BattleDebug` |
 | Flow | `LidarBattle.Flow` | ゲームの進行（会話→難易度選択→バトル→結果） | `SelectFlow`, `DifficultyOption`, `BattleFlow`, `GameSession` |
 | UI | `LidarBattle.UI` | 会話表示・日本語フォント | `DialogueBox`, `DialogueTrack`/`DialogueClip`（Timeline セリフ）, `JapaneseFontApplier` |
@@ -70,6 +70,7 @@ LiDAR シミュレーション（実機なしで検出手法を真値と比較�
 - ScriptableObject 定義クラス: `Assets/Scripts/Config/`（弾幕用の `BulletType`/`FirePattern` は例外で
   `Assets/Scripts/Battle/`。理由は bullet-system.md）
 - Timeline: 弾幕の発射タイミングは Timeline アセットで作る（`ShotTrack` に `ShotClip` を並べる）
+- カメラ検出スクリプト: `Tools/CameraTracker/`（Unity の外で動かす Python。`Assets/` には置かない）
 
 ## Unity Editor 操作のルール
 
@@ -86,12 +87,16 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
 4. `Update()` で重い処理・GC アロケーションを避ける（スキャンは別スレッド/バッファ再利用）。
 5. 弾は MonoBehaviour にしない。弾の更新は `BulletSystem` に集約する（bullet-system.md）。
 
-## 現状（2026-09-28 時点）
+## 現状（2026-09-30 時点）
 
 - Unity 6 プロジェクト。URP/2D/Input System/Timeline/URG-Unity 導入済み。
 - Battle/Input 層を bullet-system.md の方針で作り直した（Timeline 発射・BulletSystem 集約・キーボード入力）。
 - LiDAR 入力は `LidarInputSource`（UST-20LX, Ethernet）で接続済み。繋がらないときはキーボードにフォールバック。
   実機の点群確認は `Tools > LiDAR Battle > Build LiDAR Live Scene`。
+- カメラ入力を試作中（LiDAR が実機で難しかったため）。ハートに ArUco マーカー（DICT_4X4_50）を貼り、
+  `python Tools/CameraTracker/aruco_tracker.py` が検出して UDP で `CameraInputSource` に送る。
+  トラッカーが動いていなければ LiDAR → キーボードの順にフォールバックする。
+  画像全体を盤面に対応させているだけで、四隅マーカーによる盤面合わせは未実装。
 - LiDAR シミュレーション（`LidarSimScene`）を追加。UST-20LX 相当のレイキャスト点群＋白色ノイズで、検出手法 A〜E を真値と比較できる。シーンは `Tools > LiDAR Battle > Build LiDAR Sim Scene`（`Assets/Editor/LidarSimSceneBuilder.cs`）で生成する。
 - ゲームの流れ（game-flow.md）を最低限実装。シーン・弾アセット・難易度別 Timeline は
   `Tools > LiDAR Battle > Rebuild Game Setup`（`Assets/Editor/GameSetupBuilder.cs`）で生成する（上書き注意）。

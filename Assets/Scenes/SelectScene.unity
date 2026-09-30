@@ -455,6 +455,7 @@ GameObject:
   - component: {fileID: 140774188}
   - component: {fileID: 140774187}
   - component: {fileID: 240774187}
+  - component: {fileID: 240774188}
   m_Layer: 0
   m_Name: Input
   m_TagString: Untagged
@@ -462,20 +463,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &240774187
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 140774186}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8932f89c20f04b5f81334a7bd6ecfd10, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Input.LidarInputSource
-  _settings: {fileID: 11400000, guid: 5a45cd1803929df4d9c2e92f15113c25, type: 2}
-  _fallback: {fileID: 140774187}
 --- !u!114 &140774187
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -628,6 +615,37 @@ Transform:
   - {fileID: 1983254437}
   m_Father: {fileID: 2016888848}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &240774187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 140774186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8932f89c20f04b5f81334a7bd6ecfd10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Input.LidarInputSource
+  _settings: {fileID: 11400000, guid: 5a45cd1803929df4d9c2e92f15113c25, type: 2}
+  _fallback: {fileID: 140774187}
+--- !u!114 &240774188
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 140774186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7caa3c388a2876f47b40775b4190cb72, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Input.CameraInputSource
+  _port: 5005
+  _imageBottomLeft: {x: 0, y: 1}
+  _imageTopRight: {x: 1, y: 0}
+  _timeoutSec: 1
+  _fallback: {fileID: 240774187}
 --- !u!1 &268799509
 GameObject:
   m_ObjectHideFlags: 0
@@ -1802,10 +1820,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.DialogueBox
   _label: {fileID: 268799510}
-  _music: {fileID: 0}
-  _blip: {fileID: 0}
   _charsPerSecond: 30
-  _blipEvery: 2
   _linePrefix: '* '
 --- !u!224 &1718862243
 RectTransform:
@@ -2076,7 +2091,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dcf5f7edb8516b94895440950c71d48f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.SoulController
-  _inputSource: {fileID: 240774187}
+  _inputSource: {fileID: 240774188}
   _board: {fileID: 1544997614}
   _clock: {fileID: 856310721}
   _halfSize: 0.15

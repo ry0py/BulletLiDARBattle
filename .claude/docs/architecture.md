@@ -31,7 +31,8 @@
 ┌──────────────────────────────────────────────────────────────┐
 │ Input 層 (LidarBattle.Input)                              │
 │   IHeartInputSource ── KeyboardInputSource                   │
-│                   └─── (LiDAR 入力源: 未実装・上3層を合成)   │
+│                   ├─── LidarInputSource (上3層を合成)        │
+│                   └─── CameraInputSource (UDP 受信)          │
 │   出力: 目標位置の正規化座標 (0..1)                          │
 └──────────────────────────────────────────────────────────────┘
     │  正規化 Vector2
@@ -70,7 +71,11 @@
 - 唯一の責務: 「SOUL の目標位置（正規化座標）を毎フレーム供給する」抽象 `IHeartInputSource`。
   キーボードのような相対入力も、今の位置に移動量を足して目標位置として返す。
 - `KeyboardInputSource` は Input System で矢印キー / WASD を読む。
-- LiDAR 入力源は、Hardware+Tracking+Mapping を **合成するだけ**のクラスとして追加する予定。
+- `LidarInputSource` は Hardware+Tracking+Mapping を **合成するだけ**のクラス。
+- `CameraInputSource` は、Unity の外で動く `Tools/CameraTracker/aruco_tracker.py` が検出した
+  ArUco マーカーの画像内位置 (0..1) を UDP で受け取り、`RectCoordinateMapper` で盤面座標にする。
+  検出を Python (OpenCV) に任せるのは、Unity に ArUco 検出の手段が無いため。
+  トラッカーが止まっていれば次の入力源 (LiDAR → キーボード) に任せる。
 - これにより Battle 層は **入力源を一切知らずに**動く（OCP: 入力源追加は新クラスのみ）。
 
 ### Battle 層
