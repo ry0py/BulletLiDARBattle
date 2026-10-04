@@ -88,13 +88,11 @@ switch に分岐を 1 つ足す。Inspector には全パラメータが並ぶが
 
 - 弾の GameObject は `BulletSystem` が実行時に作る（SpriteRenderer のみ）。Prefab は使わない。
   見た目は `BulletType` のスプライト・色・サイズで決まる。
-- スプライトは `Assets/Art/Bullets/` の白い素材（Kenney Particle Pack, CC0。同フォルダの LICENSE 参照）を
-  `BulletType.Color` で着色して使う。素材は白一色なので、弾の色は `BulletType` だけで決まる。
+- 元の版は単色の円スプライト。スキャナー版（`ScannerSetupBuilder`）だけ、`Assets/Art/Bullets/` の白い素材
+  （Kenney Particle Pack, CC0。同フォルダの LICENSE 参照）を `BulletType.Color` で着色し、URP の Bloom で発光させる。
   当たり判定の半径は見た目より小さいままにする（光の縁は判定に入れない）。
-- 発光は URP の Bloom で付ける。`Assets/Settings/BattleVolume.asset`（Bloom + Vignette）を各シーンの Global Volume が共有し、
-  カメラの Post Processing を有効にする。閾値を高めにして、弾・SOUL の輪・スキャナーなど明るい部分だけがにじむようにする。
-- SOUL の輪の脈動・無敵中の点滅・グレイズ時のフラッシュは `SoulView`、敵の瞳と扇ビームは `ScannerEye`/`ScanSweep`。
-  いずれも見た目だけで、ゲームの状態は持たない（`HitFeedback` と同じ扱い）。
+- スキャナー版の SOUL の輪の脈動・無敵中の点滅・グレイズ時のフラッシュは `SoulView`、敵の瞳と扇ビームは
+  `ScannerEye`/`ScanSweep`。いずれも見た目だけで、ゲームの状態は持たない（`HitFeedback` と同じ扱い）。
 - パーティクルや専用シェーダーは使わない（必要になったら検討）。
 
 ## デバッグ（BattleDebug）

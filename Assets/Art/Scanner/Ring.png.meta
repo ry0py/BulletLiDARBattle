@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 1b9156e0541159444aeb845e3a4064ec
+guid: 1fffe2a9e32a6a149a9c76d884bce880
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5037075557597927949
-    second: PanelLine_0
+      213: 4004708080983207187
+    second: Ring_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -52,7 +52,7 @@ TextureImporter:
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 64
-  spriteBorder: {x: 16, y: 16, z: 16, w: 16}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
   alphaIsTransparency: 1
@@ -126,7 +126,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: PanelLine_0
+      name: Ring_0
       rect:
         serializedVersion: 2
         x: 0
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 3f5a29ac776b81ab0800000000000000
-      internalID: -5037075557597927949
+      spriteID: 31de32428c4939730800000000000000
+      internalID: 4004708080983207187
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      PanelLine_0: -5037075557597927949
+      Ring_0: 4004708080983207187
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

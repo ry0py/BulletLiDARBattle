@@ -60,6 +60,9 @@
 | 選択シーン | 1〜3（開始、オープニング会話、難易度選択） |
 | バトルシーン | 4〜6（バトル、エンディング会話、終了） |
 
+- 見た目違いで 2 組ある: 元の版 `SelectScene`/`BattleScene` と、スキャナー版 `ScannerSelectScene`/`ScannerBattleScene`。
+  流れ・弾幕は同じで、各組の中だけで遷移する。
+
 - 選んだ難易度は、シーンをまたいで引き継ぐ。
 - SOUL・入力・会話表示は両方のシーンで使う。
 
@@ -84,7 +87,7 @@
 | 1. 開始 | — | 選択シーンを開いたら即開始（開始操作は未実装） |
 | 2. オープニング会話 | `SelectFlow` + `DialogueBox.PlayAuto` | 1 行ずつ自動で送る |
 | 3. 難易度選択 | `DifficultyOption` ×3 | SOUL を 2 秒置くと決定。ゲージ表示あり。`GameSession` に保存 |
-| 4〜5. バトル | `BattleFlow` | 難易度の Timeline（`Assets/Timelines/Easy/Medium/Hard`）を再生。セリフは `DialogueTrack`。右上の HUD にスコア・被弾・グレイズと残り時間バー |
+| 4〜5. バトル | `BattleFlow` | 難易度の Timeline（`Assets/Timelines/Easy/Medium/Hard`）を再生。セリフは `DialogueTrack`。スキャナー版は右上の HUD にスコア・被弾・グレイズと残り時間バー |
 | 6. エンディング | `BattleFlow` | 60 秒で弾を消し、会話でスコアを出して選択シーンへ戻る |
 
 - 入力は今はキーボードのみ。スコアは `ScoreKeeper` の仮の式（1000 − 被弾×100 ＋ グレイズ×10）。

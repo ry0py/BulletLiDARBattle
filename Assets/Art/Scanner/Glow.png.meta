@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: fdb7c322a53b15445bb9a65185f27bfd
+guid: 83d1771ac88870e4a834ede7cbbee43a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 2331543995467143833
-    second: Wedge_0
+      213: -676628513636133388
+    second: Glow_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -49,9 +49,9 @@ TextureImporter:
   spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 0
-  alignment: 9
-  spritePivot: {x: 0.5, y: 1}
-  spritePixelsToUnits: 128
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 64
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -126,13 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Wedge_0
+      name: Glow_0
       rect:
         serializedVersion: 2
-        x: 124
+        x: 0
         y: 0
-        width: 132
-        height: 256
+        width: 64
+        height: 64
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 99a930c29ee4b5020800000000000000
-      internalID: 2331543995467143833
+      spriteID: 4f551d7a3f12c96f0800000000000000
+      internalID: -676628513636133388
       vertices: []
       indices: 
       edges: []
@@ -161,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Wedge_0: 2331543995467143833
+      Glow_0: -676628513636133388
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

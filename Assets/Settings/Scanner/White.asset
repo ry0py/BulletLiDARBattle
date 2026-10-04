@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b6a886d756da9c429bcee56a08e1fdc, type: 3}
   m_Name: White
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.BulletType
-  _sprite: {fileID: 21300000, guid: 12a18f4018be9ac48999c3ca1ff3a1a6, type: 3}
-  _color: {r: 1, g: 1, b: 1, a: 1}
-  _scale: 0.25
+  _sprite: {fileID: 21300000, guid: 803865efccc444142af55cf9f817a22a, type: 3}
+  _color: {r: 0.8666667, g: 0.96862745, b: 1, a: 1}
+  _scale: 0.45
   _radius: 0.09

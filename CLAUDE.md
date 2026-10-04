@@ -101,8 +101,10 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
 - LiDAR シミュレーション（`LidarSimScene`）を追加。UST-20LX 相当のレイキャスト点群＋白色ノイズで、検出手法 A〜E を真値と比較できる。シーンは `Tools > LiDAR Battle > Build LiDAR Sim Scene`（`Assets/Editor/LidarSimSceneBuilder.cs`）で生成する。
 - ゲームの流れ（game-flow.md）を最低限実装。シーン・弾アセット・難易度別 Timeline は
   `Tools > LiDAR Battle > Rebuild Game Setup`（`Assets/Editor/GameSetupBuilder.cs`）で生成する（上書き注意）。
-- 弾の見た目: `Assets/Art/Bullets/` の素材（Kenney, CC0）を `BulletType.Color` で着色し、URP の Bloom（`Assets/Settings/BattleVolume.asset`）で発光させる。
-- 見た目は 2026-10-02 に「スキャナー」テーマへ変更（黒背景・白枠・赤ハートをやめた）。紺色の背景にシアンの方眼、
-  盤面の上の敵「スキャナー」が扇ビームで盤面を掃く。SOUL は琥珀色のハートで、輪がグレイズ範囲。Bloom/Vignette は
-  `Assets/Settings/BattleVolume.asset`。配色・スプライト生成はすべて `GameSetupBuilder` にある（画像素材は Kenney の弾のみ）。
+- 見た目は 2 種類あり、シーンもアセットも分けている。弾幕の中身（Timeline の配置・FirePattern）は共通。
+  - 元の版（黒背景・白枠・赤ハート）: `SelectScene`/`BattleScene`。`Tools > LiDAR Battle > Rebuild Game Setup`（`GameSetupBuilder`）。
+  - 独自の「スキャナー」版: `ScannerSelectScene`/`ScannerBattleScene`。`Tools > LiDAR Battle > Rebuild Scanner Setup`
+    （`Assets/Editor/ScannerSetupBuilder.cs`）。紺色の背景にシアンの方眼、盤面の上の敵「スキャナー」が扇ビームで盤面を掃く。
+    SOUL は琥珀色のハートで、輪がグレイズ範囲。アセットは `Assets/Art/Scanner/`・`Assets/Settings/Scanner/`・`Assets/Timelines/Scanner/`。
+    弾は `Assets/Art/Bullets/` の素材（Kenney, CC0）を着色し、Bloom/Vignette（`Assets/Settings/Scanner/ScannerVolume.asset`）で発光させる。
 - 未実装: スコア計算式（`ScoreKeeper` は仮の式）、弾の寿命。
