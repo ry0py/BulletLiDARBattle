@@ -50,7 +50,7 @@
 | Tracking | `LidarBattle.Tracking` | スキャンからハート位置を検出 | `IHeartTracker`, `NearestClusterFinder`, `ScanSegmenter`, `NearestClusterTracker`, `SegmentCentroidTracker`, `BackgroundSubtractionTracker`（デコレータ）, `CircleFitTracker`, `SmoothedTracker`（デコレータ） |
 | Mapping | `LidarBattle.Mapping` | 物理座標 → 正規化盤面座標 | `ICoordinateMapper`, `RectCoordinateMapper` |
 | Input | `LidarBattle.Input` | SOUL の入力源を抽象化 | `IHeartInputSource`, `KeyboardInputSource`, `LidarInputSource`, `CameraInputSource` |
-| Battle | `LidarBattle.Battle` | 弾幕ゲーム本体 | `SoulController`, `BulletBoard`, `BattleClock`, `BulletSystem`, `Bullet`, `BulletType`（弾の種類）, `FirePattern`（飛ばし方）, `ShotTrack`/`ShotClip`（Timeline 発射）, `ScoreKeeper`, `BattleDebug` |
+| Battle | `LidarBattle.Battle` | 弾幕ゲーム本体 | `SoulController`, `BulletBoard`, `BattleClock`, `BulletSystem`, `Bullet`, `BulletType`（弾の種類）, `FirePattern`（飛ばし方）, `ShotTrack`/`ShotClip`（Timeline 発射）, `ScoreKeeper`, `BattleDebug`, 見た目だけの `HitFeedback`/`SoulView`/`ScannerEye`/`ScanSweep` |
 | Flow | `LidarBattle.Flow` | ゲームの進行（会話→難易度選択→バトル→結果） | `SelectFlow`, `DifficultyOption`, `BattleFlow`, `GameSession` |
 | UI | `LidarBattle.UI` | 会話表示・日本語フォント | `DialogueBox`, `DialogueTrack`/`DialogueClip`（Timeline セリフ）, `JapaneseFontApplier` |
 | Config | `LidarBattle.Config` | 接続/キャリブレーションの設定 | `LidarSettings` |
@@ -70,6 +70,7 @@ LiDAR シミュレーション（実機なしで検出手法を真値と比較�
 - ScriptableObject 定義クラス: `Assets/Scripts/Config/`（弾幕用の `BulletType`/`FirePattern` は例外で
   `Assets/Scripts/Battle/`。理由は bullet-system.md）
 - Timeline: 弾幕の発射タイミングは Timeline アセットで作る（`ShotTrack` に `ShotClip` を並べる）
+- 画像素材: `Assets/Art/`（弾は `Assets/Art/Bullets/`。外部のフリー素材はライセンス表記のファイルを同じフォルダに置く）
 - カメラ検出スクリプト: `Tools/CameraTracker/`（Unity の外で動かす Python。`Assets/` には置かない）
 
 ## Unity Editor 操作のルール
@@ -100,4 +101,8 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
 - LiDAR シミュレーション（`LidarSimScene`）を追加。UST-20LX 相当のレイキャスト点群＋白色ノイズで、検出手法 A〜E を真値と比較できる。シーンは `Tools > LiDAR Battle > Build LiDAR Sim Scene`（`Assets/Editor/LidarSimSceneBuilder.cs`）で生成する。
 - ゲームの流れ（game-flow.md）を最低限実装。シーン・弾アセット・難易度別 Timeline は
   `Tools > LiDAR Battle > Rebuild Game Setup`（`Assets/Editor/GameSetupBuilder.cs`）で生成する（上書き注意）。
+- 弾の見た目: `Assets/Art/Bullets/` の素材（Kenney, CC0）を `BulletType.Color` で着色し、URP の Bloom（`Assets/Settings/BattleVolume.asset`）で発光させる。
+- 見た目は 2026-10-02 に「スキャナー」テーマへ変更（黒背景・白枠・赤ハートをやめた）。紺色の背景にシアンの方眼、
+  盤面の上の敵「スキャナー」が扇ビームで盤面を掃く。SOUL は琥珀色のハートで、輪がグレイズ範囲。Bloom/Vignette は
+  `Assets/Settings/BattleVolume.asset`。配色・スプライト生成はすべて `GameSetupBuilder` にある（画像素材は Kenney の弾のみ）。
 - 未実装: スコア計算式（`ScoreKeeper` は仮の式）、弾の寿命。

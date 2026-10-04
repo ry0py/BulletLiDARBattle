@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
 using UnityEngine.Timeline;
+using UnityEngine.UI;
 
 namespace LidarBattle.Flow
 {
@@ -19,6 +20,8 @@ namespace LidarBattle.Flow
         [SerializeField] private ScoreKeeper _score;
         [SerializeField] private DialogueBox _dialogue;
         [SerializeField] private float _battleSeconds = 60f;
+        [Tooltip("残り時間を Fill で表す Image（任意）")]
+        [SerializeField] private Image _timeBar;
         [Tooltip("{0} にスコアが入る")]
         [SerializeField, TextArea] private string[] _endingLines =
         {
@@ -38,9 +41,11 @@ namespace LidarBattle.Flow
             while (elapsed < _battleSeconds)
             {
                 elapsed += _clock.DeltaTime;
+                if (_timeBar != null) _timeBar.fillAmount = 1f - elapsed / _battleSeconds;
                 yield return null;
             }
 
+            if (_timeBar != null) _timeBar.fillAmount = 0f;
             _director.Stop();
             _bullets.ClearAll();
 

@@ -1,0 +1,29 @@
+	
+
+	Particle Pack (1.1)
+
+	by Kenney Vleugels (Kenney.nl)
+
+	Additional credit for creating filter templates:
+	Indigo Ray, Craig Nisbet, Zoltan Erdokovy, Heliagon, ThreeDee, Killst4r and Tim2501
+
+			------------------------------
+
+	License (Creative Commons Zero, CC0)
+	http://creativecommons.org/publicdomain/zero/1.0/
+
+	You may use these assets in personal and commercial projects.
+	Credit (Kenney or www.kenney.nl) would be nice but is not mandatory.
+
+			------------------------------
+
+	Donate:   http://support.kenney.nl
+	Request:  http://request.kenney.nl
+
+	Follow on Twitter for updates: @KenneyNL (www.twitter.com/kenneynl)
+------------------------------
+
+このフォルダの kenney_*.png は上記 Particle Pack (https://kenney.nl/assets/particle-pack) の
+"PNG (Transparent)" を元に 128px へ縮小・加工したもの。ライセンスは CC0。
+- kenney_ring_glow.png: circle_03 のリングに、リングをぼかしたにじみを重ねたもの (白弾)
+- kenney_star_09.png:   star_09 を縮小し、少し明るくしたもの (黄弾)
