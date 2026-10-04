@@ -104,5 +104,4 @@ switch に分岐を 1 つ足す。Inspector には全パラメータが並ぶが
 ## 未実装（必要になったら追加）
 
 - 弾の寿命（今は盤面外に出たら消える）。
-- スコア計算（`ScoreKeeper`）。`Hit` / `Grazed` イベントを購読する形で作る。
 - LiDAR 入力（`IHeartInputSource` を実装した入力源を足す）。

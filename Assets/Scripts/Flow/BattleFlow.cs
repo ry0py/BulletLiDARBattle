@@ -22,10 +22,11 @@ namespace LidarBattle.Flow
         [SerializeField] private float _battleSeconds = 60f;
         [Tooltip("残り時間を Fill で表す Image（任意）")]
         [SerializeField] private Image _timeBar;
-        [Tooltip("{0} にスコアが入る")]
+        [Tooltip("{0} = 最終スコア, {1} = グレイズ点, {2} = 被弾ボーナス, {3} = 被弾回数")]
         [SerializeField, TextArea] private string[] _endingLines =
         {
             "ゲームをプレイしてくれてありがとう！",
+            "グレイズ {1} 点 ＋ 被弾ボーナス {2} 点（被弾 {3} 回）",
             "スコアは {0} でした",
         };
         [SerializeField] private float _lineHoldSeconds = 2f;
@@ -50,7 +51,8 @@ namespace LidarBattle.Flow
             _bullets.ClearAll();
 
             var lines = new string[_endingLines.Length];
-            for (int i = 0; i < lines.Length; i++) lines[i] = string.Format(_endingLines[i], _score.Score);
+            for (int i = 0; i < lines.Length; i++)
+                lines[i] = string.Format(_endingLines[i], _score.FinalScore, _score.GrazeScore, _score.HitBonus, _score.Hits);
             yield return _dialogue.PlayAuto(lines, _lineHoldSeconds);
 
             SceneManager.LoadScene(_selectSceneName);

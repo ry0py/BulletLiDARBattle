@@ -17,7 +17,7 @@
 
 - 流れ: 最初にテキスト表示 → 1 分間弾幕を避け続ける → 終了時にスコアを表示。
 - 難易度: **Easy / Mid / Hard**。
-- **デスなし**。グレイズで加点し、被弾数に応じてスコア倍率が下がる。
+- **デスなし**。減点はしない。プレイ中はグレイズで加点し、被弾が少ないほど大きい「被弾ボーナス」を終了時に足す。
 - スコアは会場でスプレッドシートに記録する。ゲーム側での保存・ランキング機能は作らない（YAGNI）。
 
 ## 技術スタック
@@ -107,4 +107,5 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
     （`Assets/Editor/ScannerSetupBuilder.cs`）。紺色の背景にシアンの方眼、盤面の上の敵「スキャナー」が扇ビームで盤面を掃く。
     SOUL は琥珀色のハートで、輪がグレイズ範囲。アセットは `Assets/Art/Scanner/`・`Assets/Settings/Scanner/`・`Assets/Timelines/Scanner/`。
     弾は `Assets/Art/Bullets/` の素材（Kenney, CC0）を着色し、Bloom/Vignette（`Assets/Settings/Scanner/ScannerVolume.asset`）で発光させる。
-- 未実装: スコア計算式（`ScoreKeeper` は仮の式）、弾の寿命。
+- スコア（`ScoreKeeper`）: グレイズ×10 ＋ 被弾ボーナス max(0, 1000 − 被弾×100)。ボーナスは終了時の会話で内訳と一緒に出す。
+- 未実装: 弾の寿命。

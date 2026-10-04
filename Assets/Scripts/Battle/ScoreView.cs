@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace LidarBattle.Battle
 {
-    /// <summary>現在のスコア・被弾・グレイズ回数を画面に出す。値が変わったときだけ文字列を作る（毎フレームの GC を避ける）。</summary>
+    /// <summary>プレイ中のスコア（グレイズ点。被弾ボーナスは終了時に足す）・被弾・グレイズ回数を画面に出す。値が変わったときだけ文字列を作る（毎フレームの GC を避ける）。</summary>
     public class ScoreView : MonoBehaviour
     {
         [SerializeField] private ScoreKeeper _score;
@@ -17,8 +17,8 @@ namespace LidarBattle.Battle
 
         private void Update()
         {
-            if (_score.Score == _shownScore && _score.Hits == _shownHits && _score.Grazes == _shownGrazes) return;
-            _shownScore = _score.Score;
+            if (_score.GrazeScore == _shownScore && _score.Hits == _shownHits && _score.Grazes == _shownGrazes) return;
+            _shownScore = _score.GrazeScore;
             _shownHits = _score.Hits;
             _shownGrazes = _score.Grazes;
             _label.text = string.Format(_format, _shownScore, _shownHits, _shownGrazes);
