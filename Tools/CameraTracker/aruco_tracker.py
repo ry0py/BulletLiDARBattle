@@ -11,6 +11,7 @@
 import argparse
 import socket
 import struct
+import time
 
 import cv2
 
@@ -38,26 +39,40 @@ def main():
     parser.add_argument("--height", type=int, default=720)
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=5005, help="CameraInputSource の Port と合わせる")
+    parser.add_argument("--exposure", type=float, default=None,
+                        help="手動露出 (DirectShow の値。-8 で約 1/256 秒)。短いほど動かしたときのブレが減るが暗くなる。省略で自動露出")
     parser.add_argument("--no-preview", action="store_true", help="プレビュー窓を出さない")
     args = parser.parse_args()
 
-    capture = cv2.VideoCapture(args.camera)
+    capture = cv2.VideoCapture(args.camera, cv2.CAP_DSHOW)
     if not capture.isOpened():
         raise SystemExit(f"カメラ {args.camera} を開けません")
     capture.set(cv2.CAP_PROP_FRAME_WIDTH, args.width)
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, args.height)
+    if args.exposure is not None:
+        capture.set(cv2.CAP_PROP_AUTO_EXPOSURE, 0.25)  # 0.25 = 手動 (DirectShow)
+        capture.set(cv2.CAP_PROP_EXPOSURE, args.exposure)
 
     detector = cv2.aruco.ArucoDetector(cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50))
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     target = (args.host, args.port)
     print(f"camera {args.camera} -> udp {args.host}:{args.port} (marker id {args.marker_id})", flush=True)
 
+    frames = found = 0
+    report_at = time.monotonic() + 1.0
     while True:
         ok, frame = capture.read()
         if not ok:
             raise SystemExit("カメラからフレームを読めません")
         position = find_marker(detector, frame, args.marker_id)
         sock.sendto(struct.pack("<ff", *position) if position else LOST, target)
+
+        frames += 1
+        found += position is not None
+        if time.monotonic() >= report_at:  # 検出率を 1 秒ごとに出す (展示前の調整用)
+            print(f"{frames} fps, detected {100 * found // frames}%", flush=True)
+            frames = found = 0
+            report_at += 1.0
 
         if args.no_preview:
             continue
