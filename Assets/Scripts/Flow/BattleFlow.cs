@@ -1,6 +1,7 @@
 using System.Collections;
 using LidarBattle.Battle;
 using LidarBattle.UI;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Playables;
 using UnityEngine.SceneManagement;
@@ -22,6 +23,10 @@ namespace LidarBattle.Flow
         [SerializeField] private float _battleSeconds = 60f;
         [Tooltip("残り時間を Fill で表す Image（任意）")]
         [SerializeField] private Image _timeBar;
+        [Tooltip("残り秒数を出すテキスト（任意）")]
+        [SerializeField] private TMP_Text _timeLabel;
+        [Tooltip("{0} に残り秒数（切り上げ）が入る。リッチテキスト可")]
+        [SerializeField] private string _timeFormat = "残り {0} 秒";
         [Tooltip("{0} = 最終スコア, {1} = グレイズ点, {2} = 被弾ボーナス, {3} = 被弾回数")]
         [SerializeField, TextArea] private string[] _endingLines =
         {
@@ -32,6 +37,8 @@ namespace LidarBattle.Flow
         [SerializeField] private float _lineHoldSeconds = 2f;
         [SerializeField] private string _selectSceneName = "SelectScene";
 
+        private int _shownSeconds = -1;
+
         private IEnumerator Start()
         {
             _dialogue.Hide();
@@ -41,12 +48,12 @@ namespace LidarBattle.Flow
             float elapsed = 0f;
             while (elapsed < _battleSeconds)
             {
+                ShowRemaining(_battleSeconds - elapsed);
                 elapsed += _clock.DeltaTime;
-                if (_timeBar != null) _timeBar.fillAmount = 1f - elapsed / _battleSeconds;
                 yield return null;
             }
 
-            if (_timeBar != null) _timeBar.fillAmount = 0f;
+            ShowRemaining(0f);
             _director.Stop();
             _bullets.ClearAll();
 
@@ -56,6 +63,18 @@ namespace LidarBattle.Flow
             yield return _dialogue.PlayAuto(lines, _lineHoldSeconds);
 
             SceneManager.LoadScene(_selectSceneName);
+        }
+
+        /// <summary>残り時間をバーと秒数で出す。秒数の文字列は値が変わったときだけ作る（毎フレームの GC を避ける）。</summary>
+        private void ShowRemaining(float remaining)
+        {
+            remaining = Mathf.Max(0f, remaining);
+            if (_timeBar != null) _timeBar.fillAmount = remaining / _battleSeconds;
+
+            int seconds = Mathf.CeilToInt(remaining);
+            if (_timeLabel == null || seconds == _shownSeconds) return;
+            _shownSeconds = seconds;
+            _timeLabel.text = string.Format(_timeFormat, seconds);
         }
 
         /// <summary>トラックの種類からバインド先を決めるので、Timeline 側でバインドを設定しなくてよい。</summary>

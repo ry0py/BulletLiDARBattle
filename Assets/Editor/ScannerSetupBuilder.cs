@@ -151,6 +151,7 @@ namespace LidarBattle.EditorTools
             var component = profile.Add<T>(overrides: true);
             component.hideFlags = HideFlags.HideInHierarchy | HideFlags.HideInInspector;
             AssetDatabase.AddObjectToAsset(component, profile);
+            EditorUtility.SetDirty(profile); // 新規作成直後は dirty にしないと components の一覧が保存されない
             return component;
         }
 
@@ -207,17 +208,19 @@ namespace LidarBattle.EditorTools
             var score = bullets.gameObject.AddComponent<ScoreKeeper>();
             Set(score, ("_bullets", bullets));
 
-            // 右上の HUD: スコア・被弾・グレイズと、残り時間のバー。
+            // 右上の HUD: スコア・被弾・グレイズ。
             var hud = MakePanel("Hud", common.Canvas, new Vector2(1f, 1f), new Vector2(1f, 1f),
-                new Vector2(-400f, -290f), new Vector2(-30f, -40f), WithAlpha(PanelBg, 0.75f));
-            var scoreLabel = MakeLabel(hud, "ScoreLabel", Vector2.zero, Vector2.one, new Vector2(28f, 80f), new Vector2(-28f, -18f), 56f, TextMain);
+                new Vector2(-400f, -240f), new Vector2(-30f, -40f), WithAlpha(PanelBg, 0.75f));
+            var scoreLabel = MakeLabel(hud, "ScoreLabel", Vector2.zero, Vector2.one, new Vector2(28f, 20f), new Vector2(-28f, -18f), 56f, TextMain);
             var scoreView = scoreLabel.gameObject.AddComponent<ScoreView>();
             Set(scoreView, ("_score", score), ("_label", scoreLabel),
                 ("_format", "<size=40%><color=#19C8E6>SCORE</color></size>\n<b>{0}</b>\n<size=40%><color=#9FB3C8>HIT {1}   GRAZE {2}</color></size>"));
-            var timeLabel = MakeLabel(hud, "TimeLabel", new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(28f, 26f), new Vector2(-28f, 50f), 22f, Cyan);
-            timeLabel.text = "TIME";
-            timeLabel.characterSpacing = 6f;
-            var track = MakeRect("TimeTrack", hud, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(28f, 18f), new Vector2(-28f, 24f));
+
+            // 左上の HUD: 残り秒数とバー（会話パネルより左の空き）。
+            var timeHud = MakePanel("TimeHud", common.Canvas, new Vector2(0f, 1f), new Vector2(0f, 1f),
+                new Vector2(30f, -240f), new Vector2(400f, -40f), WithAlpha(PanelBg, 0.75f));
+            var timeLabel = MakeLabel(timeHud, "TimeLabel", Vector2.zero, Vector2.one, new Vector2(28f, 40f), new Vector2(-28f, -18f), 56f, TextMain);
+            var track = MakeRect("TimeTrack", timeHud, new Vector2(0f, 0f), new Vector2(1f, 0f), new Vector2(28f, 26f), new Vector2(-28f, 32f));
             track.gameObject.AddComponent<Image>().color = WithAlpha(TextMuted, 0.2f);
             var timeBar = MakeRect("TimeBar", track, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero).gameObject.AddComponent<Image>();
             timeBar.sprite = _square;
@@ -239,7 +242,9 @@ namespace LidarBattle.EditorTools
 
             var flow = new GameObject("BattleFlow").AddComponent<BattleFlow>();
             Set(flow, ("_director", director), ("_timelines", timelines), ("_clock", common.Clock), ("_bullets", bullets),
-                ("_score", score), ("_dialogue", common.Dialogue), ("_timeBar", timeBar), ("_selectSceneName", SelectSceneName));
+                ("_score", score), ("_dialogue", common.Dialogue), ("_timeBar", timeBar), ("_timeLabel", timeLabel),
+                ("_timeFormat", "<size=40%><color=#19C8E6>TIME</color></size>\n<b>{0}</b><size=50%><color=#9FB3C8> s</color></size>"),
+                ("_selectSceneName", SelectSceneName));
 
             EditorSceneManager.SaveScene(scene, BattleScenePath);
         }

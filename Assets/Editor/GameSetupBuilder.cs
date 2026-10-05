@@ -231,6 +231,10 @@ namespace LidarBattle.EditorTools
             var scoreView = scoreLabel.gameObject.AddComponent<ScoreView>();
             Set(scoreView, ("_score", score), ("_label", scoreLabel));
 
+            // 左上に残り時間（会話ボックスより左の空き）。
+            var timeLabel = MakeText(common.Canvas, "TimeLabel", new Vector2(0f, 1f), new Vector2(0f, 1f),
+                new Vector2(20f, -100f), new Vector2(370f, -30f), 40f);
+
             var debug = new GameObject("BattleDebug").AddComponent<BattleDebug>();
             Set(debug, ("_clock", common.Clock), ("_bullets", bullets), ("_soul", common.Soul));
 
@@ -244,7 +248,7 @@ namespace LidarBattle.EditorTools
 
             var flow = new GameObject("BattleFlow").AddComponent<BattleFlow>();
             Set(flow, ("_director", director), ("_timelines", timelines), ("_clock", common.Clock), ("_bullets", bullets),
-                ("_score", score), ("_dialogue", common.Dialogue), ("_selectSceneName", "SelectScene"));
+                ("_score", score), ("_dialogue", common.Dialogue), ("_timeLabel", timeLabel), ("_selectSceneName", "SelectScene"));
 
             EditorSceneManager.SaveScene(scene, BattleScenePath);
         }

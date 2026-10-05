@@ -103,7 +103,9 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
   `Tools > LiDAR Battle > Rebuild Game Setup`（`Assets/Editor/GameSetupBuilder.cs`）で生成する（上書き注意）。
 - 見た目は 2 種類あり、シーンもアセットも分けている。弾幕の中身（Timeline の配置・FirePattern）は共通。
   - 元の版（黒背景・白枠・赤ハート）: `SelectScene`/`BattleScene`。`Tools > LiDAR Battle > Rebuild Game Setup`（`GameSetupBuilder`）。
-  - 独自の「スキャナー」版: `ScannerSelectScene`/`ScannerBattleScene`。`Tools > LiDAR Battle > Rebuild Scanner Setup`
+  - 独自の「スキャナー」版（**2026-10-05 から開発停止中**。機能追加・修正は元の版だけに行い、スキャナー版の
+    ビルダー・シーン・アセットは触らない。共用コードを変えるときも、スキャナー版のコンパイルが通る範囲にとどめる）:
+    `ScannerSelectScene`/`ScannerBattleScene`。`Tools > LiDAR Battle > Rebuild Scanner Setup`
     （`Assets/Editor/ScannerSetupBuilder.cs`）。紺色の背景にシアンの方眼、盤面の上の敵「スキャナー」が扇ビームで盤面を掃く。
     SOUL は琥珀色のハートで、輪がグレイズ範囲。アセットは `Assets/Art/Scanner/`・`Assets/Settings/Scanner/`・`Assets/Timelines/Scanner/`。
     弾は `Assets/Art/Bullets/` の素材（Kenney, CC0）を着色し、Bloom/Vignette（`Assets/Settings/Scanner/ScannerVolume.asset`）で発光させる。

@@ -87,7 +87,7 @@
 | 1. 開始 | — | 選択シーンを開いたら即開始（開始操作は未実装） |
 | 2. オープニング会話 | `SelectFlow` + `DialogueBox.PlayAuto` | 1 行ずつ自動で送る |
 | 3. 難易度選択 | `DifficultyOption` ×3 | SOUL を 2 秒置くと決定。ゲージ表示あり。`GameSession` に保存 |
-| 4〜5. バトル | `BattleFlow` | 難易度の Timeline（`Assets/Timelines/Easy/Medium/Hard`）を再生。セリフは `DialogueTrack`。スキャナー版は右上の HUD にスコア・被弾・グレイズと残り時間バー |
+| 4〜5. バトル | `BattleFlow` | 難易度の Timeline（`Assets/Timelines/Easy/Medium/Hard`）を再生。セリフは `DialogueTrack`。左上に残り秒数（スキャナー版はバー付き）、スコアは元の版が左下・スキャナー版が右上 |
 | 6. エンディング | `BattleFlow` | 60 秒で弾を消し、会話でスコアを出して選択シーンへ戻る |
 
 - 入力は今はキーボードのみ。スコアは減点なし（`ScoreKeeper`）。

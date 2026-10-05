@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-7038748387234814135
+--- !u!114 &-9214496945479490304
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -14,11 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
   _bulletType: {fileID: 11400000, guid: 2606fb6d7102d2743ae751cd1af929fa, type: 2}
   _pattern: {fileID: 11400000, guid: c07c61ed8bcbb584fa2226879982cb5f, type: 2}
-  _position: {x: 0.1, y: 1.15}
+  _position: {x: 0.9, y: 1.15}
   _interval: 1.2
   _useFixedSeed: 1
-  _seed: 2500
---- !u!114 &-6979226697179474994
+  _seed: 3500
+--- !u!114 &-7723006690663594165
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -30,298 +30,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 134ab054d1646f54eaa0ee33f5abf28b, type: 3}
   m_Name: DialogueClip
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.DialogueClip
-  _text: "\u672C\u6C17\u3067\u3044\u304F\u3088\uFF01"
---- !u!114 &-6416251883840433527
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
-  m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
-  _bulletType: {fileID: 11400000, guid: 1609386fbd2e324459bdd9d9a001d75e, type: 2}
-  _pattern: {fileID: 11400000, guid: 8292062e4e5c7a94699b697f79829770, type: 2}
-  _position: {x: 0.5, y: 1.15}
-  _interval: 0.1
-  _useFixedSeed: 1
-  _seed: 200
---- !u!114 &-5652447615405669375
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
-  m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
-  _bulletType: {fileID: 11400000, guid: 1609386fbd2e324459bdd9d9a001d75e, type: 2}
-  _pattern: {fileID: 11400000, guid: 92af7f447a1013b49ae684f603dc6d8e, type: 2}
-  _position: {x: 0.5, y: 1.15}
-  _interval: 0.12
-  _useFixedSeed: 1
-  _seed: 4000
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
-  m_Name: Hard
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.TimelineAsset
-  m_Version: 0
-  m_Tracks:
-  - {fileID: 272586089455133592}
-  - {fileID: 2939721139078244136}
-  - {fileID: 628739885123424533}
-  - {fileID: 3497554238004274501}
-  m_FixedDuration: 60
-  m_EditorSettings:
-    m_Framerate: 60
-    m_ScenePreview: 1
-  m_DurationMode: 1
-  m_MarkerTrack: {fileID: 0}
---- !u!114 &272586089455133592
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0be7b67e31615b347a2f5e43467a5059, type: 3}
-  m_Name: Shots
-  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotTrack
-  m_Version: 3
-  m_AnimClip: {fileID: 0}
-  m_Locked: 0
-  m_Muted: 0
-  m_CustomPlayableFullTypename: 
-  m_Curves: {fileID: 0}
-  m_Parent: {fileID: 11400000}
-  m_Children: []
-  m_Clips:
-  - m_Version: 1
-    m_Start: 2
-    m_ClipIn: 0
-    m_Asset: {fileID: -6416251883840433527}
-    m_Duration: 23
-    m_TimeScale: 1
-    m_ParentTrack: {fileID: 272586089455133592}
-    m_EaseInDuration: 0
-    m_EaseOutDuration: 0
-    m_BlendInDuration: 0
-    m_BlendOutDuration: 0
-    m_MixInCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_MixOutCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_BlendInCurveMode: 0
-    m_BlendOutCurveMode: 0
-    m_ExposedParameterNames: []
-    m_AnimationCurves: {fileID: 0}
-    m_Recordable: 0
-    m_PostExtrapolationMode: 0
-    m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 0
-    m_PreExtrapolationTime: 0
-    m_DisplayName: Spiral
-  - m_Version: 1
-    m_Start: 25
-    m_ClipIn: 0
-    m_Asset: {fileID: -7038748387234814135}
-    m_Duration: 15
-    m_TimeScale: 1
-    m_ParentTrack: {fileID: 272586089455133592}
-    m_EaseInDuration: 0
-    m_EaseOutDuration: 0
-    m_BlendInDuration: 0
-    m_BlendOutDuration: 0
-    m_MixInCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_MixOutCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_BlendInCurveMode: 0
-    m_BlendOutCurveMode: 0
-    m_ExposedParameterNames: []
-    m_AnimationCurves: {fileID: 0}
-    m_Recordable: 0
-    m_PostExtrapolationMode: 0
-    m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 0
-    m_PreExtrapolationTime: 0
-    m_DisplayName: Homing
-  - m_Version: 1
-    m_Start: 40
-    m_ClipIn: 0
-    m_Asset: {fileID: -5652447615405669375}
-    m_Duration: 20
-    m_TimeScale: 1
-    m_ParentTrack: {fileID: 272586089455133592}
-    m_EaseInDuration: 0
-    m_EaseOutDuration: 0
-    m_BlendInDuration: 0
-    m_BlendOutDuration: 0
-    m_MixInCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_MixOutCurve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
-        value: 1
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      - serializedVersion: 3
-        time: 1
-        value: 0
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 0
-        weightedMode: 0
-        inWeight: 0
-        outWeight: 0
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    m_BlendInCurveMode: 0
-    m_BlendOutCurveMode: 0
-    m_ExposedParameterNames: []
-    m_AnimationCurves: {fileID: 0}
-    m_Recordable: 0
-    m_PostExtrapolationMode: 0
-    m_PreExtrapolationMode: 0
-    m_PostExtrapolationTime: 0
-    m_PreExtrapolationTime: 0
-    m_DisplayName: Rain
-  m_Markers:
-    m_Objects: []
---- !u!114 &628739885123424533
+  _text: "\u3042\u3068\u5C11\u3057\uFF01"
+--- !u!114 &-7224838922959204318
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -345,10 +55,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 15
     m_ClipIn: 0
-    m_Asset: {fileID: 8542376522370823447}
+    m_Asset: {fileID: -3719880337090823826}
     m_Duration: 20
     m_TimeScale: 1
-    m_ParentTrack: {fileID: 628739885123424533}
+    m_ParentTrack: {fileID: -7224838922959204318}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -414,10 +124,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 35
     m_ClipIn: 0
-    m_Asset: {fileID: 8521826170448169503}
+    m_Asset: {fileID: -9214496945479490304}
     m_Duration: 23
     m_TimeScale: 1
-    m_ParentTrack: {fileID: 628739885123424533}
+    m_ParentTrack: {fileID: -7224838922959204318}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -482,7 +192,61 @@ MonoBehaviour:
     m_DisplayName: Homing
   m_Markers:
     m_Objects: []
---- !u!114 &2633466048101110842
+--- !u!114 &-6086053729513576074
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
+  m_Name: ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
+  _bulletType: {fileID: 11400000, guid: 2606fb6d7102d2743ae751cd1af929fa, type: 2}
+  _pattern: {fileID: 11400000, guid: c07c61ed8bcbb584fa2226879982cb5f, type: 2}
+  _position: {x: 0.1, y: 1.15}
+  _interval: 1.2
+  _useFixedSeed: 1
+  _seed: 2500
+--- !u!114 &-3898900211456705959
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
+  m_Name: ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
+  _bulletType: {fileID: 11400000, guid: 1609386fbd2e324459bdd9d9a001d75e, type: 2}
+  _pattern: {fileID: 11400000, guid: 743ffb3ac9317894b930bc389c14e5c5, type: 2}
+  _position: {x: 0.5, y: 1.15}
+  _interval: 0.9
+  _useFixedSeed: 1
+  _seed: 500
+--- !u!114 &-3719880337090823826
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
+  m_Name: ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
+  _bulletType: {fileID: 11400000, guid: 1609386fbd2e324459bdd9d9a001d75e, type: 2}
+  _pattern: {fileID: 11400000, guid: ec4be870d5b81c549ba8e8ce7b636fd3, type: 2}
+  _position: {x: 0.5, y: 1.15}
+  _interval: 1.5
+  _useFixedSeed: 1
+  _seed: 1500
+--- !u!114 &-2183415705361766686
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -494,8 +258,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 134ab054d1646f54eaa0ee33f5abf28b, type: 3}
   m_Name: DialogueClip
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.DialogueClip
-  _text: "\u3042\u3068\u5C11\u3057\uFF01"
---- !u!114 &2939721139078244136
+  _text: "\u3088\u3051\u3089\u308C\u308B\u304B\u306A\uFF1F"
+--- !u!114 &-1709563014329257471
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 134ab054d1646f54eaa0ee33f5abf28b, type: 3}
+  m_Name: DialogueClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.DialogueClip
+  _text: "\u672C\u6C17\u3067\u3044\u304F\u3088\uFF01"
+--- !u!114 &-1291828462324227584
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -519,10 +296,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 5
     m_ClipIn: 0
-    m_Asset: {fileID: 6170618910261099659}
+    m_Asset: {fileID: -3898900211456705959}
     m_Duration: 53
     m_TimeScale: 1
-    m_ParentTrack: {fileID: 2939721139078244136}
+    m_ParentTrack: {fileID: -1291828462324227584}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -587,7 +364,49 @@ MonoBehaviour:
     m_DisplayName: Aimed3
   m_Markers:
     m_Objects: []
---- !u!114 &3497554238004274501
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
+  m_Name: Hard
+  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.TimelineAsset
+  m_Version: 0
+  m_Tracks:
+  - {fileID: 7011039867878158410}
+  - {fileID: -1291828462324227584}
+  - {fileID: -7224838922959204318}
+  - {fileID: 2817205574296694306}
+  m_FixedDuration: 60
+  m_EditorSettings:
+    m_Framerate: 60
+    m_ScenePreview: 1
+  m_DurationMode: 1
+  m_MarkerTrack: {fileID: 0}
+--- !u!114 &250390133721260968
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
+  m_Name: ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
+  _bulletType: {fileID: 11400000, guid: 1609386fbd2e324459bdd9d9a001d75e, type: 2}
+  _pattern: {fileID: 11400000, guid: 92af7f447a1013b49ae684f603dc6d8e, type: 2}
+  _position: {x: 0.5, y: 1.15}
+  _interval: 0.12
+  _useFixedSeed: 1
+  _seed: 4000
+--- !u!114 &2817205574296694306
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -611,10 +430,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 0
     m_ClipIn: 0
-    m_Asset: {fileID: -6979226697179474994}
+    m_Asset: {fileID: -1709563014329257471}
     m_Duration: 3
     m_TimeScale: 1
-    m_ParentTrack: {fileID: 3497554238004274501}
+    m_ParentTrack: {fileID: 2817205574296694306}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -680,10 +499,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 25
     m_ClipIn: 0
-    m_Asset: {fileID: 5621302382257773425}
+    m_Asset: {fileID: -2183415705361766686}
     m_Duration: 3
     m_TimeScale: 1
-    m_ParentTrack: {fileID: 3497554238004274501}
+    m_ParentTrack: {fileID: 2817205574296694306}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -749,10 +568,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 50
     m_ClipIn: 0
-    m_Asset: {fileID: 2633466048101110842}
+    m_Asset: {fileID: -7723006690663594165}
     m_Duration: 3
     m_TimeScale: 1
-    m_ParentTrack: {fileID: 3497554238004274501}
+    m_ParentTrack: {fileID: 2817205574296694306}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -817,20 +636,7 @@ MonoBehaviour:
     m_DisplayName: "\u3042\u3068\u5C11\u3057\uFF01"
   m_Markers:
     m_Objects: []
---- !u!114 &5621302382257773425
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 134ab054d1646f54eaa0ee33f5abf28b, type: 3}
-  m_Name: DialogueClip
-  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.DialogueClip
-  _text: "\u3088\u3051\u3089\u308C\u308B\u304B\u306A\uFF1F"
---- !u!114 &6170618910261099659
+--- !u!114 &4394573020525140659
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -843,12 +649,12 @@ MonoBehaviour:
   m_Name: ShotClip
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
   _bulletType: {fileID: 11400000, guid: 1609386fbd2e324459bdd9d9a001d75e, type: 2}
-  _pattern: {fileID: 11400000, guid: 743ffb3ac9317894b930bc389c14e5c5, type: 2}
+  _pattern: {fileID: 11400000, guid: 8292062e4e5c7a94699b697f79829770, type: 2}
   _position: {x: 0.5, y: 1.15}
-  _interval: 0.9
+  _interval: 0.1
   _useFixedSeed: 1
-  _seed: 500
---- !u!114 &8521826170448169503
+  _seed: 200
+--- !u!114 &7011039867878158410
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -857,30 +663,224 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
-  m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
-  _bulletType: {fileID: 11400000, guid: 2606fb6d7102d2743ae751cd1af929fa, type: 2}
-  _pattern: {fileID: 11400000, guid: c07c61ed8bcbb584fa2226879982cb5f, type: 2}
-  _position: {x: 0.9, y: 1.15}
-  _interval: 1.2
-  _useFixedSeed: 1
-  _seed: 3500
---- !u!114 &8542376522370823447
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
-  m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
-  _bulletType: {fileID: 11400000, guid: 1609386fbd2e324459bdd9d9a001d75e, type: 2}
-  _pattern: {fileID: 11400000, guid: ec4be870d5b81c549ba8e8ce7b636fd3, type: 2}
-  _position: {x: 0.5, y: 1.15}
-  _interval: 1.5
-  _useFixedSeed: 1
-  _seed: 1500
+  m_Script: {fileID: 11500000, guid: 0be7b67e31615b347a2f5e43467a5059, type: 3}
+  m_Name: Shots
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotTrack
+  m_Version: 3
+  m_AnimClip: {fileID: 0}
+  m_Locked: 0
+  m_Muted: 0
+  m_CustomPlayableFullTypename: 
+  m_Curves: {fileID: 0}
+  m_Parent: {fileID: 11400000}
+  m_Children: []
+  m_Clips:
+  - m_Version: 1
+    m_Start: 2
+    m_ClipIn: 0
+    m_Asset: {fileID: 4394573020525140659}
+    m_Duration: 23
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 7011039867878158410}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: Spiral
+  - m_Version: 1
+    m_Start: 25
+    m_ClipIn: 0
+    m_Asset: {fileID: -6086053729513576074}
+    m_Duration: 15
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 7011039867878158410}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: Homing
+  - m_Version: 1
+    m_Start: 40
+    m_ClipIn: 0
+    m_Asset: {fileID: 250390133721260968}
+    m_Duration: 20
+    m_TimeScale: 1
+    m_ParentTrack: {fileID: 7011039867878158410}
+    m_EaseInDuration: 0
+    m_EaseOutDuration: 0
+    m_BlendInDuration: 0
+    m_BlendOutDuration: 0
+    m_MixInCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_MixOutCurve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 1
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      - serializedVersion: 3
+        time: 1
+        value: 0
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    m_BlendInCurveMode: 0
+    m_BlendOutCurveMode: 0
+    m_ExposedParameterNames: []
+    m_AnimationCurves: {fileID: 0}
+    m_Recordable: 0
+    m_PostExtrapolationMode: 0
+    m_PreExtrapolationMode: 0
+    m_PostExtrapolationTime: 0
+    m_PreExtrapolationTime: 0
+    m_DisplayName: Rain
+  m_Markers:
+    m_Objects: []
