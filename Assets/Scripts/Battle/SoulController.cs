@@ -38,8 +38,9 @@ namespace LidarBattle.Battle
 
             _invincibleTimer -= dt;
             // どの入力源も位置を出せなければ（見失い等）その場で止まる。
-            if (!_input.TryReadTarget(_board.WorldToNormalized(Position), dt, out var target)) return;
-            transform.position = _board.Clamp(_board.NormalizedToWorld(target), _halfSize);
+            // 正規化座標 0〜1 は SOUL の可動範囲（枠から _halfSize 内側）に対応させる。
+            if (!_input.TryReadTarget(_board.WorldToNormalized(Position, _halfSize), dt, out var target)) return;
+            transform.position = _board.Clamp(_board.NormalizedToWorld(target, _halfSize), _halfSize);
         }
 
         private void OnValidate()

@@ -10,8 +10,12 @@ namespace LidarBattle.Battle
         public Vector2 Size => _size;
         public Vector2 Min => (Vector2)transform.position - _size * 0.5f;
 
-        public Vector2 NormalizedToWorld(Vector2 normalized) => Min + normalized * _size;
-        public Vector2 WorldToNormalized(Vector2 world) => (world - Min) / _size;
+        /// <summary>padding を指定すると、枠から padding だけ内側の矩形を 0〜1 とみなす（SOUL の可動範囲）。</summary>
+        public Vector2 NormalizedToWorld(Vector2 normalized, float padding = 0f)
+            => Min + Vector2.one * padding + normalized * (_size - Vector2.one * (2f * padding));
+
+        public Vector2 WorldToNormalized(Vector2 world, float padding = 0f)
+            => (world - Min - Vector2.one * padding) / (_size - Vector2.one * (2f * padding));
 
         /// <summary>中心から padding だけ内側に収める（SOUL の見た目が枠からはみ出さないように）。</summary>
         public Vector2 Clamp(Vector2 world, float padding)
