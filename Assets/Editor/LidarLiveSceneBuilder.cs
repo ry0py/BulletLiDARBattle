@@ -50,6 +50,13 @@ namespace LidarBattle.EditorTools
                 var body = GameSetupBuilder.MakeSpriteObject("Body", sensor.transform, circle, Color.white, 15);
                 body.localScale = Vector3.one * 0.05f;
 
+                // 正面 (センサーの +X) を明るい線、取得範囲 (StartStep〜EndStep) の両端を薄い線で示す。
+                var square = AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Square.png");
+                float degPerStep = 360f / settings.AngularResolution;
+                MakeRay("Front", sensor.transform, square, 0f, new Color(0f, 1f, 1f, 0.9f), 0.012f);
+                MakeRay("RangeStart", sensor.transform, square, (settings.StartStep - settings.FrontStep) * degPerStep, new Color(1f, 1f, 1f, 0.3f), 0.006f);
+                MakeRay("RangeEnd", sensor.transform, square, (settings.EndStep - settings.FrontStep) * degPerStep, new Color(1f, 1f, 1f, 0.3f), 0.006f);
+
                 var marker = GameSetupBuilder.MakeSpriteObject("HeartMarker", null, circle, Color.red, 30);
                 marker.localScale = Vector3.one * (settings.HeartRadiusM * 2f);
 
@@ -60,7 +67,7 @@ namespace LidarBattle.EditorTools
                 scaler.referenceResolution = new Vector2(1920f, 1080f);
                 scaler.matchWidthOrHeight = 0.5f;
                 var label = GameSetupBuilder.MakeText(canvasGo.transform, "Status", new Vector2(0f, 1f), new Vector2(1f, 1f),
-                    new Vector2(20f, -200f), new Vector2(-20f, -20f), 28f);
+                    new Vector2(20f, -240f), new Vector2(-20f, -20f), 28f);
 
                 var live = sensor.AddComponent<LidarLiveView>();
                 GameSetupBuilder.Set(live, ("_settings", settings), ("_view", view),
@@ -74,6 +81,16 @@ namespace LidarBattle.EditorTools
                 Debug.LogException(e);
                 if (Application.isBatchMode) EditorApplication.Exit(1);
             }
+        }
+
+        /// <summary>センサーから angleDeg 方向 (正面 0°、反時計回りが正) に伸びる長さ 2 m の線。点群より奥に描く。</summary>
+        private static void MakeRay(string name, Transform sensor, Sprite square, float angleDeg, Color color, float widthM)
+        {
+            const float lengthM = 2f;
+            var ray = GameSetupBuilder.MakeSpriteObject(name, sensor, square, color, 5);
+            ray.localRotation = Quaternion.Euler(0f, 0f, angleDeg);
+            ray.localPosition = ray.localRotation * new Vector3(lengthM * 0.5f, 0f, 0f);
+            ray.localScale = new Vector3(lengthM, widthM, 1f);
         }
     }
 }

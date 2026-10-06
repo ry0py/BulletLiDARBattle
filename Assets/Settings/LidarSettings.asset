@@ -17,8 +17,8 @@ MonoBehaviour:
   TcpPort: 10940
   PortName: COM3
   BaudRate: 115200
-  StartStep: 0
-  EndStep: 1080
+  StartStep: 180
+  EndStep: 900
   FrontStep: 540
   AngularResolution: 1440
   MinRangeM: 0.06

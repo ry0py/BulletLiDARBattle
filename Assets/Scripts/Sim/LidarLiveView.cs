@@ -122,7 +122,7 @@ namespace LidarBattle.Sim
                 : "未接続";
             string background = _backgroundFramesLeft > 0 ? "学習中..." : _tracker.HasBackground ? "学習済み" : "なし (最も近い物体を検出)";
             string heart = detected ? $"x {positionM.x * 1000f:F0} mm, y {positionM.y * 1000f:F0} mm (距離 {positionM.magnitude * 1000f:F0} mm)" : "未検出";
-            _label.text = $"{status}\n背景: {background}\nハート: {heart}\n[B] ハートを外して背景学習  [C] 背景消去  ホイール: ズーム";
+            _label.text = $"{status}\n背景: {background}\nハート: {heart}\n<color=#00FFFF>水色の線</color> = センサー正面 / 薄い線 = 取得範囲の端\n[B] ハートを外して背景学習  [C] 背景消去  ホイール: ズーム";
         }
     }
 }
