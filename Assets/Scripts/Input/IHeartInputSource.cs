@@ -8,6 +8,7 @@ namespace LidarBattle.Input
     /// </summary>
     public interface IHeartInputSource
     {
-        Vector2 ReadTarget(Vector2 currentNormalized, float deltaTime);
+        /// <summary>今この入力源が位置を出せれば true（未接続・見失い・キーを押していない等は false）。</summary>
+        bool TryReadTarget(Vector2 currentNormalized, float deltaTime, out Vector2 target);
     }
 }

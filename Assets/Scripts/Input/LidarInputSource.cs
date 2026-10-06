@@ -10,7 +10,7 @@ namespace LidarBattle.Input
 {
     /// <summary>
     /// 実機 LiDAR で検出したハート位置を SOUL の目標にする入力源 (Hardware → Tracking → Mapping の合成点)。
-    /// 接続できない / UseLidar=false のときは <see cref="_fallback"/> (キーボード) に任せる。
+    /// 接続できない / UseLidar=false / 見失い中は位置を出さない（どの入力源を使うかは HeartInputSelector が決める）。
     /// センサー接続と背景は static に持ち、シーンをまたいでも再接続・再校正しない。
     /// キー: [B] ハートを外して背景学習 / [1] 今の位置を画面左下に / [2] 今の位置を画面右上に / [F1] 状態表示。
     /// </summary>
@@ -18,8 +18,6 @@ namespace LidarBattle.Input
     public sealed class LidarInputSource : MonoBehaviour, IHeartInputSource
     {
         [SerializeField] private LidarSettings _settings;
-        [Tooltip("LiDAR が使えないときの入力源 (IHeartInputSource)")]
-        [SerializeField] private MonoBehaviour _fallback;
 
         private static HokuyoEthernetSensor s_sensor;
         private static BackgroundSubtractionTracker s_tracker;
@@ -28,7 +26,6 @@ namespace LidarBattle.Input
         private static int s_backgroundFramesLeft;
         private static bool s_showStatus = true;
 
-        private IHeartInputSource _fallbackInput;
         private RectCoordinateMapper _mapper;
         private int _lastScanCount = -1;
         private bool _detected;
@@ -38,7 +35,6 @@ namespace LidarBattle.Input
 
         private void Awake()
         {
-            _fallbackInput = _fallback as IHeartInputSource;
             if (_settings.UseLidar) EnsureConnected(_settings);
             RebuildMapper();
         }
@@ -56,7 +52,7 @@ namespace LidarBattle.Input
             catch (Exception e)
             {
                 s_error = e.Message;
-                Debug.LogWarning($"[LidarInputSource] LiDAR に接続できないのでキーボードで操作します: {e.Message}");
+                Debug.LogWarning($"[LidarInputSource] LiDAR に接続できないので LiDAR 入力は使いません: {e.Message}");
             }
         }
 
@@ -97,11 +93,11 @@ namespace LidarBattle.Input
             _detected = s_tracker.TryTrack(scan, out _positionM);
         }
 
-        public Vector2 ReadTarget(Vector2 currentNormalized, float deltaTime)
+        public bool TryReadTarget(Vector2 currentNormalized, float deltaTime, out Vector2 target)
         {
-            if (!LidarActive)
-                return _fallbackInput != null ? _fallbackInput.ReadTarget(currentNormalized, deltaTime) : currentNormalized;
-            return _detected ? _mapper.ToNormalized(_positionM) : currentNormalized; // 見失ったらその場で止める
+            bool ok = LidarActive && _detected;
+            target = ok ? _mapper.ToNormalized(_positionM) : currentNormalized;
+            return ok;
         }
 
         private void HandleKeys()
@@ -134,9 +130,9 @@ namespace LidarBattle.Input
         {
             if (!s_showStatus) return;
 
-            string lidar = !_settings.UseLidar ? "OFF (keyboard)"
+            string lidar = !_settings.UseLidar ? "OFF"
                 : LidarActive ? $"connected {_settings.HostName}"
-                : $"FAILED (keyboard) {s_error}";
+                : $"FAILED {s_error}";
             string background = s_backgroundFramesLeft > 0 ? "learning..."
                 : s_tracker != null && s_tracker.HasBackground ? "learned" : "none";
             string heart = !LidarActive ? "-"

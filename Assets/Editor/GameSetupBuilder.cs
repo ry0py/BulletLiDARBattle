@@ -283,15 +283,15 @@ namespace LidarBattle.EditorTools
             Set(board, ("_size", boardSize));
             MakeFrame(board.transform, boardSize, 0.08f, 0);
 
-            // カメラのトラッカーが動いていなければ LiDAR、LiDAR も使えなければキーボードにフォールバックする。
+            // キーボード → LiDAR → カメラ (ArUco) の順に、位置を出せた入力源を使う（HeartInputSelector）。
             var keyboard = new GameObject("Input").AddComponent<KeyboardInputSource>();
             Set(keyboard, ("_board", board), ("_speed", 3f));
             var lidar = keyboard.gameObject.AddComponent<LidarInputSource>();
             var lidarSettings = AssetDatabase.LoadAssetAtPath<LidarSettings>("Assets/Settings/LidarSettings.asset")
                 ?? throw new InvalidOperationException("Assets/Settings/LidarSettings.asset がありません。");
-            Set(lidar, ("_settings", lidarSettings), ("_fallback", keyboard));
-            var input = keyboard.gameObject.AddComponent<CameraInputSource>();
-            Set(input, ("_fallback", lidar));
+            Set(lidar, ("_settings", lidarSettings));
+            keyboard.gameObject.AddComponent<CameraInputSource>();
+            var input = keyboard.gameObject.AddComponent<HeartInputSelector>();
 
             var soul = new GameObject("Soul").AddComponent<SoulController>();
             soul.transform.position = soulStart;

@@ -14,8 +14,8 @@
 
 手順 1（センサー実装）は実装済み（`HokuyoEthernetSensor` / `ScipScanParser`）。実機確認は
 `Tools > LiDAR Battle > Build LiDAR Live Scene` で `LidarLiveScene` を生成して再生する（`LidarLiveView`: 点群＋検出マーカー、`B` で背景学習）。
-手順 2・3 も実装済み: `LidarInputSource`（Select/Battle 両シーンの SOUL 入力）。接続できない / `UseLidar=false` なら
-`KeyboardInputSource` にフォールバックする（Mock 切替の代わり）。接続と背景はシーンをまたいで static に保持する。
+手順 2・3 も実装済み: `LidarInputSource`（Select/Battle 両シーンの SOUL 入力）。接続できない / `UseLidar=false` / 見失い中は
+位置を出さず、`HeartInputSelector` が次の入力源（カメラ）に回す（キーボードは押している間だけ最優先）。接続と背景はシーンをまたいで static に保持する。
 キー: `B` 背景学習 / `1` 今のハート位置を画面左下 (`PhysicalMin`) / `2` 右上 (`PhysicalMax`) / `F1` 状態表示。
 `PhysicalMin/Max` は `RotationDeg` 補正後の座標で、min > max なら反転になる（`Invert*` は不要）。
 センサーは同時 1 接続のみ。UrgBenriPlus 等で接続中だと Unity から繋がらない。

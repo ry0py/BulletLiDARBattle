@@ -37,7 +37,8 @@ namespace LidarBattle.Battle
             if (dt <= 0f || _input == null) return;
 
             _invincibleTimer -= dt;
-            var target = _input.ReadTarget(_board.WorldToNormalized(Position), dt);
+            // どの入力源も位置を出せなければ（見失い等）その場で止まる。
+            if (!_input.TryReadTarget(_board.WorldToNormalized(Position), dt, out var target)) return;
             transform.position = _board.Clamp(_board.NormalizedToWorld(target), _halfSize);
         }
 

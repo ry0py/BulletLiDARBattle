@@ -49,7 +49,7 @@
 | Hardware | `LidarBattle.LiDAR` | センサーから生スキャン取得 | `ILidarSensor`, `LidarScan`, `HokuyoEthernetSensor`, `HokuyoUrgSensor`, `MockLidarSensor`, `SimulatedLidarSensor`（Physics2D レイキャスト） |
 | Tracking | `LidarBattle.Tracking` | スキャンからハート位置を検出 | `IHeartTracker`, `NearestClusterFinder`, `ScanSegmenter`, `NearestClusterTracker`, `SegmentCentroidTracker`, `BackgroundSubtractionTracker`（デコレータ）, `CircleFitTracker`, `SmoothedTracker`（デコレータ） |
 | Mapping | `LidarBattle.Mapping` | 物理座標 → 正規化盤面座標 | `ICoordinateMapper`, `RectCoordinateMapper` |
-| Input | `LidarBattle.Input` | SOUL の入力源を抽象化 | `IHeartInputSource`, `KeyboardInputSource`, `LidarInputSource`, `CameraInputSource` |
+| Input | `LidarBattle.Input` | SOUL の入力源を抽象化 | `IHeartInputSource`, `HeartInputSelector`（キーボード → LiDAR → カメラの順に選ぶ）, `KeyboardInputSource`, `LidarInputSource`, `CameraInputSource` |
 | Battle | `LidarBattle.Battle` | 弾幕ゲーム本体 | `SoulController`, `BulletBoard`, `BattleClock`, `BulletSystem`, `Bullet`, `BulletType`（弾の種類）, `FirePattern`（飛ばし方）, `ShotTrack`/`ShotClip`（Timeline 発射）, `ScoreKeeper`, `BattleDebug`, 見た目だけの `HitFeedback`/`SoulView`/`ScannerEye`/`ScanSweep` |
 | Flow | `LidarBattle.Flow` | ゲームの進行（会話→難易度選択→バトル→結果） | `SelectFlow`, `DifficultyOption`, `BattleFlow`, `GameSession` |
 | UI | `LidarBattle.UI` | 会話表示・日本語フォント | `DialogueBox`, `DialogueTrack`/`DialogueClip`（Timeline セリフ）, `JapaneseFontApplier` |
@@ -92,12 +92,14 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
 
 - Unity 6 プロジェクト。URP/2D/Input System/Timeline/URG-Unity 導入済み。
 - Battle/Input 層を bullet-system.md の方針で作り直した（Timeline 発射・BulletSystem 集約・キーボード入力）。
-- LiDAR 入力は `LidarInputSource`（UST-20LX, Ethernet）で接続済み。繋がらないときはキーボードにフォールバック。
+- LiDAR 入力は `LidarInputSource`（UST-20LX, Ethernet）で接続済み。
   実機の点群確認は `Tools > LiDAR Battle > Build LiDAR Live Scene`。
 - カメラ入力を試作中（LiDAR が実機で難しかったため）。ハートに ArUco マーカー（DICT_4X4_50）を貼り、
   `python Tools/CameraTracker/aruco_tracker.py` が検出して UDP で `CameraInputSource` に送る。
-  トラッカーが動いていなければ LiDAR → キーボードの順にフォールバックする。
   画像全体を盤面に対応させているだけで、四隅マーカーによる盤面合わせは未実装。
+- SOUL の入力は `HeartInputSelector` が **キーボード → LiDAR → カメラ (ArUco)** の順に聞き、最初に位置を出せたものを使う
+  （キーボードは移動キーを押している間だけ。LiDAR/カメラは接続中かつハート検出中だけ）。どれも出せなければ SOUL は止まる。
+  入力源どうしは Inspector でつながず、優先順は `HeartInputSelector` のコードで固定。
 - LiDAR シミュレーション（`LidarSimScene`）を追加。UST-20LX 相当のレイキャスト点群＋白色ノイズで、検出手法 A〜E を真値と比較できる。シーンは `Tools > LiDAR Battle > Build LiDAR Sim Scene`（`Assets/Editor/LidarSimSceneBuilder.cs`）で生成する。
 - ゲームの流れ（game-flow.md）を最低限実装。シーン・弾アセット・難易度別 Timeline は
   `Tools > LiDAR Battle > Rebuild Game Setup`（`Assets/Editor/GameSetupBuilder.cs`）で生成する（上書き注意）。

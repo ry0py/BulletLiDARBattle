@@ -11,7 +11,7 @@ namespace LidarBattle.Input
     /// カメラで検出した ArUco マーカー (ハートに貼る) の位置を SOUL の目標にする入力源。
     /// 検出は Unity の外 (Tools/CameraTracker/aruco_tracker.py) で行い、ここは結果を UDP で受け取るだけ。
     /// パケットは float32 x2 = 画像内の位置 (0..1、x 右向き・y 下向き)。見失っている間は NaN が届く。
-    /// トラッカーが動いていない (パケットが来ない) ときは <see cref="_fallback"/> に任せる。[F1] 状態表示。
+    /// トラッカーが動いていない (パケットが来ない) / 見失い中は位置を出さない（どの入力源を使うかは HeartInputSelector が決める）。[F1] 状態表示。
     /// ソケットは static に持つ。シーン切替では新シーンの Awake が旧シーンの破棄より先に走り、同じポートを開き直せないため。
     /// </summary>
     [DefaultExecutionOrder(-10)] // SoulController より先に受信する
@@ -25,13 +25,10 @@ namespace LidarBattle.Input
         [SerializeField] private Vector2 _imageTopRight = new Vector2(1f, 0f);
         [Tooltip("この秒数パケットが来なければトラッカー停止とみなす")]
         [SerializeField] private float _timeoutSec = 1f;
-        [Tooltip("トラッカーが動いていないときの入力源 (IHeartInputSource)")]
-        [SerializeField] private MonoBehaviour _fallback;
 
         private static Socket s_socket;
 
         private readonly byte[] _buffer = new byte[8];
-        private IHeartInputSource _fallbackInput;
         private RectCoordinateMapper _mapper;
         private float _lastPacketTime = float.NegativeInfinity;
         private bool _detected;
@@ -42,7 +39,6 @@ namespace LidarBattle.Input
 
         private void Awake()
         {
-            _fallbackInput = _fallback as IHeartInputSource;
             RebuildMapper();
             EnsureOpen(_port);
         }
@@ -95,19 +91,19 @@ namespace LidarBattle.Input
             }
         }
 
-        public Vector2 ReadTarget(Vector2 currentNormalized, float deltaTime)
+        public bool TryReadTarget(Vector2 currentNormalized, float deltaTime, out Vector2 target)
         {
-            if (!TrackerActive)
-                return _fallbackInput != null ? _fallbackInput.ReadTarget(currentNormalized, deltaTime) : currentNormalized;
-            return _detected ? _mapper.ToNormalized(_imagePosition) : currentNormalized; // 見失ったらその場で止める
+            bool ok = TrackerActive && _detected;
+            target = ok ? _mapper.ToNormalized(_imagePosition) : currentNormalized;
+            return ok;
         }
 
         private void OnGUI()
         {
             if (!_showStatus) return;
 
-            string state = s_socket == null ? $"port {_port} unavailable (fallback)"
-                : !TrackerActive ? "tracker not running (fallback)"
+            string state = s_socket == null ? $"port {_port} unavailable"
+                : !TrackerActive ? "tracker not running"
                 : _detected ? $"marker ({_imagePosition.x:F2}, {_imagePosition.y:F2}) -> {_mapper.ToNormalized(_imagePosition):F2}"
                 : "marker lost";
             GUI.Box(new Rect(10, 125, 620, 30), GUIContent.none);
