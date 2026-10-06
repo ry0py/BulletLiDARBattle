@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 124d6d088d7d6f14cb07904eeabcc034, type: 3}
+  m_Name: LidarSettings_Heart
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Config.LidarSettings
+  UseLidar: 1
+  HostName: 192.168.6.114
+  TcpPort: 10940
+  PortName: COM3
+  BaudRate: 115200
+  StartStep: 180
+  EndStep: 900
+  FrontStep: 540
+  AngularResolution: 1440
+  MinRangeM: 0.06
+  MaxRangeM: 20
+  PollIntervalMs: 25
+  ClusterRadiusM: 0.08
+  MinClusterPoints: 3
+  BackgroundMarginM: 0.05
+  BackgroundFrames: 20
+  HeartRadiusM: 0.04
+  FitIterations: 5
+  SmoothingAlpha: 0.3
+  MaxJumpM: 0.1
+  MaxHoldFrames: 5
+  PhysicalMin: {x: 0.05, y: -0.08}
+  PhysicalMax: {x: 0.31, y: 0.08}
+  RotationDeg: 0
+  InvertX: 0
+  InvertY: 0

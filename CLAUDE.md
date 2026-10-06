@@ -94,6 +94,11 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
 - Battle/Input 層を bullet-system.md の方針で作り直した（Timeline 発射・BulletSystem 集約・キーボード入力）。
 - LiDAR 入力は `LidarInputSource`（UST-20LX, Ethernet）で接続済み。本番ではセンサーを盤面の左端に置き、
   右（盤面側）を向ける（`RotationDeg` 0）。
+- LiDAR で検出する物体は 2 種類。どちらも既知の半径の円を当てはめる（`CircleFitTracker`）。
+  - 円柱（今の主）: `SelectScene`/`BattleScene`、設定 `LidarSettings.asset`（`HeartRadiusM` 0.02）。
+  - 以前の 3D プリントのハート: `HeartSelectScene`/`HeartBattleScene`、設定 `LidarSettings_Heart.asset`（`HeartRadiusM` 0.04）。
+    円柱用シーンのコピーで、違いは設定アセットとシーン遷移先だけ。円柱用シーンを直したら
+    `Tools > LiDAR Battle > Copy Scenes for Heart`（`HeartSceneCopier`）でコピーし直す（ハート用設定は上書きしない）。
   実機の点群確認は `Tools > LiDAR Battle > Build LiDAR Live Scene`。
 - カメラ入力を試作中（LiDAR が実機で難しかったため）。ハートに ArUco マーカー（DICT_4X4_50）を貼り、
   `python Tools/CameraTracker/aruco_tracker.py` が検出して UDP で `CameraInputSource` に送る。
@@ -113,6 +118,6 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
     SOUL は琥珀色のハートで、輪がグレイズ範囲。アセットは `Assets/Art/Scanner/`・`Assets/Settings/Scanner/`・`Assets/Timelines/Scanner/`。
     弾は `Assets/Art/Bullets/` の素材（Kenney, CC0）を着色し、Bloom/Vignette（`Assets/Settings/Scanner/ScannerVolume.asset`）で発光させる。
 - スコア（`ScoreKeeper`）: グレイズ×10 ＋ 被弾ボーナス max(0, 1000 − 被弾×100)。ボーナスは終了時の会話で内訳と一緒に出す。
-- 運用ショートカット（`Flow/OperatorShortcuts`、キー 5 秒長押し・表示なし）: BattleScene は R でやり直し・P で選択へ、
-  SelectScene は E/M/H で難易度を選んでバトルへ・L で `LidarLiveScene` へ、`LidarLiveScene` は P で選択へ。
+- 運用ショートカット（`Flow/OperatorShortcuts`、キー 5 秒長押し・表示なし。円柱用・ハート用それぞれの組の中で移る）: バトルは R でやり直し・P で選択へ、
+  選択は E/M/H で難易度を選んでバトルへ・L で `LidarLiveScene` へ、`LidarLiveScene` は P で直前の選択へ。
 - 未実装: 弾の寿命。

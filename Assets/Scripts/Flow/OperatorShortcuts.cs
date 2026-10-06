@@ -8,15 +8,24 @@ namespace LidarBattle.Flow
 {
     /// <summary>
     /// 展示運用のためのキー長押しショートカット（表示は出さない）。起動時に自動で作られ、シーンをまたいで残る。
-    /// BattleScene: [R] やり直し / [P] 選択シーンへ。SelectScene: [E][M][H] 難易度を選んでバトルへ / [L] LiDAR 確認シーンへ。
-    /// LidarLiveScene: [P] 選択シーンへ。
+    /// バトル: [R] やり直し / [P] 選択シーンへ。選択: [E][M][H] 難易度を選んでバトルへ / [L] LiDAR 確認シーンへ。
+    /// LidarLiveScene: [P] 直前に使っていた選択シーンへ。
+    /// 選択とバトルのシーンは組（円柱用 SelectScene/BattleScene、ハート用 HeartSelectScene/HeartBattleScene）で扱い、
+    /// 組の中だけで移る。
     /// </summary>
     public sealed class OperatorShortcuts : MonoBehaviour
     {
         private const float HoldSeconds = 5f;
-        private const string SelectScene = "SelectScene";
-        private const string BattleScene = "BattleScene";
         private const string DebugScene = "LidarLiveScene";
+
+        // (選択シーン, バトルシーン) の組。
+        private static readonly (string Select, string Battle)[] ScenePairs =
+        {
+            ("SelectScene", "BattleScene"),
+            ("HeartSelectScene", "HeartBattleScene"),
+        };
+
+        private static string s_lastSelectScene = ScenePairs[0].Select; // LiDAR 確認シーンから戻る先
 
         private static readonly Key[] Keys = { Key.R, Key.P, Key.E, Key.M, Key.H, Key.L };
 
@@ -66,26 +75,45 @@ namespace LidarBattle.Flow
             action();
         }
 
-        private static Action ActionFor(string scene, Key key) => (scene, key) switch
+        private static Action ActionFor(string scene, Key key)
         {
-            (BattleScene, Key.R) => () => Load(BattleScene),
-            (BattleScene, Key.P) => () => Load(SelectScene),
-            (SelectScene, Key.E) => () => StartBattle(Difficulty.Easy),
-            (SelectScene, Key.M) => () => StartBattle(Difficulty.Medium),
-            (SelectScene, Key.H) => () => StartBattle(Difficulty.Hard),
-            (SelectScene, Key.L) => OpenDebugScene,
-            (DebugScene, Key.P) => () => Load(SelectScene),
-            _ => null,
-        };
+            if (scene == DebugScene) return key == Key.P ? () => Load(s_lastSelectScene) : null;
 
-        private static void StartBattle(Difficulty difficulty)
-        {
-            GameSession.Difficulty = difficulty;
-            Load(BattleScene);
+            foreach (var (select, battle) in ScenePairs)
+            {
+                if (scene == battle)
+                {
+                    return key switch
+                    {
+                        Key.R => () => Load(battle),
+                        Key.P => () => Load(select),
+                        _ => null,
+                    };
+                }
+                if (scene == select)
+                {
+                    return key switch
+                    {
+                        Key.E => () => StartBattle(battle, Difficulty.Easy),
+                        Key.M => () => StartBattle(battle, Difficulty.Medium),
+                        Key.H => () => StartBattle(battle, Difficulty.Hard),
+                        Key.L => () => OpenDebugScene(select),
+                        _ => null,
+                    };
+                }
+            }
+            return null;
         }
 
-        private static void OpenDebugScene()
+        private static void StartBattle(string battleScene, Difficulty difficulty)
         {
+            GameSession.Difficulty = difficulty;
+            Load(battleScene);
+        }
+
+        private static void OpenDebugScene(string fromSelectScene)
+        {
+            s_lastSelectScene = fromSelectScene;
             // センサーは同時に 1 接続しか受け付けないので、ゲーム側の接続を切ってから確認シーンに直接つながせる。
             LidarInputSource.Shutdown();
             Load(DebugScene);

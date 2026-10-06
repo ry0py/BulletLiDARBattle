@@ -20,6 +20,7 @@ namespace LidarBattle.Input
         [SerializeField] private LidarSettings _settings;
 
         private static HokuyoEthernetSensor s_sensor;
+        private static LidarSettings s_connectedSettings; // 接続と検出器を作ったときの設定
         private static BackgroundSubtractionTracker s_tracker;
         private static RegionFilterTracker s_region;
         private static SmoothedTracker s_smoothed;
@@ -42,7 +43,11 @@ namespace LidarBattle.Input
 
         private static void EnsureConnected(LidarSettings settings)
         {
-            if (s_sensor != null) return;
+            // 円柱用とハート用のシーンは設定アセットが違う（円の半径など）。違う設定のシーンに来たら作り直す。
+            if (s_sensor != null && s_connectedSettings == settings) return;
+            if (s_sensor != null) Shutdown();
+
+            s_connectedSettings = settings;
 
             s_sensor = new HokuyoEthernetSensor(settings);
             s_region = new RegionFilterTracker(
@@ -64,6 +69,7 @@ namespace LidarBattle.Input
             Application.quitting -= Shutdown;
             s_sensor?.Dispose();
             s_sensor = null;
+            s_connectedSettings = null;
             s_tracker = null;
             s_region = null;
             s_smoothed = null;

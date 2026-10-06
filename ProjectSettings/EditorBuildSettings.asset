@@ -20,6 +20,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/LidarLiveScene.unity
     guid: 56f32659bf080ca4aa538c6baefb4952
+  - enabled: 1
+    path: Assets/Scenes/HeartSelectScene.unity
+    guid: 202d8b55af0ee9b498fdc6578b974c99
+  - enabled: 1
+    path: Assets/Scenes/HeartBattleScene.unity
+    guid: 9ea218338fc440040bcee6933781c487
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
