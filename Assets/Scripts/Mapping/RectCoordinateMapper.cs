@@ -37,6 +37,15 @@ namespace LidarBattle.Mapping
                 physicalM.x * _cos + physicalM.y * _sin,
                 -physicalM.x * _sin + physicalM.y * _cos);
 
+        /// <summary>物理座標[m] がキャリブレーション矩形を marginM だけ広げた範囲に入るか。</summary>
+        public bool Contains(Vector2 physicalM, float marginM)
+        {
+            Vector2 r = ToAligned(physicalM);
+            Vector2 max = _min + _size;
+            return r.x >= Mathf.Min(_min.x, max.x) - marginM && r.x <= Mathf.Max(_min.x, max.x) + marginM
+                && r.y >= Mathf.Min(_min.y, max.y) - marginM && r.y <= Mathf.Max(_min.y, max.y) + marginM;
+        }
+
         public Vector2 ToNormalized(Vector2 physicalM)
         {
             Vector2 r = ToAligned(physicalM);

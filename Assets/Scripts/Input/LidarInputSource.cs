@@ -23,6 +23,7 @@ namespace LidarBattle.Input
 
         private static HokuyoEthernetSensor s_sensor;
         private static BackgroundSubtractionTracker s_tracker;
+        private static RegionFilterTracker s_region;
         private static string s_error;
         private static int s_backgroundFramesLeft;
         private static bool s_showStatus = true;
@@ -38,8 +39,8 @@ namespace LidarBattle.Input
         private void Awake()
         {
             _fallbackInput = _fallback as IHeartInputSource;
-            RebuildMapper();
             if (_settings.UseLidar) EnsureConnected(_settings);
+            RebuildMapper();
         }
 
         private static void EnsureConnected(LidarSettings settings)
@@ -47,9 +48,9 @@ namespace LidarBattle.Input
             if (s_sensor != null) return;
 
             s_sensor = new HokuyoEthernetSensor(settings);
-            s_tracker = new BackgroundSubtractionTracker(
-                new CircleFitTracker(settings.ClusterRadiusM, settings.MinClusterPoints, settings.HeartRadiusM, settings.FitIterations),
-                settings.AngularResolution, settings.BackgroundMarginM);
+            s_region = new RegionFilterTracker(
+                new CircleFitTracker(settings.ClusterRadiusM, settings.MinClusterPoints, settings.HeartRadiusM, settings.FitIterations));
+            s_tracker = new BackgroundSubtractionTracker(s_region, settings.AngularResolution, settings.BackgroundMarginM);
             Application.quitting += Shutdown;
             try { s_sensor.Connect(); }
             catch (Exception e)
@@ -65,13 +66,20 @@ namespace LidarBattle.Input
             s_sensor?.Dispose();
             s_sensor = null;
             s_tracker = null;
+            s_region = null;
             s_error = null;
             s_backgroundFramesLeft = 0;
         }
 
         private void RebuildMapper()
-            => _mapper = new RectCoordinateMapper(_settings.PhysicalMin, _settings.PhysicalMax,
+        {
+            var mapper = new RectCoordinateMapper(_settings.PhysicalMin, _settings.PhysicalMax,
                 _settings.RotationDeg, _settings.InvertX, _settings.InvertY);
+            _mapper = mapper;
+            // PhysicalMin/Max はハート中心の可動範囲なので、表面点が入るよう半径ぶん広げた盤面だけを見る。
+            float margin = _settings.HeartRadiusM;
+            if (s_region != null) s_region.Region = p => mapper.Contains(p, margin);
+        }
 
         private void Update()
         {

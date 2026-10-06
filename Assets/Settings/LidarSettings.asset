@@ -28,10 +28,10 @@ MonoBehaviour:
   MinClusterPoints: 3
   BackgroundMarginM: 0.05
   BackgroundFrames: 20
-  HeartRadiusM: 0.04
+  HeartRadiusM: 0.02
   FitIterations: 5
-  PhysicalMin: {x: -0.3, y: 0.2}
-  PhysicalMax: {x: 0.3, y: 0.6}
-  RotationDeg: -90
+  PhysicalMin: {x: -0.46, y: -0.13}
+  PhysicalMax: {x: -0.05, y: 0.13}
+  RotationDeg: 180
   InvertX: 0
   InvertY: 0
