@@ -30,8 +30,11 @@ MonoBehaviour:
   BackgroundFrames: 20
   HeartRadiusM: 0.02
   FitIterations: 5
-  PhysicalMin: {x: -0.31, y: -0.08}
-  PhysicalMax: {x: -0.05, y: 0.08}
-  RotationDeg: 180
+  SmoothingAlpha: 0.3
+  MaxJumpM: 0.1
+  MaxHoldFrames: 5
+  PhysicalMin: {x: 0.05, y: -0.08}
+  PhysicalMax: {x: 0.31, y: 0.08}
+  RotationDeg: 0
   InvertX: 0
   InvertY: 0

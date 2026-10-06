@@ -92,7 +92,8 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
 
 - Unity 6 プロジェクト。URP/2D/Input System/Timeline/URG-Unity 導入済み。
 - Battle/Input 層を bullet-system.md の方針で作り直した（Timeline 発射・BulletSystem 集約・キーボード入力）。
-- LiDAR 入力は `LidarInputSource`（UST-20LX, Ethernet）で接続済み。
+- LiDAR 入力は `LidarInputSource`（UST-20LX, Ethernet）で接続済み。本番ではセンサーを盤面の左端に置き、
+  右（盤面側）を向ける（`RotationDeg` 0）。
   実機の点群確認は `Tools > LiDAR Battle > Build LiDAR Live Scene`。
 - カメラ入力を試作中（LiDAR が実機で難しかったため）。ハートに ArUco マーカー（DICT_4X4_50）を貼り、
   `python Tools/CameraTracker/aruco_tracker.py` が検出して UDP で `CameraInputSource` に送る。
