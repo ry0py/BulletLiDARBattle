@@ -58,7 +58,8 @@ namespace LidarBattle.Input
             }
         }
 
-        private static void Shutdown()
+        /// <summary>LiDAR との接続を閉じる。次に LidarInputSource が起きたときに接続し直す（LiDAR 確認シーンへ移る前に呼ぶ）。</summary>
+        public static void Shutdown()
         {
             Application.quitting -= Shutdown;
             s_sensor?.Dispose();

@@ -112,4 +112,6 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
     SOUL は琥珀色のハートで、輪がグレイズ範囲。アセットは `Assets/Art/Scanner/`・`Assets/Settings/Scanner/`・`Assets/Timelines/Scanner/`。
     弾は `Assets/Art/Bullets/` の素材（Kenney, CC0）を着色し、Bloom/Vignette（`Assets/Settings/Scanner/ScannerVolume.asset`）で発光させる。
 - スコア（`ScoreKeeper`）: グレイズ×10 ＋ 被弾ボーナス max(0, 1000 − 被弾×100)。ボーナスは終了時の会話で内訳と一緒に出す。
+- 運用ショートカット（`Flow/OperatorShortcuts`、キー 5 秒長押し・表示なし）: BattleScene は R でやり直し・P で選択へ、
+  SelectScene は E/M/H で難易度を選んでバトルへ・L で `LidarLiveScene` へ、`LidarLiveScene` は P で選択へ。
 - 未実装: 弾の寿命。

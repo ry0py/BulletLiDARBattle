@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/ScannerBattleScene.unity
     guid: eb05f71e0376d5545b4a8c25626b606b
+  - enabled: 1
+    path: Assets/Scenes/LidarLiveScene.unity
+    guid: 56f32659bf080ca4aa538c6baefb4952
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
