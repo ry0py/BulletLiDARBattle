@@ -31,7 +31,10 @@ namespace LidarBattle.EditorTools
         private const string SelectScenePath = "Assets/Scenes/SelectScene.unity";
         private const string BattleScenePath = "Assets/Scenes/BattleScene.unity";
 
-        private static Sprite _square, _circle, _heart;
+        private static readonly Color SoulColor = new(0.55f, 0.55f, 0.55f);
+        private const float SoulOutlineScale = 1.25f; // 白いふちの太さ（本体に対する倍率）
+
+        private static Sprite _square, _circle;
 
         [MenuItem("Tools/LiDAR Battle/Rebuild Game Setup")]
         public static void Build()
@@ -43,7 +46,7 @@ namespace LidarBattle.EditorTools
 
                 _square = MakeSprite("Square", 4, (x, y) => true);
                 _circle = MakeSprite("Circle", 32, (x, y) => Sq(x - 15.5f) + Sq(y - 15.5f) <= Sq(15.5f));
-                _heart = MakeSprite("Heart", 32, IsHeart);
+                MakeSprite("Heart", 32, IsHeart); // LiDAR シミュレーションが使う
 
                 BuildSelectScene();
                 BuildBattleScene();
@@ -297,9 +300,11 @@ namespace LidarBattle.EditorTools
             soul.transform.position = soulStart;
             soul.transform.localScale = Vector3.one * 0.3f;
             var soulRenderer = soul.gameObject.AddComponent<SpriteRenderer>();
-            soulRenderer.sprite = _heart;
-            soulRenderer.color = Color.red;
+            // 自機は灰色の丸に白いふち。白い弾（ふちなしの丸）と見分けられるようにする。
+            soulRenderer.sprite = _circle;
+            soulRenderer.color = SoulColor;
             soulRenderer.sortingOrder = 20;
+            MakeSpriteObject("Outline", soul.transform, _circle, Color.white, 19).localScale = Vector3.one * SoulOutlineScale;
             Set(soul, ("_inputSource", input), ("_board", board), ("_clock", clock),
                 ("_halfSize", 0.15f), ("_hitRadius", 0.06f), ("_grazeRadius", 0.3f));
 

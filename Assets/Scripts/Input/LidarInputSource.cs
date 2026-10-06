@@ -24,7 +24,7 @@ namespace LidarBattle.Input
         private static RegionFilterTracker s_region;
         private static string s_error;
         private static int s_backgroundFramesLeft;
-        private static bool s_showStatus = true;
+        private static bool s_showStatus; // 展示中は出さない。[F1] で表示（シーンをまたいで保持）
 
         private RectCoordinateMapper _mapper;
         private int _lastScanCount = -1;

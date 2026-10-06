@@ -14,7 +14,7 @@ namespace LidarBattle.Input
         private IHeartInputSource[] _sources;
         private string[] _names;
         private int _activeIndex = -1;
-        private bool _showStatus = true;
+        private static bool s_showStatus; // 展示中は出さない。[F1] で表示（シーンをまたいで保持）
 
         private void Awake()
         {
@@ -44,12 +44,12 @@ namespace LidarBattle.Input
         private void Update()
         {
             Keyboard keyboard = Keyboard.current;
-            if (keyboard != null && keyboard.f1Key.wasPressedThisFrame) _showStatus = !_showStatus;
+            if (keyboard != null && keyboard.f1Key.wasPressedThisFrame) s_showStatus = !s_showStatus;
         }
 
         private void OnGUI()
         {
-            if (!_showStatus) return;
+            if (!s_showStatus) return;
             GUI.Box(new Rect(10, 160, 620, 30), GUIContent.none);
             GUI.Label(new Rect(20, 165, 600, 20),
                 $"Input: {(_activeIndex >= 0 ? _names[_activeIndex] : "none (stopped)")}   order: keyboard > LiDAR > camera");

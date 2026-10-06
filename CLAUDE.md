@@ -104,7 +104,7 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
 - ゲームの流れ（game-flow.md）を最低限実装。シーン・弾アセット・難易度別 Timeline は
   `Tools > LiDAR Battle > Rebuild Game Setup`（`Assets/Editor/GameSetupBuilder.cs`）で生成する（上書き注意）。
 - 見た目は 2 種類あり、シーンもアセットも分けている。弾幕の中身（Timeline の配置・FirePattern）は共通。
-  - 元の版（黒背景・白枠・赤ハート）: `SelectScene`/`BattleScene`。`Tools > LiDAR Battle > Rebuild Game Setup`（`GameSetupBuilder`）。
+  - 元の版（黒背景・白枠。自機は 2026-10-07 に赤ハートから白ふちの灰色の丸に変更）: `SelectScene`/`BattleScene`。`Tools > LiDAR Battle > Rebuild Game Setup`（`GameSetupBuilder`）。
   - 独自の「スキャナー」版（**2026-10-05 から開発停止中**。機能追加・修正は元の版だけに行い、スキャナー版の
     ビルダー・シーン・アセットは触らない。共用コードを変えるときも、スキャナー版のコンパイルが通る範囲にとどめる）:
     `ScannerSelectScene`/`ScannerBattleScene`。`Tools > LiDAR Battle > Rebuild Scanner Setup`

@@ -33,7 +33,7 @@ namespace LidarBattle.Input
         private float _lastPacketTime = float.NegativeInfinity;
         private bool _detected;
         private Vector2 _imagePosition;
-        private bool _showStatus = true;
+        private static bool s_showStatus; // 展示中は出さない。[F1] で表示（シーンをまたいで保持）
 
         private bool TrackerActive => Time.unscaledTime - _lastPacketTime < _timeoutSec;
 
@@ -77,7 +77,7 @@ namespace LidarBattle.Input
         private void Update()
         {
             Keyboard keyboard = Keyboard.current;
-            if (keyboard != null && keyboard.f1Key.wasPressedThisFrame) _showStatus = !_showStatus;
+            if (keyboard != null && keyboard.f1Key.wasPressedThisFrame) s_showStatus = !s_showStatus;
             if (s_socket == null) return;
 
             while (s_socket.Available > 0) // 溜まった分を読み切って最新だけ使う
@@ -100,7 +100,7 @@ namespace LidarBattle.Input
 
         private void OnGUI()
         {
-            if (!_showStatus) return;
+            if (!s_showStatus) return;
 
             string state = s_socket == null ? $"port {_port} unavailable"
                 : !TrackerActive ? "tracker not running"
