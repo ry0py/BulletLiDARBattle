@@ -42,6 +42,12 @@ namespace LidarBattle.Config
         [Tooltip("ハートを円とみなしたときの半径 [m] (スキャン面の高さでの断面幅の半分程度)")] public float HeartRadiusM = 0.040f;
         public int FitIterations = 5;
 
+        [Header("平滑化 (震え対策)")]
+        [Tooltip("指数移動平均の係数 (0〜1)。小さいほど震えが減るが遅れる。1 で平滑化なし")]
+        [Range(0.05f, 1f)] public float SmoothingAlpha = 0.3f;
+        [Tooltip("1 スキャンでこれ以上飛んだ結果は誤検出とみなし、少しの間直前位置を保つ [m]")] public float MaxJumpM = 0.1f;
+        [Tooltip("見失い・飛びのときに直前位置を保つスキャン数")] public int MaxHoldFrames = 5;
+
         [Header("キャリブレーション (Mapping: 物理[m] → 正規化0..1)")]
         [Tooltip("画面の左下に対応する物理座標 [m] (回転補正後)。実行中に [1] で記録できる")] public Vector2 PhysicalMin = new Vector2(-0.3f, 0.3f);
         [Tooltip("画面の右上に対応する物理座標 [m] (回転補正後)。実行中に [2] で記録できる")] public Vector2 PhysicalMax = new Vector2(0.3f, 0.9f);

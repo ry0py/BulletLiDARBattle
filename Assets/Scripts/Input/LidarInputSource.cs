@@ -22,6 +22,7 @@ namespace LidarBattle.Input
         private static HokuyoEthernetSensor s_sensor;
         private static BackgroundSubtractionTracker s_tracker;
         private static RegionFilterTracker s_region;
+        private static SmoothedTracker s_smoothed;
         private static string s_error;
         private static int s_backgroundFramesLeft;
         private static bool s_showStatus; // 展示中は出さない。[F1] で表示（シーンをまたいで保持）
@@ -47,6 +48,7 @@ namespace LidarBattle.Input
             s_region = new RegionFilterTracker(
                 new CircleFitTracker(settings.ClusterRadiusM, settings.MinClusterPoints, settings.HeartRadiusM, settings.FitIterations));
             s_tracker = new BackgroundSubtractionTracker(s_region, settings.AngularResolution, settings.BackgroundMarginM);
+            s_smoothed = new SmoothedTracker(s_tracker, settings.SmoothingAlpha, settings.MaxJumpM, settings.MaxHoldFrames);
             Application.quitting += Shutdown;
             try { s_sensor.Connect(); }
             catch (Exception e)
@@ -63,6 +65,7 @@ namespace LidarBattle.Input
             s_sensor = null;
             s_tracker = null;
             s_region = null;
+            s_smoothed = null;
             s_error = null;
             s_backgroundFramesLeft = 0;
         }
@@ -90,7 +93,7 @@ namespace LidarBattle.Input
                 _detected = false;
                 return;
             }
-            _detected = s_tracker.TryTrack(scan, out _positionM);
+            _detected = s_smoothed.TryTrack(scan, out _positionM);
         }
 
         public bool TryReadTarget(Vector2 currentNormalized, float deltaTime, out Vector2 target)
