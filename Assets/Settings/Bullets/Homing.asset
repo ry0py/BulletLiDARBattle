@@ -17,6 +17,7 @@ MonoBehaviour:
   _angle: 0
   _spread: 15
   _spiralStep: 10
+  _width: 5
   _move: 4
   _speed: 2.2
   _acceleration: 0
@@ -26,3 +27,6 @@ MonoBehaviour:
   _amplitude: 0.5
   _frequency: 1
   _turnRate: 60
+  _stopTime: 0.6
+  _waitTime: 0.4
+  _gravity: 3

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c773d3bf2db61741b4c8569b740db31, type: 3}
+  m_Name: Medium
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.PortraitSet
+  _base: {fileID: 21300000, guid: fbde4b238725ab14f846640437219aac, type: 3}
+  _talk: {fileID: 21300000, guid: 4b5fc2e6b7f24fe4d85c29b970603ac9, type: 3}
+  _attack: {fileID: 21300000, guid: 70ef4a5aaa254cc4d86136dda852efb5, type: 3}
+  _smile: {fileID: 21300000, guid: 7550e407058678d408d3c7c75b93b333, type: 3}
+  _defeat: {fileID: 21300000, guid: e4e78ee6cb494f746b3f047e4dc42162, type: 3}

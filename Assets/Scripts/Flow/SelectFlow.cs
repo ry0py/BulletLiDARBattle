@@ -1,4 +1,5 @@
 using System.Collections;
+using LidarBattle.Audio;
 using LidarBattle.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -18,10 +19,13 @@ namespace LidarBattle.Flow
         [SerializeField] private GameObject _optionsRoot;
         [SerializeField] private DifficultyOption[] _options;
         [SerializeField] private string _battleSceneName = "BattleScene";
+        [Tooltip("決定音を聞かせてからバトルへ移るまでの秒数")]
+        [SerializeField] private float _decideWaitSeconds = 0.6f;
 
         private IEnumerator Start()
         {
             _optionsRoot.SetActive(false);
+            GameAudio.PlayBgm(Bgm.Select);
             yield return _dialogue.PlayAuto(_openingLines, _lineHoldSeconds);
 
             // 最後のセリフ（「難易度を選んでね」）は表示したまま選ばせる。
@@ -37,6 +41,9 @@ namespace LidarBattle.Flow
             }
 
             GameSession.Difficulty = selected.Difficulty;
+            GameAudio.StopBgm();
+            GameAudio.PlaySe(Se.Decide);
+            yield return new WaitForSeconds(_decideWaitSeconds);
             SceneManager.LoadScene(_battleSceneName);
         }
     }

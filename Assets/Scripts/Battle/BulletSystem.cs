@@ -21,11 +21,13 @@ namespace LidarBattle.Battle
         public event Action<Bullet> Grazed;
 
         private readonly List<Bullet> _active = new();
-        private readonly List<float> _angles = new();
+        private readonly List<(Vector2 offset, float angle)> _shots = new();
         private ObjectPool<Bullet> _pool;
         private float _accumulator;
 
         public IReadOnlyList<Bullet> Active => _active;
+        public SoulController Soul => _soul;
+        public BulletBoard Board => _board;
 
         private void Awake()
         {
@@ -38,15 +40,15 @@ namespace LidarBattle.Battle
         public void Fire(BulletType type, FirePattern pattern, Vector2 boardPosition, int shotIndex, System.Random random)
         {
             var origin = _board.NormalizedToWorld(boardPosition);
-            pattern.GetAngles(origin, _soul.Position, shotIndex, random, _angles);
+            pattern.GetShots(origin, _soul.Position, shotIndex, random, _shots);
 
-            foreach (float angle in _angles)
+            foreach (var (offset, angle) in _shots)
             {
                 var b = _pool.Get();
                 b.Type = type;
                 b.Pattern = pattern;
-                b.Origin = origin;
-                b.Position = origin;
+                b.Origin = origin + offset;
+                b.Position = b.Origin;
                 b.Angle = angle;
                 b.Speed = pattern.Speed;
                 b.Age = 0f;
@@ -54,7 +56,7 @@ namespace LidarBattle.Battle
                 b.View.sprite = type.Sprite;
                 b.View.color = type.Color;
                 b.View.transform.localScale = Vector3.one * type.Scale;
-                b.View.transform.position = origin;
+                b.View.transform.position = b.Origin;
                 _active.Add(b);
             }
         }

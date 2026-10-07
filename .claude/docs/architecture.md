@@ -83,6 +83,15 @@
 - 弾の発射は Timeline、発射後の管理は `BulletSystem`。詳細は [bullet-system.md](bullet-system.md)。
 - 全体をまとめる司令役クラスは置かず、参照は Inspector で直接つなぐ。
 
+### Audio 層
+- 唯一の責務: BGM・SE・セリフ音を鳴らす。`GameAudio` 1 つだけ。
+- 起動時に自動生成されてシーンをまたいで残り（BGM を途切れさせない）、`Resources/Audio/` の WAV を読む。
+  呼び出し側は静的メソッド（`PlayBgm`/`PlaySe`/`PlaySelectTick`/`PlayVoice`）を呼ぶだけで、シーン側の配線は不要。
+  例外的に Inspector 注入にしていないのは、音を足すたびに全シーン（円柱用・ハート用）を組み直さずに済ませるため（KISS）。
+- 何をいつ鳴らすかは呼ぶ側が決める（Flow が BGM・決定音・開始音・被弾音、`DialogueBox` がセリフ音、
+  `DifficultyOption` が選択中の音）。セリフ音のピッチは難易度ごとに `BattleFlow._voicePitches` で決める。
+- 音源は `Tools/AudioGen/generate_audio.py` で合成した自作チップチューン（外部素材なし）。差し替えは同名の WAV を置くだけ。
+
 ## 依存性注入の方針
 
 - MonoBehaviour 同士の参照は Inspector 注入（`[SerializeField]`）を基本とする。

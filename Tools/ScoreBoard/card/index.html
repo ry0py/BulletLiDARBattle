@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>記録カード</title>
+<style>
+  :root { --bg: #000; --fg: #fff; --dim: #8a8a8a; --accent: #ffe14d; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 16px 40px;
+  }
+  h1 { margin: 0; font-size: 20px; letter-spacing: .1em; }
+  #card { width: 100%; max-width: 540px; border: 2px solid #333; display: none; }
+  button {
+    width: 100%;
+    max-width: 540px;
+    padding: 16px;
+    font: inherit;
+    font-size: 18px;
+    font-weight: bold;
+    color: #000;
+    background: var(--accent);
+    border: 0;
+    display: none;
+  }
+  p { margin: 0; color: var(--dim); font-size: 14px; text-align: center; }
+</style>
+</head>
+<body>
+<h1>あなたの記録</h1>
+<img id="card" alt="記録カード">
+<button id="save">画像を保存</button>
+<p id="message">読み込み中…</p>
+
+<script src="cardcode.js"></script>
+<script>
+  const TITLE = "BULLET LiDAR BATTLE";
+  const EVENT = "工大祭 2026";
+  const W = 1080, H = 1350, PAD = 60;
+  const COLORS = { Easy: "#5be37d", Medium: "#ffb43b", Hard: "#ff5a5a" };
+  const FONT = '"Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif';
+
+  const pad2 = n => String(n).padStart(2, "0");
+  const dateText = d => `${d.getFullYear()}.${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}  ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+
+  function draw(rec) {
+    const canvas = document.createElement("canvas");
+    canvas.width = W; canvas.height = H;
+    const g = canvas.getContext("2d");
+    const font = (size, weight = "normal") => `${weight} ${size}px ${FONT}`;
+
+    g.fillStyle = "#000";
+    g.fillRect(0, 0, W, H);
+
+    // 見出し
+    g.fillStyle = "#8a8a8a";
+    g.font = font(34);
+    g.fillText(TITLE, PAD, 100);
+    g.fillStyle = COLORS[rec.difficulty] ?? "#fff";
+    g.font = font(96, "bold");
+    g.fillText(rec.difficulty.toUpperCase(), PAD, 210);
+    g.fillStyle = "#fff";
+    g.font = font(40);
+    g.textAlign = "right";
+    g.fillText(dateText(rec.time), W - PAD, 205);
+    g.textAlign = "left";
+
+    // 盤面と軌跡（座標は 0〜1、y は上向き）
+    const bw = W - PAD * 2, bh = bw / rec.aspect, bx = PAD, by = 260;
+    const px = x => bx + x * bw, py = y => by + (1 - y) * bh;
+
+    g.strokeStyle = "#1c1c1c";
+    g.lineWidth = 2;
+    for (let i = 1; i < 8; i++) {
+      g.beginPath(); g.moveTo(bx + bw * i / 8, by); g.lineTo(bx + bw * i / 8, by + bh); g.stroke();
+      g.beginPath(); g.moveTo(bx, by + bh * i / 8); g.lineTo(bx + bw, by + bh * i / 8); g.stroke();
+    }
+
+    g.lineWidth = 5;
+    g.lineCap = "round";
+    const n = rec.path.length;
+    for (let i = 1; i < n; i++) {
+      // 時間で色を変える（始め シアン → 終わり ピンク）
+      g.strokeStyle = `hsl(${190 + 130 * i / n}, 90%, 62%)`;
+      g.beginPath();
+      g.moveTo(px(rec.path[i - 1][0]), py(rec.path[i - 1][1]));
+      g.lineTo(px(rec.path[i][0]), py(rec.path[i][1]));
+      g.stroke();
+    }
+    if (n > 0) {
+      g.strokeStyle = "#fff"; g.lineWidth = 4;
+      g.beginPath(); g.arc(px(rec.path[0][0]), py(rec.path[0][1]), 14, 0, Math.PI * 2); g.stroke();
+      g.fillStyle = "#fff";
+      g.beginPath(); g.arc(px(rec.path[n - 1][0]), py(rec.path[n - 1][1]), 12, 0, Math.PI * 2); g.fill();
+    }
+
+    g.save();
+    g.strokeStyle = "#ff3b3b"; g.lineWidth = 5;
+    g.shadowColor = "#ff3b3b"; g.shadowBlur = 16;
+    for (const h of rec.hits) {
+      const x = px(h.x), y = py(h.y), r = 13;
+      g.beginPath(); g.moveTo(x - r, y - r); g.lineTo(x + r, y + r); g.moveTo(x + r, y - r); g.lineTo(x - r, y + r); g.stroke();
+    }
+    g.restore();
+
+    g.strokeStyle = "#fff"; g.lineWidth = 6;
+    g.strokeRect(bx, by, bw, bh);
+
+    g.font = font(26);
+    g.fillStyle = "#8a8a8a";
+    g.fillText("○ スタート   ● ゴール   ✕ 被弾", bx, by + bh + 44);
+
+    // 被弾回数
+    const sy = by + bh + 200;
+    g.fillStyle = "#fff";
+    g.font = font(44);
+    g.fillText("被弾", PAD, sy - 70);
+    g.font = font(150, "bold");
+    const count = String(rec.hits.length);
+    g.fillText(count, PAD, sy + 50);
+    const cw = g.measureText(count).width;
+    g.font = font(56);
+    g.fillText("回", PAD + cw + 16, sy + 50);
+    if (rec.hits.length === 0) {
+      g.fillStyle = "#ffe14d";
+      g.font = font(72, "bold");
+      g.textAlign = "right";
+      g.fillText("ノーミス！", W - PAD, sy + 40);
+      g.textAlign = "left";
+    }
+
+    // 被弾したタイミング
+    const duration = Math.max(1, n * rec.interval);
+    const ty = sy + 150;
+    g.strokeStyle = "#555"; g.lineWidth = 4;
+    g.beginPath(); g.moveTo(PAD, ty); g.lineTo(W - PAD, ty); g.stroke();
+    g.strokeStyle = "#ff3b3b"; g.lineWidth = 6;
+    for (const h of rec.hits) {
+      const x = PAD + (W - PAD * 2) * Math.min(1, h.t / duration);
+      g.beginPath(); g.moveTo(x, ty - 22); g.lineTo(x, ty + 22); g.stroke();
+    }
+    g.fillStyle = "#8a8a8a"; g.font = font(24);
+    g.fillText("0秒", PAD, ty + 54);
+    g.textAlign = "right";
+    g.fillText(`${Math.round(duration)}秒`, W - PAD, ty + 54);
+    g.fillText(EVENT, W - PAD, H - 40);
+    g.textAlign = "left";
+    g.fillText("被弾したタイミング", PAD + 90, ty + 54);
+
+    return canvas;
+  }
+
+  async function main() {
+    const message = document.getElementById("message");
+    let rec;
+    try {
+      rec = await CardCode.decode(location.hash.slice(1));
+    } catch {
+      message.textContent = "記録を読み込めませんでした。QR コードを読み直してください。";
+      return;
+    }
+
+    const canvas = draw(rec);
+    const img = document.getElementById("card");
+    img.src = canvas.toDataURL("image/png");
+    img.style.display = "block";
+
+    const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
+    const name = `lidar-battle-${rec.time.getFullYear()}${pad2(rec.time.getMonth() + 1)}${pad2(rec.time.getDate())}-${pad2(rec.time.getHours())}${pad2(rec.time.getMinutes())}.png`;
+    const file = new File([blob], name, { type: "image/png" });
+
+    const save = document.getElementById("save");
+    save.style.display = "block";
+    save.onclick = async () => {
+      // スマホは共有メニュー（「画像を保存」で写真に入る）、PC はダウンロード。
+      if (navigator.canShare?.({ files: [file] })) {
+        try { await navigator.share({ files: [file] }); } catch { /* キャンセル */ }
+        return;
+      }
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      a.click();
+    };
+    message.textContent = "画像を長押ししても保存できます";
+  }
+
+  main();
+</script>
+</body>
+</html>

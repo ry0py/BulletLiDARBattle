@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>被弾ランキング</title>
+<style>
+  /* 会場はネットが無い前提なので、外部フォント・CDN は使わない */
+  :root {
+    --bg: #000;
+    --fg: #fff;
+    --dim: #8a8a8a;
+    --line: #fff;
+    --new: #ffe14d;
+    --easy: #5be37d;
+    --medium: #ffb43b;
+    --hard: #ff5a5a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "BIZ UDGothic", "MS Gothic", "Yu Gothic UI", monospace;
+    display: flex;
+    flex-direction: column;
+    padding: 2.5vh 3vw;
+    gap: 2.5vh;
+    overflow: hidden;
+  }
+  header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+  }
+  h1 {
+    margin: 0;
+    font-size: 5vh;
+    letter-spacing: .15em;
+  }
+  #total { font-size: 2.6vh; color: var(--dim); }
+  #total b { color: var(--fg); font-size: 3.4vh; }
+
+  main {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr) 0.9fr;
+    gap: 2vw;
+    min-height: 0;
+  }
+  .board {
+    border: 4px solid var(--line);
+    padding: 2vh 1.5vw;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+  .board h2 {
+    margin: 0 0 1.5vh;
+    font-size: 4vh;
+    text-align: center;
+    letter-spacing: .1em;
+    color: var(--c);
+  }
+  .board h2 small { display: block; font-size: 2vh; color: var(--dim); letter-spacing: 0; margin-top: .5vh; }
+  ol { list-style: none; margin: 0; padding: 0; flex: 1; display: flex; flex-direction: column; gap: .6vh; }
+  li {
+    display: grid;
+    grid-template-columns: 4.5em 1fr auto;
+    align-items: baseline;
+    font-size: 3vh;
+    padding: .4vh .6vw;
+    border-bottom: 1px dashed #333;
+  }
+  li .rank { color: var(--dim); }
+  li:nth-child(1) .rank { color: var(--c); font-weight: bold; }
+  li .time { color: var(--dim); font-size: 2.2vh; }
+  li .hits { font-size: 3.4vh; font-weight: bold; }
+  li .hits small { font-size: 2vh; font-weight: normal; color: var(--dim); margin-left: .2em; }
+  li.nomiss .hits { color: var(--new); }
+  li.latest { background: #2a2600; outline: 2px solid var(--new); animation: blink 1s steps(2) 6; }
+  li.empty { color: #444; border-bottom-color: #1a1a1a; }
+  @keyframes blink { 50% { background: transparent; } }
+
+  .cards {
+    border: 4px solid var(--new);
+    padding: 2vh 1vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5vh;
+    min-height: 0;
+  }
+  .cards h2 { margin: 0; font-size: 3.4vh; color: var(--new); text-align: center; }
+  .cards h2 small { display: block; font-size: 1.9vh; color: var(--dim); margin-top: .5vh; }
+  .card { flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; align-items: center; gap: .8vh; }
+  .card img { flex: 1; min-height: 0; max-width: 100%; aspect-ratio: 1; image-rendering: pixelated; }
+  .card img:not([src]) { visibility: hidden; }
+  .card p { margin: 0; font-size: 2.2vh; white-space: nowrap; }
+  .card p .label { color: var(--new); margin-right: .5em; }
+
+  footer {
+    border: 4px solid var(--line);
+    padding: 1.8vh 2vw;
+    font-size: 3.2vh;
+    display: flex;
+    align-items: center;
+    gap: 1.2em;
+    min-height: 9vh;
+  }
+  footer .label { color: var(--new); }
+  footer .heart { color: var(--hard); }
+  #status { margin-left: auto; font-size: 1.8vh; color: #555; }
+</style>
+</head>
+<body>
+<header>
+  <h1>被弾ランキング</h1>
+  <div id="total">これまでの挑戦 <b>0</b> 回</div>
+</header>
+
+<main>
+  <section class="board" data-difficulty="Easy" style="--c: var(--easy)"><h2>EASY<small>被弾が少ない順</small></h2><ol></ol></section>
+  <section class="board" data-difficulty="Medium" style="--c: var(--medium)"><h2>MEDIUM<small>被弾が少ない順</small></h2><ol></ol></section>
+  <section class="board" data-difficulty="Hard" style="--c: var(--hard)"><h2>HARD<small>被弾が少ない順</small></h2><ol></ol></section>
+  <section class="cards">
+    <h2>記録カード<small>スマホで読み取って保存</small></h2>
+    <div class="card"><img alt=""><p></p></div>
+    <div class="card"><img alt=""><p></p></div>
+  </section>
+</main>
+
+<footer>
+  <span class="heart">&#9829;</span>
+  <span id="latest">まだ挑戦者はいません</span>
+  <span id="status"></span>
+</footer>
+
+<script src="qrcode.js"></script>
+<script src="card/cardcode.js"></script>
+<script>
+  const TOP = 10;          // 各難易度で出す順位の数
+  const POLL_MS = 3000;    // plays.jsonl を読み直す間隔
+  // カードページ（card/）の公開先。来場者のスマホが自分の回線で開く。
+  const CARD_URL = "https://ry0py.com/lidar-battle-card/";
+
+  let lastText = null;
+
+  // 1 行 1 プレイ。書き込み途中の行などは読み飛ばす。
+  function parse(text) {
+    const plays = [];
+    for (const line of text.split("\n")) {
+      if (!line.trim()) continue;
+      try {
+        const p = JSON.parse(line);
+        if (typeof p.hits === "number" && p.difficulty) plays.push(p);
+      } catch { /* 壊れた行は無視 */ }
+    }
+    return plays;
+  }
+
+  // 被弾が少ない順。同じ被弾数なら先に出した人が上。同じ被弾数は同じ順位。
+  function ranking(plays) {
+    const sorted = plays.slice().sort((a, b) => a.hits - b.hits || a.time.localeCompare(b.time));
+    let rank = 0;
+    return sorted.map((p, i) => {
+      if (i === 0 || p.hits !== sorted[i - 1].hits) rank = i + 1;
+      return { ...p, rank };
+    });
+  }
+
+  function clock(time) { return time.slice(11, 16); }
+
+  function render(plays) {
+    const latest = plays[plays.length - 1];
+    if (latest) latest.latest = true;
+    document.querySelector("#total b").textContent = plays.length;
+
+    let latestRank = null;
+    for (const board of document.querySelectorAll(".board")) {
+      const ranked = ranking(plays.filter(p => p.difficulty === board.dataset.difficulty));
+      const ol = board.querySelector("ol");
+      ol.replaceChildren();
+      for (let i = 0; i < TOP; i++) {
+        const li = document.createElement("li");
+        const p = ranked[i];
+        if (!p) {
+          li.className = "empty";
+          li.innerHTML = `<span class="rank">${i + 1}位</span><span>---</span><span></span>`;
+        } else {
+          if (p.hits === 0) li.classList.add("nomiss");
+          if (p.latest) li.classList.add("latest");
+          li.innerHTML = `<span class="rank">${p.rank}位</span><span class="time">${clock(p.time)}</span>`
+                       + `<span class="hits">${p.hits}<small>回</small></span>`;
+        }
+        ol.appendChild(li);
+      }
+      const mine = ranked.find(r => r.latest);
+      if (mine) latestRank = mine.rank;
+    }
+
+    document.getElementById("latest").innerHTML = latest
+      ? `<span class="label">さっきの挑戦</span> ${clock(latest.time)} ／ ${latest.difficulty} ／ `
+        + `被弾 <b>${latest.hits}</b> 回 ／ <b>${latestRank}</b> 位`
+        + (latest.hits === 0 ? ' <span class="label">ノーミス！</span>' : "")
+      : "まだ挑戦者はいません";
+
+    renderCards(plays);
+  }
+
+  // 直前 2 プレイの記録カードの QR。replays/<id>.json を読み、データごと URL に入れる。
+  const qrCache = new Map(); // id → Promise<QR 画像の data URL>
+
+  function cardQr(id) {
+    if (!qrCache.has(id)) {
+      const job = (async () => {
+        const res = await fetch(`replays/${id}.json`, { cache: "no-store" });
+        if (!res.ok) throw new Error(res.status);
+        const url = CARD_URL + "#" + await CardCode.encode(await res.json());
+        const qr = qrcode(0, "L");
+        qr.addData(url, "Byte");
+        qr.make();
+        return qr.createDataURL(1, 3);
+      })();
+      job.catch(() => qrCache.delete(id)); // 失敗したら次に描き直すときにやり直す
+      qrCache.set(id, job);
+    }
+    return qrCache.get(id);
+  }
+
+  function renderCards(plays) {
+    const recent = plays.filter(p => p.id).slice(-2).reverse();
+    document.querySelectorAll(".card").forEach(async (card, i) => {
+      const p = recent[i];
+      const img = card.querySelector("img");
+      card.dataset.id = p?.id ?? "";
+      card.querySelector("p").innerHTML = p
+        ? `<span class="label">${i === 0 ? "さっき" : "その前"}</span>${clock(p.time)} ${p.difficulty} 被弾${p.hits}回`
+        : "";
+      if (!p) { img.removeAttribute("src"); return; }
+      try {
+        const src = await cardQr(p.id);
+        if (card.dataset.id === p.id) img.src = src;
+      } catch {
+        img.removeAttribute("src");
+      }
+    });
+  }
+
+  async function poll() {
+    try {
+      const res = await fetch("plays.jsonl", { cache: "no-store" });
+      const text = await res.text();
+      if (text !== lastText) {
+        lastText = text;
+        render(parse(text));
+      }
+      document.getElementById("status").textContent = "";
+    } catch {
+      document.getElementById("status").textContent = "サーバーにつながりません";
+    }
+  }
+
+  poll();
+  setInterval(poll, POLL_MS);
+</script>
+</body>
+</html>

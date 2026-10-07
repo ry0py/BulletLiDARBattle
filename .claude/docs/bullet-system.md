@@ -37,7 +37,7 @@ Bullet … 状態を持つだけ（位置・角度・速さ・経過時間・Bul
 | `ShotTrack` / `ShotClip` / `ShotBehaviour` | Timeline | 発射のタイミングと組み合わせを決める |
 | `BattleClock` | MonoBehaviour | 一時停止・スロー。Timeline の再生速度も合わせる |
 | `SoulController` | MonoBehaviour | SOUL の移動・判定半径・被弾後の無敵時間 |
-| `ScoreKeeper` / `ScoreView` | MonoBehaviour | 被弾・グレイズを数えてスコアにする / スコアと被弾回数を画面に出す |
+| `ScoreKeeper` / `ScoreView` | MonoBehaviour | 被弾回数を数える / 被弾回数を画面に出す（元の版では使わない。プレイ中は出さず終了時の会話でだけ出す。グレイズは SOUL の見た目とログだけ） |
 | `HitFeedback` | MonoBehaviour | 被弾時のカメラ振動と画面の赤フラッシュ（見た目だけ） |
 | `BattleDebug` | MonoBehaviour | Gizmo・イベントログ・デバッグキー |
 
@@ -53,12 +53,27 @@ switch に分岐を 1 つ足す。Inspector には全パラメータが並ぶが
     **発射数そのもので奇数・偶数が決まる**（奇数 = 中央の 1 発が SOUL を向く、偶数 = 両脇を通る）。
   - `Spiral`: 渦巻き。「何回目の発射か」から角度を計算するので、パターン自体は状態を持たない。
   - `Random`: ばらまき。乱数は `ShotClip` が持つ `System.Random` を使う。
+  - `Arc`: 向き固定の扇形（`Aimed` の中心角を `Angle` に固定したもの）。
+  - `Line`: 進む向きと直交する長さ `Width` の線上に `Count` 発を等間隔に並べ、全弾同じ向きに撃つ（壁）。
+  - `RandomLine`: `Line` の線上のランダムな位置から撃つ（盤面全体に降る雨など）。
+  - 撃ち方は「発射位置からのずれ＋発射角」の組を返す（`GetShots`）。ずれを使うのは `Line`/`RandomLine` だけ。
 - **飛び方（`MoveType`）**
   - `Linear`: 直線。
   - `Accelerate`: 加減速。速さは最小〜最大に収める。
   - `Curve`: 角速度で向きを回す。
   - `SineWave`: 毎ステップ加算せず、発射位置と経過時間から現在位置を直接計算する（誤差の蓄積を防ぐ）。
   - `Homing`: 1 秒あたりの旋回量に上限を付けて SOUL の方へ向きを変える。
+  - `StopAndAim`: `StopTime` 秒かけて止まり、`WaitTime` 秒待ってから 1 回だけ SOUL へ向け直して `MaxSpeed` で飛ぶ。
+    状態は持たず、経過時間が再発射の時刻をまたいだステップで向け直す。
+  - `Gravity`: 下向きに `Gravity` で加速する（放物線）。
+
+## 技のライブラリ（Timeline）
+
+- 1 つの「技」＝ ShotTrack だけを持つ長さ 8 秒の Timeline。`Assets/Timelines/Attacks/` に 23 個ある。
+  `Tools > LiDAR Battle > Build Attack Library`（`Assets/Editor/AttackLibraryBuilder.cs`）で生成する（上書き注意）。
+  技用の FirePattern は `Assets/Settings/Bullets/Attacks/`。弾の種類は既存の White/Yellow に Small（小さい水色）・Big（大きい赤）を足した。
+- 難易度別 Timeline（Easy/Medium/Hard）にはまだ組み込んでいない。使うときは技の Timeline をそのまま再生するか、
+  中のクリップを難易度別 Timeline にコピーする。ShotTrack のバインドは `BattleFlow` と同じく実行時に BulletSystem へ付ける。
 
 ## 当たり判定・グレイズ・被弾
 
@@ -82,7 +97,7 @@ switch に分岐を 1 つ足す。Inspector には全パラメータが並ぶが
 - `BulletType` / `FirePattern` の定義クラスは `Assets/Scripts/Battle/` に置く
   （`FirePattern` が `Bullet` を直接動かすため。Config 層に置くと Config → Battle の逆依存になる）。
 - `.asset` は `Assets/Settings/` に置く。
-- 乱数はクリップごとにシードを固定できる。来場者どうしでスコアを比べるため、本番の弾幕はシード固定にする。
+- 乱数はクリップごとにシードを固定できる。来場者どうしで被弾回数を比べるため、本番の弾幕はシード固定にする。
 
 ## 見た目
 

@@ -1,4 +1,5 @@
 using System;
+using LidarBattle.Audio;
 using LidarBattle.Input;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -116,6 +117,7 @@ namespace LidarBattle.Flow
             s_lastSelectScene = fromSelectScene;
             // センサーは同時に 1 接続しか受け付けないので、ゲーム側の接続を切ってから確認シーンに直接つながせる。
             LidarInputSource.Shutdown();
+            GameAudio.StopBgm(); // 確認シーンは無音でよい。選択シーンに戻ると SelectFlow が流し直す
             Load(DebugScene);
         }
 

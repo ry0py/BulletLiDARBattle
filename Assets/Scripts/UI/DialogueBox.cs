@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using LidarBattle.Audio;
 using TMPro;
 using UnityEngine;
 
@@ -17,10 +18,16 @@ namespace LidarBattle.UI
         [SerializeField] private float _charsPerSecond = 30f;
         [Tooltip("各行頭へ付ける接頭辞")]
         [SerializeField] private string _linePrefix = "* ";
+        [Tooltip("セリフ音を鳴らす最短間隔（秒）。毎文字だと細かすぎるため")]
+        [SerializeField] private float _voiceInterval = 0.06f;
 
         private Coroutine _typing;
+        private float _lastVoiceTime = float.NegativeInfinity;
 
         public bool IsTyping => _typing != null;
+
+        /// <summary>セリフ音のピッチ。難易度ごとに変えるのは呼び出し側（BattleFlow）が決める。</summary>
+        public float VoicePitch { get; set; } = 1f;
 
         /// <summary>1 行を表示する。表示中の行があれば打ち切って差し替える。</summary>
         public void Show(string line)
@@ -55,9 +62,19 @@ namespace LidarBattle.UI
             for (int shown = 1; shown <= full.Length; shown++)
             {
                 _label.text = full.Substring(0, shown);
+                PlayVoice(full[shown - 1]);
                 yield return new WaitForSeconds(perChar);
             }
             _typing = null;
+        }
+
+        /// <summary>空白・記号では鳴らさない（アンダーテールのように文字のところだけ「ポポポ」と鳴る）。</summary>
+        private void PlayVoice(char c)
+        {
+            if (char.IsWhiteSpace(c) || char.IsPunctuation(c) || char.IsSymbol(c)) return;
+            if (Time.time - _lastVoiceTime < _voiceInterval) return;
+            _lastVoiceTime = Time.time;
+            GameAudio.PlayVoice(VoicePitch);
         }
 
         private void StopTyping()
