@@ -4,7 +4,10 @@ using UnityEngine;
 
 namespace LidarBattle.Flow
 {
-    /// <summary>難易度の選択肢。SOUL が枠内に holdSeconds 居続けたら選択済みになる。外れたらリセット。</summary>
+    /// <summary>
+    /// 難易度の選択肢。SOUL が枠内に holdSeconds 居続けたら選択済みになる。外れたらリセット。
+    /// 表示された時点で SOUL がすでに枠内にいたら、一度枠から出るまで数えない（乗せたままで勝手に始まらないように）。
+    /// </summary>
     public class DifficultyOption : MonoBehaviour
     {
         [SerializeField] private Difficulty _difficulty;
@@ -20,14 +23,23 @@ namespace LidarBattle.Flow
 
         private float _timer;
         private float _nextTick;
+        private bool _armed;
 
         public Difficulty Difficulty => _difficulty;
         public bool IsSelected => _timer >= _holdSeconds;
+
+        private void OnEnable()
+        {
+            _armed = false;
+            _timer = 0f;
+        }
 
         private void Update()
         {
             var offset = _soul.Position - (Vector2)transform.position;
             bool inside = Mathf.Abs(offset.x) <= _size.x * 0.5f && Mathf.Abs(offset.y) <= _size.y * 0.5f;
+            if (!inside) _armed = true;
+            inside &= _armed;
             _timer = inside ? _timer + Time.deltaTime : 0f;
             UpdateTick(inside);
 
