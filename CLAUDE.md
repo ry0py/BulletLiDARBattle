@@ -138,7 +138,7 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
 - 音（2026-10-08）: `GameAudio` が鳴らす。BGM はセレクト用（ポップ）とバトル用（ポップ＋緊迫感、全難易度共通）。
   SE は被弾・選択中（ゲージが溜まるほど高く）・難易度決定・バトル開始・敵のセリフ音（アンダーテール風の「ポポポ」。
   ピッチは Easy 1.0 / Medium 0.85 / Hard 0.7）。音源はすべて `python Tools/AudioGen/generate_audio.py` で合成した自作。
-- 立ち絵（2026-10-08、素材は依頼中。今は仮の画像を割り当て済み）: 会話ボックスの左に `PortraitView`。表情はベース・口あけ・技・笑顔・負け顔の 5 種で、
+- 立ち絵（2026-10-08。Easy は sake・Medium は idle・Hard は inu。元画像は `Resource/`。inu はベースのみで黒線を白に変換済み）: 会話ボックスの左に `PortraitView`。表情はベース・口あけ・技・笑顔・負け顔の 5 種で、
   難易度ごとに `Assets/Settings/Portraits/{Easy,Medium,Hard}.asset`（`PortraitSet`）に画像を割り当てる。詳細は game-flow.md。
 - 弾幕の「技」を 8 秒の Timeline として 23 個用意した（`Assets/Timelines/Attacks/`、`Tools > LiDAR Battle > Build Attack Library`）。
   難易度別 Timeline にはまだ組み込んでいない（将来ランダムに再生するかも）。詳細は bullet-system.md。
