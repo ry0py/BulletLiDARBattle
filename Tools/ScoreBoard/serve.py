@@ -102,6 +102,10 @@ def make_handler(log_path: Path):
                 self.send_data(log_path, "application/x-ndjson", missing_ok=True)
             elif REPLAY_PATH.match(path):
                 self.send_data(log_path.parent / path.lstrip("/"), "application/json", missing_ok=False)
+            elif path.rstrip("/") == "/debug":
+                self.send_response(302)  # デバッグ表示は index.html に ?debug を付けたもの
+                self.send_header("Location", "/?debug")
+                self.end_headers()
             elif path == "/admin.html" and not self.is_local():
                 self.send_error(403)
             else:
