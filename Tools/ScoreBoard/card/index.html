@@ -164,8 +164,8 @@
 
     // 被弾回数
     const sy = by + bh + 230;
-    drawCount(g, rec.hits.length, sy);
-    if (rec.hits.length === 0) {
+    drawCount(g, rec.count, sy);
+    if (rec.count === 0) {
       g.fillStyle = "#ffe14d";
       g.font = font(72, "bold");
       g.textAlign = "right";

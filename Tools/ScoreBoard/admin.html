@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>記録の管理</title>
+<style>
+  /* 会場はネットが無い前提なので、外部フォント・CDN は使わない */
+  :root {
+    --bg: #000;
+    --fg: #fff;
+    --dim: #8a8a8a;
+    --line: #333;
+    --accent: #ffe14d;
+    --easy: #5be37d;
+    --medium: #ffb43b;
+    --hard: #ff5a5a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "BIZ UDGothic", "MS Gothic", "Yu Gothic UI", monospace;
+    padding: 24px 16px 48px;
+  }
+  .wrap { max-width: 960px; margin: 0 auto; }
+  header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; margin-bottom: 8px; }
+  h1 { margin: 0; font-size: 26px; letter-spacing: .1em; }
+  #summary { color: var(--dim); }
+  #summary b { color: var(--fg); }
+  header .tools { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  p.note { margin: 0 0 16px; color: var(--dim); font-size: 13px; line-height: 1.6; }
+  #status { min-height: 1.4em; margin: 0 0 8px; color: var(--accent); }
+  #status.error { color: var(--hard); }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; white-space: nowrap; }
+  th { color: var(--dim); font-weight: normal; user-select: none; }
+  th[data-key] { cursor: pointer; }
+  th[data-key]:hover { color: var(--fg); }
+  th.sorted { color: var(--accent); }
+  th.sorted::after { content: " ▲"; }
+  th.sorted.desc::after { content: " ▼"; }
+  td.num, th.num { text-align: right; }
+  tr.dirty { background: #2a2600; }
+  tr.latest td:first-child::after { content: "最新"; margin-left: 8px; font-size: 11px; color: #000; background: var(--accent); padding: 1px 6px; }
+  .id { color: var(--dim); font-size: 12px; }
+
+  select, input, button { font: inherit; color: var(--fg); background: #111; border: 1px solid #555; padding: 4px 8px; }
+  input[type=number] { width: 5em; text-align: right; }
+  input[type=checkbox] { width: 18px; height: 18px; accent-color: var(--accent); }
+  select.Easy { color: var(--easy); }
+  select.Medium { color: var(--medium); }
+  select.Hard { color: var(--hard); }
+  button { cursor: pointer; }
+  button:hover:not(:disabled) { border-color: var(--fg); }
+  button:disabled { opacity: .35; cursor: default; }
+  button.save { border-color: var(--accent); color: var(--accent); }
+  button.delete { color: var(--hard); }
+  a.card { color: var(--fg); border: 1px solid #555; padding: 4px 8px; text-decoration: none; }
+  a.card:hover { border-color: var(--fg); }
+  .actions { display: flex; gap: 6px; }
+  .empty { color: var(--dim); text-align: center; padding: 32px; }
+  .scroll { overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>記録の管理</h1>
+    <span id="summary"></span>
+    <span class="tools">
+      <select id="filter" aria-label="難易度で絞り込み">
+        <option value="">すべての難易度</option>
+        <option>Easy</option><option>Medium</option><option>Hard</option>
+      </select>
+      <button id="reload">再読み込み</button>
+    </span>
+  </header>
+  <p class="note">
+    変えた行は黄色になり、「保存」で plays.jsonl に書き込みます（直前の内容は plays.jsonl.bak に残ります）。
+    削除したプレイの再生データは replays/deleted/ に移します。列の見出しを押すと並べ替えます（表示だけで、ファイルの順は変わりません）。
+    被弾回数を変えると記録カードの回数も変わります（減らすと × 印も先頭からその数だけ。元の記録は消えないので、戻せば元どおり）。
+  </p>
+  <p id="status"></p>
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th data-key="time">日時</th>
+          <th data-key="difficulty">難易度</th>
+          <th data-key="hits" class="num">被弾</th>
+          <th data-key="debug">デバッグ</th>
+          <th>ID</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+</div>
+
+<script src="card/cardcode.js"></script>
+<script>
+  const DIFFICULTIES = ["Easy", "Medium", "Hard"];
+  const POLL_MS = 5000; // 変更中の行が無いときだけ読み直す
+
+  let plays = [];
+  let sort = { key: "time", desc: true };
+  const edits = new Map(); // id → まだ保存していない変更
+
+  // スコアボードと同じ読み方。壊れた行と id の無い行（編集できない）は出さない。
+  function parse(text) {
+    const list = [];
+    for (const line of text.split("\n")) {
+      if (!line.trim()) continue;
+      try {
+        const p = JSON.parse(line);
+        if (p.id && typeof p.hits === "number" && p.difficulty) list.push(p);
+      } catch { /* 壊れた行は無視 */ }
+    }
+    return list;
+  }
+
+  async function load() {
+    try {
+      const res = await fetch("plays.jsonl", { cache: "no-store" });
+      plays = parse(await res.text());
+      render();
+    } catch {
+      setStatus("サーバーにつながりません", true);
+    }
+  }
+
+  function setStatus(text, error = false) {
+    const el = document.getElementById("status");
+    el.textContent = text;
+    el.classList.toggle("error", error);
+  }
+
+  const current = p => ({ difficulty: p.difficulty, hits: p.hits, debug: !!p.debug, ...edits.get(p.id) });
+
+  function compare(a, b) {
+    const x = a[sort.key], y = b[sort.key];
+    const d = sort.key === "difficulty" ? DIFFICULTIES.indexOf(x) - DIFFICULTIES.indexOf(y)
+            : typeof x === "string" ? x.localeCompare(y)
+            : Number(x) - Number(y);
+    return (sort.desc ? -d : d) || b.time.localeCompare(a.time);
+  }
+
+  function render() {
+    const latestId = plays.length ? plays[plays.length - 1].id : null;
+    const filter = document.getElementById("filter").value;
+    const shown = plays.filter(p => !filter || p.difficulty === filter).sort(compare);
+
+    const counts = DIFFICULTIES.map(d => `${d} ${plays.filter(p => p.difficulty === d).length}`).join(" ／ ");
+    document.getElementById("summary").innerHTML = `全 <b>${plays.length}</b> 件（${counts}）`;
+
+    for (const th of document.querySelectorAll("th[data-key]")) {
+      th.classList.toggle("sorted", th.dataset.key === sort.key);
+      th.classList.toggle("desc", th.dataset.key === sort.key && sort.desc);
+    }
+
+    const tbody = document.querySelector("tbody");
+    tbody.replaceChildren(...shown.map(p => row(p, p.id === latestId)));
+    if (!shown.length) {
+      const tr = tbody.insertRow();
+      const td = tr.insertCell();
+      td.colSpan = 6;
+      td.className = "empty";
+      td.textContent = plays.length ? "この難易度の記録はありません" : "まだ記録がありません";
+    }
+  }
+
+  function row(p, latest) {
+    const v = current(p);
+    const tr = document.createElement("tr");
+    tr.classList.toggle("dirty", edits.has(p.id));
+    tr.classList.toggle("latest", latest);
+
+    const time = tr.insertCell();
+    time.textContent = p.time.replace("T", " ");
+
+    const difficulty = document.createElement("select");
+    difficulty.className = v.difficulty;
+    for (const d of DIFFICULTIES) difficulty.add(new Option(d, d, false, d === v.difficulty));
+    difficulty.onchange = () => change(p, { difficulty: difficulty.value });
+    tr.insertCell().append(difficulty);
+
+    const hits = document.createElement("input");
+    hits.type = "number";
+    hits.min = 0;
+    hits.max = 999;
+    hits.value = v.hits;
+    hits.onchange = () => change(p, { hits: Math.max(0, Math.min(999, Math.round(Number(hits.value) || 0))) });
+    const hitsCell = tr.insertCell();
+    hitsCell.className = "num";
+    hitsCell.append(hits);
+
+    const debug = document.createElement("input");
+    debug.type = "checkbox";
+    debug.checked = v.debug;
+    debug.onchange = () => change(p, { debug: debug.checked });
+    tr.insertCell().append(debug);
+
+    const id = tr.insertCell();
+    id.className = "id";
+    id.textContent = p.id;
+
+    const actions = document.createElement("div");
+    actions.className = "actions";
+    const save = button("保存", "save", () => saveEdit(p));
+    save.disabled = !edits.has(p.id);
+    const revert = button("戻す", "", () => { edits.delete(p.id); render(); });
+    revert.disabled = !edits.has(p.id);
+    actions.append(cardLink(p), save, revert, button("削除", "delete", () => remove(p)));
+    tr.insertCell().append(actions);
+    return tr;
+  }
+
+  function button(label, className, onclick) {
+    const b = document.createElement("button");
+    b.textContent = label;
+    b.className = className;
+    b.onclick = onclick;
+    return b;
+  }
+
+  // 元の値に戻ったら「変更なし」に戻す。
+  function change(p, patch) {
+    const next = { ...current(p), ...patch };
+    const same = next.difficulty === p.difficulty && next.hits === p.hits && next.debug === !!p.debug;
+    if (same) edits.delete(p.id); else edits.set(p.id, next);
+    render();
+  }
+
+  // そのプレイの記録カード（画像）を新しいタブで開く。会場はオフラインなので、公開ページではなく
+  // このサーバーが配る card/ を使う。データは QR と同じく # 以降に入れる。
+  function cardLink(p) {
+    const a = document.createElement("a");
+    a.className = "card";
+    a.textContent = "カード";
+    a.href = "card/";
+    a.target = "_blank";
+    a.onclick = async e => {
+      e.preventDefault();
+      const tab = window.open("about:blank", "_blank"); // await の後だとポップアップとして止められるので先に開く
+      try {
+        const res = await fetch(`replays/${p.id}.json`, { cache: "no-store" });
+        if (!res.ok) throw new Error(res.status);
+        tab.location = "card/#" + await CardCode.encode(await res.json());
+      } catch {
+        tab?.close();
+        setStatus(`記録カードを開けませんでした（再生データがありません）: ${label(p)}`, true);
+      }
+    };
+    return a;
+  }
+
+  const label = p => `${p.time.replace("T", " ")} ${p.difficulty} 被弾${p.hits}回`;
+
+  async function saveEdit(p) {
+    const res = await fetch(`api/plays/${p.id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(current(p)),
+    });
+    if (!res.ok) return setStatus(`保存できませんでした（${res.status}）: ${label(p)}`, true);
+    edits.delete(p.id);
+    setStatus(`保存しました: ${label({ ...p, ...current(p) })}`);
+    await load();
+  }
+
+  async function remove(p) {
+    if (!confirm(`この記録を削除しますか？\n${label(p)}`)) return;
+    const res = await fetch(`api/plays/${p.id}`, { method: "DELETE" });
+    if (!res.ok) return setStatus(`削除できませんでした（${res.status}）: ${label(p)}`, true);
+    edits.delete(p.id);
+    setStatus(`削除しました: ${label(p)}`);
+    await load();
+  }
+
+  for (const th of document.querySelectorAll("th[data-key]")) {
+    th.onclick = () => {
+      const key = th.dataset.key;
+      sort = { key, desc: sort.key === key ? !sort.desc : key === "time" };
+      render();
+    };
+  }
+  document.getElementById("filter").onchange = render;
+  document.getElementById("reload").onclick = () => { edits.clear(); setStatus(""); load(); };
+
+  load();
+  setInterval(() => { if (!edits.size) load(); }, POLL_MS);
+</script>
+</body>
+</html>

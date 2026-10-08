@@ -2,16 +2,18 @@
 // スコアボード（encode, 展示 PC）とカードページ（decode, 来場者のスマホ）で共用する。
 // QR を小さく保つため、replays/<id>.json を粗くしてから圧縮する（元のファイルはそのまま）。
 //
-// 形式 v1（圧縮前のバイト列、数値はリトルエンディアン）
-//   [0] 版 (1)  [1] 難易度 0-2 | デバッグなら 0x80
+// 形式 v2（圧縮前のバイト列、数値はリトルエンディアン）
+//   [0] 版 (2)  [1] 難易度 0-2 | デバッグなら 0x80
 //   [2..6] 開始時刻 年-2000, 月, 日, 時, 分
 //   [7] 盤面の横/縦 × 50
 //   [8] 軌跡の間隔（0.1 秒単位）
-//   [9..10] 被弾数 n, 続けて n 個 × (時刻 0.1 秒単位 u16, x u8, y u8)
+//   [9..10] カードに出す被弾回数（管理画面で直した値。被弾の記録の数と違うことがある）
+//   被弾の記録の数 n (u16), 続けて n 個 × (時刻 0.1 秒単位 u16, x u8, y u8)
 //   軌跡の点数 m (u16), 続けて m 個 × (x, y) の前の点との差 (mod 256)
 //   座標は盤面の左下 0, 右上 255。
+// v1 は [9..10] が無く、被弾回数 = 被弾の記録の数。読むときは v1 も受け付ける。
 const CardCode = (() => {
-  const VERSION = 1;
+  const VERSION = 2;
   const PATH_STEP = 2; // 0.1 秒おきの軌跡を 2 つに 1 つへ間引く（0.2 秒おき）
   const DIFFICULTIES = ["Easy", "Medium", "Hard"];
 
@@ -48,8 +50,12 @@ const CardCode = (() => {
     out.push(Math.min(255, Math.round(bw / bh * 50)));
     out.push(Math.round(replay.pathInterval * PATH_STEP * 10));
 
-    u16(replay.hitEvents.length);
-    for (const h of replay.hitEvents) {
+    // 管理画面で被弾回数を減らしたら、× 印も先頭からその数だけにする（元の記録は消さない）。
+    const count = replay.hits ?? replay.hitEvents.length;
+    const hitEvents = replay.hitEvents.slice(0, count);
+    u16(count);
+    u16(hitEvents.length);
+    for (const h of hitEvents) {
       u16(Math.round(h.t * 10));
       out.push(nx(h.x), ny(h.y));
     }
@@ -66,21 +72,24 @@ const CardCode = (() => {
     return toBase64Url(await pipe(new Uint8Array(out), new CompressionStream("deflate-raw")));
   }
 
-  /** URL の文字列 → { time, difficulty, debug, aspect, hits:[{t,x,y}], path:[[x,y]], interval }（座標は 0〜1） */
+  /** URL の文字列 → { time, difficulty, debug, aspect, count, hits:[{t,x,y}], path:[[x,y]], interval }（座標は 0〜1） */
   async function decode(text) {
     const b = await pipe(fromBase64Url(text), new DecompressionStream("deflate-raw"));
     let i = 0;
     const u8 = () => b[i++];
     const u16 = () => b[i++] | (b[i++] << 8);
 
-    if (u8() !== VERSION) throw new Error("unknown version");
+    const version = u8();
+    if (version !== 1 && version !== 2) throw new Error("unknown version");
     const flags = u8();
     const [yy, mo, dd, hh, mi] = [u8() + 2000, u8(), u8(), u8(), u8()];
     const aspect = u8() / 50;
     const interval = u8() / 10;
+    const shownCount = version >= 2 ? u16() : null;
 
     const hits = [];
     for (let n = u16(); n > 0; n--) hits.push({ t: u16() / 10, x: u8() / 255, y: u8() / 255 });
+    const count = shownCount ?? hits.length;
 
     const path = [];
     let px = 0, py = 0;
@@ -94,7 +103,7 @@ const CardCode = (() => {
       time: new Date(yy, mo - 1, dd, hh, mi),
       difficulty: DIFFICULTIES[flags & 0x7f] ?? "?",
       debug: (flags & 0x80) !== 0,
-      aspect, interval, hits, path,
+      aspect, interval, count, hits, path,
     };
   }
 
