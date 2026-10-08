@@ -85,6 +85,7 @@ LiDAR シミュレーション（実機なしで検出手法を真値と比較�
 - 音源: `Assets/Resources/Audio/`（`GameAudio` が名前で読む）。生成スクリプトは `Tools/AudioGen/generate_audio.py`
 - カメラ検出スクリプト: `Tools/CameraTracker/`（Unity の外で動かす Python。`Assets/` には置かない）
 - スコアボード: `Tools/ScoreBoard/`（`python Tools/ScoreBoard/serve.py` で LAN に配信。同じ PC は localhost:8000）。
+  `localhost:8000/` は本番のプレイだけ、`localhost:8000/?debug` はデバッグモードのプレイだけを出す。
   記録の編集・削除は管理画面 `localhost:8000/admin.html`（`admin.html`。この PC からだけ開ける）
 
 ## Unity Editor 操作のルール

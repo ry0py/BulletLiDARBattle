@@ -39,6 +39,7 @@
     letter-spacing: .15em;
   }
   #total { font-size: 2.6vh; color: var(--dim); }
+  h1 .debug { margin-left: .6em; padding: 0 .4em; font-size: 2.6vh; letter-spacing: .1em; color: #000; background: var(--new); vertical-align: middle; }
   #total b { color: var(--fg); font-size: 3.4vh; }
 
   main {
@@ -180,17 +181,23 @@
 <script>
   const MAX_HITS = 10;     // この回数以上はまとめて「○回以上」の 1 行にする
   const POLL_MS = 3000;    // plays.jsonl を読み直す間隔
+  // 本番は localhost:8000/ のまま。?debug を付けるとデバッグモードのプレイだけを出す（本番のプレイは出さない）。
+  const DEBUG_VIEW = new URLSearchParams(location.search).has("debug");
+  if (DEBUG_VIEW) {
+    document.querySelector("h1").insertAdjacentHTML("beforeend", '<span class="debug">DEBUG</span>');
+    document.title += "（デバッグ）";
+  }
 
   let lastText = null;
 
-  // 1 行 1 プレイ。書き込み途中の行などは読み飛ばす。
+  // 1 行 1 プレイ。書き込み途中の行などは読み飛ばし、今の表示（本番／デバッグ）のプレイだけを返す。
   function parse(text) {
     const plays = [];
     for (const line of text.split("\n")) {
       if (!line.trim()) continue;
       try {
         const p = JSON.parse(line);
-        if (typeof p.hits === "number" && p.difficulty) plays.push(p);
+        if (typeof p.hits === "number" && p.difficulty && !!p.debug === DEBUG_VIEW) plays.push(p);
       } catch { /* 壊れた行は無視 */ }
     }
     return plays;

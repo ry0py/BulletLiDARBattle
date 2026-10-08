@@ -33,12 +33,26 @@
     display: none;
   }
   p { margin: 0; color: var(--dim); font-size: 14px; text-align: center; }
+  /* 保存（黄色）と並ぶので、こちらは枠だけにして目立ちすぎないようにする */
+  a.link {
+    width: 100%;
+    max-width: 540px;
+    padding: 14px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: center;
+    text-decoration: none;
+    color: var(--accent);
+    border: 2px solid var(--accent);
+  }
 </style>
 </head>
 <body>
 <h1>あなたの記録</h1>
 <img id="card" alt="記録カード">
 <button id="save">画像を保存</button>
+<!-- 新しいタブで開き、記録カードのページは残す -->
+<a class="link" href="https://x.com/Ttech_toon_/status/2108003929850253386?s=20" target="_blank" rel="noopener">おすすめの屋台</a>
 <p id="message">読み込み中…</p>
 
 <script src="cardcode.js"></script>
