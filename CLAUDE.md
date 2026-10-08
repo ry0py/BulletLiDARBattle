@@ -27,8 +27,9 @@
   スコアボードは直前 2 プレイの「記録カード」の QR を出す。QR の URL の `#` 以降にプレイのデータを圧縮して入れ
   （形式は `Tools/ScoreBoard/card/cardcode.js`）、来場者のスマホが自分の回線で公開ページ（`card/` をこのリポジトリの GitHub Pages に置いたもの。
   URL は `cardcode.js` の `PAGE_URL`）を開き、その場で画像を描いて保存する。展示 PC はオフラインのまま。
-  公開は `.github/workflows/card-pages.yml` が main への push で自動で行う（`card/` を変えたら push するだけ）。会場のネットが悪いので
-  インターネットには頼らない（GAS・DB は使わない）。スプレッドシートへは必要なら後で取り込む。
+  公開は `.github/workflows/card-pages.yml` が main への push で自動で行う（`card/` を変えたら push するだけ）。
+  カードの左上には難易度のキャラの立ち絵（表情はランダム）。立ち絵を差し替えたら `python Tools/ScoreBoard/make_card_portraits.py` で `card/portraits/` を作り直す。
+  会場のネットが悪いのでインターネットには頼らない（GAS・DB は使わない）。スプレッドシートへは必要なら後で取り込む。
 
 ## 技術スタック
 

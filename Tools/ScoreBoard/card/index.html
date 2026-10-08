@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>記録カード</title>
+<!-- 難易度（EASY など）と「被弾」だけに使う見出しの字。使う字だけ取り寄せて軽くする（text=） -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap&text=EASYMEDIUMHARD%E8%A2%AB%E5%BC%BE">
 <style>
   :root { --bg: #000; --fg: #fff; --dim: #8a8a8a; --accent: #ffe14d; }
   * { box-sizing: border-box; }
@@ -56,6 +58,7 @@
 <p id="message">読み込み中…</p>
 
 <script src="cardcode.js"></script>
+<script src="portraits/list.js"></script>
 <script>
   const TITLE = "弾幕ゲーム in 工大祭2026";
   const CREDIT = "制作: りょうぴ ／ イラスト: 世界のたまちゃん・ヨーダ";
@@ -67,6 +70,24 @@
   const dateText = d => `${d.getFullYear()}.${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}  ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 
   const font = (size, weight = "normal") => `${weight} ${size}px ${FONT}`;
+  // 見出し用。読み込めなかったら FONT に落ちる。
+  const HEADING_FONT = '"Dela Gothic One", ' + FONT;
+  const headingFont = size => `${size}px ${HEADING_FONT}`;
+
+  // 難易度のキャラの立ち絵を 1 枚ランダムに選んで読み込む（ゲームと同じ組み合わせ）。読めなければ null。
+  async function loadPortrait(difficulty) {
+    const names = PORTRAITS[difficulty];
+    if (!names?.length) return null;
+    const img = new Image();
+    img.src = "portraits/" + names[Math.floor(Math.random() * names.length)];
+    try { await img.decode(); return img; } catch { return null; }
+  }
+
+  // canvas はフォントの読み込みを待たずに描くので、先に読み込んでおく。回線が遅くても 3 秒で諦める。
+  function loadHeadingFont() {
+    const timeout = new Promise(resolve => setTimeout(resolve, 3000));
+    return Promise.race([document.fonts.load(headingFont(96), "EASYMEDIUMHARD被弾"), timeout]).catch(() => {});
+  }
 
   // 赤い ✕（被弾の印）。盤面と「被弾したタイミング」で共用する。
   function cross(g, x, y, r) {
@@ -96,7 +117,7 @@
 
   function drawCount(g, hits, sy) {
     g.fillStyle = "#fff";
-    g.font = font(44);
+    g.font = headingFont(58);
     g.fillText("被弾", PAD, sy - 100);
 
     const count = String(hits);
@@ -116,7 +137,7 @@
     g.restore();
   }
 
-  function draw(rec) {
+  function draw(rec, portrait) {
     // 上から順に積む。盤面が縦長なほど下の段が下がるので、画像の高さもそれに合わせる。
     const bw = W - PAD * 2, bh = bw / rec.aspect, bx = PAD, by = 260;
     const sy = by + bh + 230;  // 被弾回数
@@ -131,17 +152,24 @@
     g.fillStyle = "#000";
     g.fillRect(0, 0, W, H);
 
-    // 見出し
+    // 見出し。左にキャラ、その右にタイトルと難易度。日時はタイトルの行の右端（難易度とぶつからないように）。
+    let tx = PAD;
+    if (portrait) {
+      const box = 190, scale = Math.min(box / portrait.width, box / portrait.height);
+      const w = portrait.width * scale, h = portrait.height * scale;
+      g.drawImage(portrait, PAD + (box - w) / 2, 40 + (box - h), w, h); // 下ぞろえ
+      tx = PAD + box + 24;
+    }
     g.fillStyle = "#8a8a8a";
     g.font = font(34);
-    g.fillText(TITLE, PAD, 100);
+    g.fillText(TITLE, tx, 100);
     g.fillStyle = COLORS[rec.difficulty] ?? "#fff";
-    g.font = font(96, "bold");
-    g.fillText(rec.difficulty.toUpperCase(), PAD, 210);
+    g.font = headingFont(96);
+    g.fillText(rec.difficulty.toUpperCase(), tx, 210);
     g.fillStyle = "#fff";
-    g.font = font(40);
+    g.font = font(34);
     g.textAlign = "right";
-    g.fillText(dateText(rec.time), W - PAD, 205);
+    g.fillText(dateText(rec.time), W - PAD, 100);
     g.textAlign = "left";
 
     // 盤面と軌跡（座標は 0〜1、y は上向き）
@@ -228,7 +256,8 @@
       return;
     }
 
-    const canvas = draw(rec);
+    const [portrait] = await Promise.all([loadPortrait(rec.difficulty), loadHeadingFont()]);
+    const canvas = draw(rec, portrait);
     const img = document.getElementById("card");
     img.src = canvas.toDataURL("image/png");
     img.style.display = "block";
