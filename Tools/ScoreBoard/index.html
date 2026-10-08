@@ -194,6 +194,7 @@
 <script src="qrcode.js"></script>
 <script src="card/cardcode.js"></script>
 <script src="cardqr.js"></script>
+<script src="card/replay.js"></script>
 <script>
   const MAX_HITS = 15;     // この回数以上はまとめて「○回以上」の 1 行にする
   const POLL_MS = 3000;    // plays.jsonl を読み直す間隔
@@ -270,13 +271,13 @@
       ? `<span class="label">さっき</span>${clock(p.time)} ${p.difficulty} 被弾${p.hits}回`
       : "";
     img.removeAttribute("src");
-    replay = null;
+    player.show(null);
     if (!p) return;
     try {
       const [src, data] = await Promise.all([cardQrDataUrl(p.id), fetchReplay(p.id)]);
       if (cardKey !== key) return;
       img.src = src;
-      replay = toReplay(data);
+      player.show(toReplay(data));
     } catch {
       if (cardKey === key) cardKey = null;
     }
@@ -292,79 +293,19 @@
 
   const textFont = (vh, dpr) => `${vh * innerHeight / 100 * dpr}px "BIZ UDGothic", "MS Gothic", monospace`;
 
-  function cross(g, x, y, r) {
-    g.beginPath(); g.moveTo(x - r, y - r); g.lineTo(x + r, y + r); g.moveTo(x + r, y - r); g.lineTo(x - r, y + r); g.stroke();
-  }
-
-  // ---- さっきのプレイの再生（下半分。ずっと繰り返す） ----
-  const REPLAY_SPEED = 2;  // 何倍速で流すか
-  const REPLAY_HOLD = 3;   // 最後まで流したあと止めておく秒数（実時間）
-  let replay = null;       // toReplay の結果
-  let replayStart = 0;
+  // ---- さっきのプレイの再生（下半分。ずっと繰り返す。描き方は card/replay.js） ----
+  const player = ReplayPlayer.create(document.querySelector(".replay canvas"), { fontPx: () => innerHeight * 0.021 });
 
   // replays/<id>.json → 盤面の正規化座標（0〜1、y は上向き）にした軌跡と被弾
   function toReplay(r) {
     const [bx, by, bw, bh] = r.board;
     const norm = ([x, y]) => [(x - bx) / bw, (y - by) / bh];
-    const hits = r.hitEvents.slice(0, r.hits ?? r.hitEvents.length).map(h => ({ t: h.t, p: norm([h.x, h.y]) }));
-    replayStart = performance.now();
-    return { aspect: bw / bh, interval: r.pathInterval, path: r.path.map(norm), hits, duration: r.path.length * r.pathInterval };
+    const hits = r.hitEvents.slice(0, r.hits ?? r.hitEvents.length).map(h => {
+      const [x, y] = norm([h.x, h.y]);
+      return { t: h.t, x, y };
+    });
+    return { aspect: bw / bh, interval: r.pathInterval, path: r.path.map(norm), hits };
   }
-
-  function drawReplay(now) {
-    requestAnimationFrame(drawReplay);
-    const [g, w, h, dpr] = fitCanvas(document.querySelector(".replay canvas"));
-    g.clearRect(0, 0, w, h);
-    if (!replay) return;
-
-    const r = replay;
-    const loop = r.duration + REPLAY_HOLD * REPLAY_SPEED;
-    const t = Math.min(r.duration, ((now - replayStart) / 1000 * REPLAY_SPEED) % loop);
-    const textH = 3.5 * innerHeight / 100 * dpr; // 下の文字の段
-    const bh = Math.min(w / r.aspect, h - textH), bw = bh * r.aspect;
-    const bx = (w - bw) / 2, by = (h - textH - bh) / 2; // 盤面と下の文字をまとめて上下の真ん中に
-    const X = u => bx + u * bw, Y = v => by + (1 - v) * bh;
-
-    g.strokeStyle = "#fff"; g.lineWidth = 2 * dpr;
-    g.strokeRect(bx, by, bw, bh);
-
-    // ここまでの軌跡
-    const n = Math.min(r.path.length, Math.floor(t / r.interval) + 1);
-    g.strokeStyle = "#4dc3ff"; g.lineWidth = 2 * dpr; g.lineJoin = "round";
-    g.beginPath();
-    for (let i = 0; i < n; i++) i === 0 ? g.moveTo(X(r.path[i][0]), Y(r.path[i][1])) : g.lineTo(X(r.path[i][0]), Y(r.path[i][1]));
-    g.stroke();
-
-    // ここまでの被弾。当たった直後は赤い輪が広がる
-    let hitCount = 0;
-    g.strokeStyle = "#ff3b3b"; g.lineWidth = 2.5 * dpr;
-    for (const hit of r.hits) {
-      if (hit.t > t) continue;
-      hitCount++;
-      const x = X(hit.p[0]), y = Y(hit.p[1]), age = (t - hit.t) / REPLAY_SPEED;
-      cross(g, x, y, 6 * dpr);
-      if (age < 0.6) {
-        g.globalAlpha = 1 - age / 0.6;
-        g.beginPath(); g.arc(x, y, (8 + age * 50) * dpr, 0, Math.PI * 2); g.stroke();
-        g.globalAlpha = 1;
-      }
-    }
-
-    // 今の SOUL
-    const [u, v] = r.path[n - 1] ?? [0.5, 0.5];
-    g.fillStyle = "#fff";
-    g.beginPath(); g.arc(X(u), Y(v), 5 * dpr, 0, Math.PI * 2); g.fill();
-
-    g.font = textFont(2.1, dpr);
-    g.textBaseline = "bottom";
-    g.textAlign = "left";
-    g.fillStyle = "#ddd";
-    g.fillText(`${Math.floor(t)} / ${Math.round(r.duration)} 秒`, bx, by + bh + textH);
-    g.textAlign = "right";
-    g.fillStyle = hitCount ? "#ff5a5a" : "#ddd";
-    g.fillText(`被弾 ${hitCount} 回`, bx + bw, by + bh + textH);
-  }
-  requestAnimationFrame(drawReplay);
 
   // ---- プレイ中の LiDAR の視界（Unity の Flow/LiveFeed が書く live.json。座標は盤面の正規化座標 × 1000） ----
   const LIVE_POLL_MS = 100;
