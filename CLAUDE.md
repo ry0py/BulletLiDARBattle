@@ -20,13 +20,13 @@
 - **デスなし**。スコアは出さず、結果は被弾回数だけ（グレイズは点にしない）。
 - 結果はバトル終了時に `PlayLog` がローカル（`Application.persistentDataPath`）に保存する。
   要約（開始時刻・難易度・被弾回数・デバッグモードか）は `plays.jsonl` に 1 行ずつ追記し、
-  `Tools/ScoreBoard/` のスコアボード（難易度別の被弾ランキング）がブラウザで表示する。
+  `Tools/ScoreBoard/` のスコアボード（難易度別に被弾回数ごとの人数。10 回以上はまとめる）がブラウザで表示する。
   詳細（被弾ごとの時刻・位置・弾の種類・撃ち方、0.1 秒おきの SOUL 座標）は再生用に `replays/<id>.json` へ。
   デバッグモード（`GameSession.DebugMode`、既定 true）は記録に残すだけで、切り替え手段・再生機能はまだ無い。
   スコアボードは直前 2 プレイの「記録カード」の QR を出す。QR の URL の `#` 以降にプレイのデータを圧縮して入れ
-  （形式は `Tools/ScoreBoard/card/cardcode.js`）、来場者のスマホが自分の回線で公開ページ（`card/` を GitHub Pages に
-  置いたもの。URL はスコアボードの `CARD_URL`）を開き、その場で画像を描いて保存する。展示 PC はオフラインのまま。
-  `cardcode.js` を変えたら公開ページも置き直す。会場のネットが悪いので
+  （形式は `Tools/ScoreBoard/card/cardcode.js`）、来場者のスマホが自分の回線で公開ページ（`card/` をこのリポジトリの GitHub Pages に置いたもの。
+  URL はスコアボードの `CARD_URL`）を開き、その場で画像を描いて保存する。展示 PC はオフラインのまま。
+  公開は `.github/workflows/card-pages.yml` が main への push で自動で行う（`card/` を変えたら push するだけ）。会場のネットが悪いので
   インターネットには頼らない（GAS・DB は使わない）。スプレッドシートへは必要なら後で取り込む。
 
 ## 技術スタック

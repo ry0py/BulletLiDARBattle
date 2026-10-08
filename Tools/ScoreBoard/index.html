@@ -65,21 +65,60 @@
   .board h2 small { display: block; font-size: 2vh; color: var(--dim); letter-spacing: 0; margin-top: .5vh; }
   ol { list-style: none; margin: 0; padding: 0; flex: 1; display: flex; flex-direction: column; gap: .6vh; }
   li {
+    flex: 1;
     display: grid;
-    grid-template-columns: 4.5em 1fr auto;
-    align-items: baseline;
-    font-size: 3vh;
-    padding: .4vh .6vw;
+    grid-template-columns: 5.6em 1fr 2.6em; /* 1 列目は「10回以上」のバッジが入る幅 */
+    align-items: center;
+    gap: .6vw;
+    font-size: 2.8vh;
+    padding: 0 .6vw;
     border-bottom: 1px dashed #333;
   }
-  li .rank { color: var(--dim); }
-  li:nth-child(1) .rank { color: var(--c); font-weight: bold; }
-  li .time { color: var(--dim); font-size: 2.2vh; }
-  li .hits { font-size: 3.4vh; font-weight: bold; }
-  li .hits small { font-size: 2vh; font-weight: normal; color: var(--dim); margin-left: .2em; }
-  li.nomiss .hits { color: var(--new); }
+  /* 被弾回数はバッジにする。4 回以上は同じ灰色で動かさない */
+  li .hits {
+    justify-self: start;
+    padding: .1em .55em;
+    border-radius: 1em;
+    background: #444;
+    color: #ddd;
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  li .bar { height: 1.6vh; background: var(--c); min-width: 2px; }
+  li .count { text-align: right; font-weight: bold; }
+  li .count small { font-size: 1.8vh; font-weight: normal; color: var(--dim); margin-left: .2em; }
+  li.zero .bar { background: #333; }
+  li.zero .count { color: #444; }
+
+  /* 被弾 0〜3 回は特別な色。0 回は虹色が流れ、1〜3 回は金・銀・銅が光って脈打つ。 */
+  li.h0 .hits, li.h1 .hits, li.h2 .hits, li.h3 .hits { color: #111; }
+  li.h0 .hits, li.h0 .bar {
+    /* 虹を 2 周ぶん描き、半分（1 周ぶん）ずらすと継ぎ目なく流れる */
+    background: linear-gradient(90deg, #ff4d4d, #ffb43b, #ffe14d, #5be37d, #4dc3ff, #9b6bff,
+                                       #ff4d4d, #ffb43b, #ffe14d, #5be37d, #4dc3ff, #9b6bff, #ff4d4d) 0 0 / 200% 100%;
+    animation: rainbow 2.5s linear infinite;
+  }
+  li.h1 .hits, li.h1 .bar {
+    background: linear-gradient(110deg, #a8720a 0%, #ffd34d 35%, #fff7c8 50%, #ffd34d 65%, #a8720a 100%) 0 0 / 300% 100%;
+    animation: shine 2.2s ease-in-out infinite alternate;
+  }
+  li.h1 .hits { box-shadow: 0 0 .6em #ffd34d88; animation: shine 2.2s ease-in-out infinite alternate, pulse 1.1s ease-in-out infinite alternate; }
+  li.h2 .hits, li.h2 .bar {
+    background: linear-gradient(110deg, #7c7c7c 0%, #d6d6d6 35%, #ffffff 50%, #d6d6d6 65%, #7c7c7c 100%) 0 0 / 300% 100%;
+    animation: shine 2.6s ease-in-out infinite alternate;
+  }
+  li.h3 .hits, li.h3 .bar {
+    background: linear-gradient(110deg, #6e3612 0%, #c98450 35%, #f4c79c 50%, #c98450 65%, #6e3612 100%) 0 0 / 300% 100%;
+    animation: shine 3s ease-in-out infinite alternate;
+  }
+  /* 金 → 銀 → 銅の順に脈打ちを小さく・ゆっくりにして、順位の差を残す */
+  li.h2 .hits { box-shadow: 0 0 .5em #ffffff55; animation: shine 2.6s ease-in-out infinite alternate, pulse-small 1.3s ease-in-out infinite alternate; }
+  li.h3 .hits { box-shadow: 0 0 .5em #e3a06a55; animation: shine 3s ease-in-out infinite alternate, pulse-small 1.5s ease-in-out infinite alternate; }
+  @keyframes rainbow { to { background-position: 100% 0; } }
+  @keyframes shine { from { background-position: 100% 0; } to { background-position: 0 0; } }
+  @keyframes pulse { to { transform: scale(1.08); } }
+  @keyframes pulse-small { to { transform: scale(1.04); } }
   li.latest { background: #2a2600; outline: 2px solid var(--new); animation: blink 1s steps(2) 6; }
-  li.empty { color: #444; border-bottom-color: #1a1a1a; }
   @keyframes blink { 50% { background: transparent; } }
 
   .cards {
@@ -120,9 +159,9 @@
 </header>
 
 <main>
-  <section class="board" data-difficulty="Easy" style="--c: var(--easy)"><h2>EASY<small>被弾が少ない順</small></h2><ol></ol></section>
-  <section class="board" data-difficulty="Medium" style="--c: var(--medium)"><h2>MEDIUM<small>被弾が少ない順</small></h2><ol></ol></section>
-  <section class="board" data-difficulty="Hard" style="--c: var(--hard)"><h2>HARD<small>被弾が少ない順</small></h2><ol></ol></section>
+  <section class="board" data-difficulty="Easy" style="--c: var(--easy)"><h2>EASY<small>被弾回数ごとの人数</small></h2><ol></ol></section>
+  <section class="board" data-difficulty="Medium" style="--c: var(--medium)"><h2>MEDIUM<small>被弾回数ごとの人数</small></h2><ol></ol></section>
+  <section class="board" data-difficulty="Hard" style="--c: var(--hard)"><h2>HARD<small>被弾回数ごとの人数</small></h2><ol></ol></section>
   <section class="cards">
     <h2>記録カード<small>スマホで読み取って保存</small></h2>
     <div class="card"><img alt=""><p></p></div>
@@ -139,10 +178,10 @@
 <script src="qrcode.js"></script>
 <script src="card/cardcode.js"></script>
 <script>
-  const TOP = 10;          // 各難易度で出す順位の数
+  const MAX_HITS = 10;     // この回数以上はまとめて「○回以上」の 1 行にする
   const POLL_MS = 3000;    // plays.jsonl を読み直す間隔
   // カードページ（card/）の公開先。来場者のスマホが自分の回線で開く。
-  const CARD_URL = "https://ry0py.com/lidar-battle-card/";
+  const CARD_URL = "https://ry0py.com/BulletLiDARBattle/";
 
   let lastText = null;
 
@@ -159,14 +198,13 @@
     return plays;
   }
 
-  // 被弾が少ない順。同じ被弾数なら先に出した人が上。同じ被弾数は同じ順位。
-  function ranking(plays) {
-    const sorted = plays.slice().sort((a, b) => a.hits - b.hits || a.time.localeCompare(b.time));
-    let rank = 0;
-    return sorted.map((p, i) => {
-      if (i === 0 || p.hits !== sorted[i - 1].hits) rank = i + 1;
-      return { ...p, rank };
-    });
+  // 被弾回数ごとの人数。添字 = 被弾回数（MAX_HITS 以上は最後の 1 つにまとめる）。
+  function bucket(hits) { return Math.min(hits, MAX_HITS); }
+
+  function histogram(plays) {
+    const counts = new Array(MAX_HITS + 1).fill(0);
+    for (const p of plays) counts[bucket(p.hits)]++;
+    return counts;
   }
 
   function clock(time) { return time.slice(11, 16); }
@@ -176,32 +214,27 @@
     if (latest) latest.latest = true;
     document.querySelector("#total b").textContent = plays.length;
 
-    let latestRank = null;
     for (const board of document.querySelectorAll(".board")) {
-      const ranked = ranking(plays.filter(p => p.difficulty === board.dataset.difficulty));
+      const difficulty = board.dataset.difficulty;
+      const counts = histogram(plays.filter(p => p.difficulty === difficulty));
+      const max = Math.max(1, ...counts);
       const ol = board.querySelector("ol");
       ol.replaceChildren();
-      for (let i = 0; i < TOP; i++) {
+      counts.forEach((n, hits) => {
         const li = document.createElement("li");
-        const p = ranked[i];
-        if (!p) {
-          li.className = "empty";
-          li.innerHTML = `<span class="rank">${i + 1}位</span><span>---</span><span></span>`;
-        } else {
-          if (p.hits === 0) li.classList.add("nomiss");
-          if (p.latest) li.classList.add("latest");
-          li.innerHTML = `<span class="rank">${p.rank}位</span><span class="time">${clock(p.time)}</span>`
-                       + `<span class="hits">${p.hits}<small>回</small></span>`;
-        }
+        if (n === 0) li.classList.add("zero");
+        if (hits <= 3) li.classList.add(`h${hits}`); // 0〜3 回はバッジの色（CSS）
+        if (latest && latest.difficulty === difficulty && bucket(latest.hits) === hits) li.classList.add("latest");
+        li.innerHTML = `<span class="hits">${hits === MAX_HITS ? `${hits}回以上` : `${hits}回`}</span>`
+                     + `<span class="bar" style="width: ${n / max * 100}%"></span>`
+                     + `<span class="count">${n}<small>人</small></span>`;
         ol.appendChild(li);
-      }
-      const mine = ranked.find(r => r.latest);
-      if (mine) latestRank = mine.rank;
+      });
     }
 
     document.getElementById("latest").innerHTML = latest
       ? `<span class="label">さっきの挑戦</span> ${clock(latest.time)} ／ ${latest.difficulty} ／ `
-        + `被弾 <b>${latest.hits}</b> 回 ／ <b>${latestRank}</b> 位`
+        + `被弾 <b>${latest.hits}</b> 回`
         + (latest.hits === 0 ? ' <span class="label">ノーミス！</span>' : "")
       : "まだ挑戦者はいません";
 

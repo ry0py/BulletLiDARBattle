@@ -1,0 +1,36 @@
+# 記録カードのページ（Tools/ScoreBoard/card/）だけを GitHub Pages に置く。
+# 公開先は https://ry0py.com/BulletLiDARBattle/ （スコアボードの CARD_URL）。
+# リポジトリの Settings → Pages → Source を「GitHub Actions」にしておくこと。
+name: Card Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ["Tools/ScoreBoard/card/**", ".github/workflows/card-pages.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: Tools/ScoreBoard/card
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: Tools/ScoreBoard/card
+      - id: deployment
+        uses: actions/deploy-pages@v4
