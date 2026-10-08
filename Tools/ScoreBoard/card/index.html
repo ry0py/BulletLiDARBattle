@@ -19,7 +19,10 @@
     padding: 20px 16px 40px;
   }
   h1 { margin: 0; font-size: 20px; letter-spacing: .1em; }
-  #card { width: 100%; max-width: 540px; border: 2px solid #333; display: none; }
+  #wrap { position: relative; width: 100%; max-width: 540px; border: 2px solid #333; display: none; }
+  #card { display: block; width: 100%; }
+  /* 被弾回数の光を動かすキャンバス。カード画像の上に重ね、長押しは下の画像に通す */
+  #glow { position: absolute; pointer-events: none; display: none; }
   button {
     width: 100%;
     max-width: 540px;
@@ -37,7 +40,7 @@
 </head>
 <body>
 <h1>あなたの記録</h1>
-<img id="card" alt="記録カード">
+<div id="wrap"><img id="card" alt="記録カード"><canvas id="glow"></canvas></div>
 <button id="save">画像を保存</button>
 <p id="message">読み込み中…</p>
 
@@ -52,16 +55,70 @@
   const pad2 = n => String(n).padStart(2, "0");
   const dateText = d => `${d.getFullYear()}.${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}  ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 
+  const font = (size, weight = "normal") => `${weight} ${size}px ${FONT}`;
+
   // 赤い ✕（被弾の印）。盤面と「被弾したタイミング」で共用する。
   function cross(g, x, y, r) {
     g.beginPath(); g.moveTo(x - r, y - r); g.lineTo(x + r, y + r); g.moveTo(x + r, y - r); g.lineTo(x - r, y + r); g.stroke();
+  }
+
+  // 被弾 0〜3 回は数字と「回」の文字そのものを光らせる。t [秒] で動く（保存する画像は t = 0 の姿）。
+  // 返すのは文字の塗り・光の色・光の広がり。x0〜x1 は文字の左右端。
+  const pulse = t => 22 + 14 * (0.5 + 0.5 * Math.sin(t * 4));
+  const rainbow = (g, x0, x1, t) => {
+    const hue = k => (k * 60 + t * 120) % 360;
+    const grad = g.createLinearGradient(x0, 0, x1, 0);
+    for (let k = 0; k <= 6; k++) grad.addColorStop(k / 6, `hsl(${hue(k)}, 100%, 62%)`);
+    return { fill: grad, shadow: `hsl(${hue(1)}, 100%, 60%)`, blur: pulse(t) };
+  };
+  // 金・銀・銅: 明るい帯が文字の上を左右に行き来する。
+  const metal = (base, light, shadow) => (g, x0, x1, t) => {
+    const cx = x0 + (x1 - x0) * (0.5 + 0.5 * Math.sin(t * 2.5));
+    const grad = g.createLinearGradient(cx - 90, 0, cx + 90, 0);
+    grad.addColorStop(0, base); grad.addColorStop(0.5, light); grad.addColorStop(1, base);
+    return { fill: grad, shadow, blur: pulse(t) };
+  };
+  const GLOWS = [
+    rainbow,
+    metal("#e0a81e", "#fff6c8", "#ffc93c"),
+    metal("#a9a9a9", "#ffffff", "#e6e6e6"),
+    metal("#b8743c", "#ffd2a8", "#e08a4a"),
+  ];
+
+  function layout(rec) {
+    const bw = W - PAD * 2, bh = bw / rec.aspect, bx = PAD, by = 260;
+    const sy = by + bh + 230; // 被弾回数の数字のベースライン − 50
+    // 被弾回数のまわり。表示中はこの範囲だけ #glow に描き直す（右の「ノーミス！」と上下の文字にかからない）
+    const area = { x: 0, y: sy - 148, w: 560, h: 238 };
+    return { bx, by, bw, bh, sy, area };
+  }
+
+  function drawCount(g, hits, sy, t) {
+    g.fillStyle = "#fff";
+    g.font = font(44);
+    g.fillText("被弾", PAD, sy - 100);
+
+    const count = String(hits);
+    g.font = font(150, "bold");
+    const cw = g.measureText(count).width;
+    g.font = font(56);
+    const ux = PAD + cw + 28;
+    const x1 = ux + g.measureText("回").width;
+
+    g.save();
+    const glow = GLOWS[hits]?.(g, PAD, x1, t);
+    if (glow) { g.fillStyle = glow.fill; g.shadowColor = glow.shadow; g.shadowBlur = glow.blur; }
+    g.font = font(150, "bold");
+    g.fillText(count, PAD, sy + 50);
+    g.font = font(56);
+    g.fillText("回", ux, sy + 50);
+    g.restore();
   }
 
   function draw(rec) {
     const canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
     const g = canvas.getContext("2d");
-    const font = (size, weight = "normal") => `${weight} ${size}px ${FONT}`;
 
     g.fillStyle = "#000";
     g.fillRect(0, 0, W, H);
@@ -80,7 +137,7 @@
     g.textAlign = "left";
 
     // 盤面と軌跡（座標は 0〜1、y は上向き）
-    const bw = W - PAD * 2, bh = bw / rec.aspect, bx = PAD, by = 260;
+    const { bx, by, bw, bh, sy } = layout(rec);
     const px = x => bx + x * bw, py = y => by + (1 - y) * bh;
 
     g.strokeStyle = "#1c1c1c";
@@ -119,16 +176,7 @@
     g.fillText("○ スタート   ● ゴール   ✕ 被弾", bx, by + bh + 44);
 
     // 被弾回数
-    const sy = by + bh + 200;
-    g.fillStyle = "#fff";
-    g.font = font(44);
-    g.fillText("被弾", PAD, sy - 70);
-    g.font = font(150, "bold");
-    const count = String(rec.hits.length);
-    g.fillText(count, PAD, sy + 50);
-    const cw = g.measureText(count).width;
-    g.font = font(56);
-    g.fillText("回", PAD + cw + 16, sy + 50);
+    drawCount(g, rec.hits.length, sy, 0);
     if (rec.hits.length === 0) {
       g.fillStyle = "#ffe14d";
       g.font = font(72, "bold");
@@ -163,6 +211,27 @@
     return canvas;
   }
 
+  // 被弾 0〜3 回なら、カード画像の上の #glow に被弾回数だけを毎フレーム描き直して光を動かす。
+  function animateCount(rec) {
+    const hits = rec.hits.length;
+    if (!GLOWS[hits]) return;
+    const { sy, area: a } = layout(rec);
+    const c = document.getElementById("glow");
+    c.width = a.w; c.height = a.h;
+    Object.assign(c.style, { left: `${a.x / W * 100}%`, top: `${a.y / H * 100}%`, width: `${a.w / W * 100}%`, display: "block" });
+    const g = c.getContext("2d");
+    const frame = now => {
+      g.fillStyle = "#000";
+      g.fillRect(0, 0, a.w, a.h);
+      g.save();
+      g.translate(-a.x, -a.y);
+      drawCount(g, hits, sy, now / 1000);
+      g.restore();
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  }
+
   async function main() {
     const message = document.getElementById("message");
     let rec;
@@ -176,7 +245,8 @@
     const canvas = draw(rec);
     const img = document.getElementById("card");
     img.src = canvas.toDataURL("image/png");
-    img.style.display = "block";
+    document.getElementById("wrap").style.display = "block";
+    animateCount(rec);
 
     const blob = await new Promise(r => canvas.toBlob(r, "image/png"));
     const name = `lidar-battle-${rec.time.getFullYear()}${pad2(rec.time.getMonth() + 1)}${pad2(rec.time.getDate())}-${pad2(rec.time.getHours())}${pad2(rec.time.getMinutes())}.png`;
