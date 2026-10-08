@@ -35,10 +35,9 @@
     display: none;
   }
   p { margin: 0; color: var(--dim); font-size: 14px; text-align: center; }
-  /* 見出しのすぐ下に寄せる（body の gap を詰める）。
-     大きさはカードの難易度（MEDIUM など）の字に合わせる。カードは幅 1080 に 96px で描き、幅 540px までに縮めて出す。
+  /* ページのいちばん上。大きさはカードの難易度（MEDIUM など）の字に合わせる。カードは幅 1080 に 96px で描き、幅 540px までに縮めて出す。
      入りきらないときは「ありがとう！」の前で折り返す（keep-all と <wbr>） */
-  p.thanks { margin-top: -10px; color: var(--fg); font-size: min(48px, calc((100vw - 32px) * 96 / 1080)); font-weight: bold; line-height: 1.3; word-break: keep-all; }
+  p.thanks { color: var(--fg); font-size: min(48px, calc((100vw - 32px) * 96 / 1080)); font-weight: bold; line-height: 1.3; word-break: keep-all; }
   /* プレイの再生（2 倍速で繰り返す。描き方は replay.js）。高さは盤面の縦横比で JS が決める */
   #replay { width: 100%; max-width: 540px; display: none; flex-direction: column; gap: 8px; }
   #replay h2 { margin: 0; font-size: 16px; color: var(--dim); font-weight: normal; text-align: center; }
@@ -58,8 +57,8 @@
 </style>
 </head>
 <body>
-<h1>あなたの記録</h1>
 <p class="thanks">プレイしてくれて<wbr>ありがとう！</p>
+<h1>あなたの記録</h1>
 <img id="card" alt="記録カード">
 <button id="save">画像を保存</button>
 <!-- 新しいタブで開き、記録カードのページは残す -->
