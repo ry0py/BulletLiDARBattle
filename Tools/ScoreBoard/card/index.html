@@ -43,14 +43,19 @@
 
 <script src="cardcode.js"></script>
 <script>
-  const TITLE = "BULLET LiDAR BATTLE";
-  const EVENT = "工大祭 2026";
+  const TITLE = "弾幕ゲーム in 工大祭2026";
+  const CREDIT = "制作: ry0py ／ イラスト: ○○"; // ○○ はイラストの人の名前に差し替える
   const W = 1080, H = 1350, PAD = 60;
   const COLORS = { Easy: "#5be37d", Medium: "#ffb43b", Hard: "#ff5a5a" };
   const FONT = '"Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif';
 
   const pad2 = n => String(n).padStart(2, "0");
   const dateText = d => `${d.getFullYear()}.${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}  ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+
+  // 赤い ✕（被弾の印）。盤面と「被弾したタイミング」で共用する。
+  function cross(g, x, y, r) {
+    g.beginPath(); g.moveTo(x - r, y - r); g.lineTo(x + r, y + r); g.moveTo(x + r, y - r); g.lineTo(x - r, y + r); g.stroke();
+  }
 
   function draw(rec) {
     const canvas = document.createElement("canvas");
@@ -87,15 +92,12 @@
 
     g.lineWidth = 5;
     g.lineCap = "round";
+    g.lineJoin = "round";
+    g.strokeStyle = "#4dc3ff";
     const n = rec.path.length;
-    for (let i = 1; i < n; i++) {
-      // 時間で色を変える（始め シアン → 終わり ピンク）
-      g.strokeStyle = `hsl(${190 + 130 * i / n}, 90%, 62%)`;
-      g.beginPath();
-      g.moveTo(px(rec.path[i - 1][0]), py(rec.path[i - 1][1]));
-      g.lineTo(px(rec.path[i][0]), py(rec.path[i][1]));
-      g.stroke();
-    }
+    g.beginPath();
+    rec.path.forEach(([x, y], i) => i === 0 ? g.moveTo(px(x), py(y)) : g.lineTo(px(x), py(y)));
+    g.stroke();
     if (n > 0) {
       g.strokeStyle = "#fff"; g.lineWidth = 4;
       g.beginPath(); g.arc(px(rec.path[0][0]), py(rec.path[0][1]), 14, 0, Math.PI * 2); g.stroke();
@@ -106,10 +108,7 @@
     g.save();
     g.strokeStyle = "#ff3b3b"; g.lineWidth = 5;
     g.shadowColor = "#ff3b3b"; g.shadowBlur = 16;
-    for (const h of rec.hits) {
-      const x = px(h.x), y = py(h.y), r = 13;
-      g.beginPath(); g.moveTo(x - r, y - r); g.lineTo(x + r, y + r); g.moveTo(x + r, y - r); g.lineTo(x - r, y + r); g.stroke();
-    }
+    for (const h of rec.hits) cross(g, px(h.x), py(h.y), 13);
     g.restore();
 
     g.strokeStyle = "#fff"; g.lineWidth = 6;
@@ -143,18 +142,23 @@
     const ty = sy + 150;
     g.strokeStyle = "#555"; g.lineWidth = 4;
     g.beginPath(); g.moveTo(PAD, ty); g.lineTo(W - PAD, ty); g.stroke();
-    g.strokeStyle = "#ff3b3b"; g.lineWidth = 6;
-    for (const h of rec.hits) {
-      const x = PAD + (W - PAD * 2) * Math.min(1, h.t / duration);
-      g.beginPath(); g.moveTo(x, ty - 22); g.lineTo(x, ty + 22); g.stroke();
-    }
+    g.save();
+    g.strokeStyle = "#ff3b3b"; g.lineWidth = 5;
+    g.shadowColor = "#ff3b3b"; g.shadowBlur = 12;
+    for (const h of rec.hits) cross(g, PAD + (W - PAD * 2) * Math.min(1, h.t / duration), ty, 13);
+    g.restore();
     g.fillStyle = "#8a8a8a"; g.font = font(24);
     g.fillText("0秒", PAD, ty + 54);
     g.textAlign = "right";
     g.fillText(`${Math.round(duration)}秒`, W - PAD, ty + 54);
-    g.fillText(EVENT, W - PAD, H - 40);
     g.textAlign = "left";
     g.fillText("被弾したタイミング", PAD + 90, ty + 54);
+
+    // クレジット（右下に小さく）
+    g.fillStyle = "#666"; g.font = font(20);
+    g.textAlign = "right";
+    g.fillText(CREDIT, W - PAD, H - 40);
+    g.textAlign = "left";
 
     return canvas;
   }
