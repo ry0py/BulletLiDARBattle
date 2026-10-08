@@ -235,13 +235,13 @@
     render();
   }
 
-  // そのプレイの記録カード（画像）を新しいタブで開く。会場はオフラインなので、公開ページではなく
-  // このサーバーが配る card/ を使う。データは QR と同じく # 以降に入れる。
+  // そのプレイの記録カード（画像）を新しいタブで開く。QR と同じ公開ページ（ry0py.com）なので、
+  // この PC がネットにつながっていないと開けない。
   function cardLink(p) {
     const a = document.createElement("a");
     a.className = "card";
     a.textContent = "カード";
-    a.href = "card/";
+    a.href = "#";
     a.target = "_blank";
     a.onclick = async e => {
       e.preventDefault();
@@ -249,7 +249,7 @@
       try {
         const res = await fetch(`replays/${p.id}.json`, { cache: "no-store" });
         if (!res.ok) throw new Error(res.status);
-        tab.location = "card/#" + await CardCode.encode(await res.json());
+        tab.location = await CardCode.url(await res.json());
       } catch {
         tab?.close();
         setStatus(`記録カードを開けませんでした（再生データがありません）: ${label(p)}`, true);

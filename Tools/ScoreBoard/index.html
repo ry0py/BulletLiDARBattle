@@ -180,8 +180,6 @@
 <script>
   const MAX_HITS = 10;     // この回数以上はまとめて「○回以上」の 1 行にする
   const POLL_MS = 3000;    // plays.jsonl を読み直す間隔
-  // カードページ（card/）の公開先。来場者のスマホが自分の回線で開く。
-  const CARD_URL = "https://ry0py.com/BulletLiDARBattle/";
 
   let lastText = null;
 
@@ -249,7 +247,7 @@
       const job = (async () => {
         const res = await fetch(`replays/${id}.json`, { cache: "no-store" });
         if (!res.ok) throw new Error(res.status);
-        const url = CARD_URL + "#" + await CardCode.encode(await res.json());
+        const url = await CardCode.url(await res.json());
         const qr = qrcode(0, "L");
         qr.addData(url, "Byte");
         qr.make();

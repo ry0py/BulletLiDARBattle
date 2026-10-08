@@ -45,7 +45,7 @@
 <script>
   const TITLE = "弾幕ゲーム in 工大祭2026";
   const CREDIT = "制作: ry0py ／ イラスト: ○○"; // ○○ はイラストの人の名前に差し替える
-  const W = 1080, H = 1350, PAD = 60;
+  const W = 1080, PAD = 60; // 高さは盤面の縦横比で決まる（draw）
   const COLORS = { Easy: "#5be37d", Medium: "#ffb43b", Hard: "#ff5a5a" };
   const FONT = '"Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif';
 
@@ -103,6 +103,13 @@
   }
 
   function draw(rec) {
+    // 上から順に積む。盤面が縦長なほど下の段が下がるので、画像の高さもそれに合わせる。
+    const bw = W - PAD * 2, bh = bw / rec.aspect, bx = PAD, by = 260;
+    const sy = by + bh + 230;  // 被弾回数
+    const ty = sy + 150;       // 被弾したタイミング
+    const cy = ty + 110;       // クレジット
+    const H = Math.round(cy + 40);
+
     const canvas = document.createElement("canvas");
     canvas.width = W; canvas.height = H;
     const g = canvas.getContext("2d");
@@ -124,7 +131,6 @@
     g.textAlign = "left";
 
     // 盤面と軌跡（座標は 0〜1、y は上向き）
-    const bw = W - PAD * 2, bh = bw / rec.aspect, bx = PAD, by = 260;
     const px = x => bx + x * bw, py = y => by + (1 - y) * bh;
 
     g.strokeStyle = "#1c1c1c";
@@ -163,7 +169,6 @@
     g.fillText("○ スタート   ● ゴール   ✕ 被弾", bx, by + bh + 44);
 
     // 被弾回数
-    const sy = by + bh + 230;
     drawCount(g, rec.count, sy);
     if (rec.count === 0) {
       g.fillStyle = "#ffe14d";
@@ -175,7 +180,6 @@
 
     // 被弾したタイミング
     const duration = Math.max(1, n * rec.interval);
-    const ty = sy + 150;
     g.strokeStyle = "#555"; g.lineWidth = 4;
     g.beginPath(); g.moveTo(PAD, ty); g.lineTo(W - PAD, ty); g.stroke();
     g.save();
@@ -190,10 +194,10 @@
     g.textAlign = "left";
     g.fillText("被弾したタイミング", PAD + 90, ty + 54);
 
-    // クレジット（右下に小さく）
+    // クレジット（右下に小さく。秒数の行とは段を分ける）
     g.fillStyle = "#666"; g.font = font(20);
     g.textAlign = "right";
-    g.fillText(CREDIT, W - PAD, H - 40);
+    g.fillText(CREDIT, W - PAD, cy);
     g.textAlign = "left";
 
     return canvas;

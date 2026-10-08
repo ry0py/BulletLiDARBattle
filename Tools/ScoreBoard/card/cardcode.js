@@ -13,6 +13,8 @@
 //   座標は盤面の左下 0, 右上 255。
 // v1 は [9..10] が無く、被弾回数 = 被弾の記録の数。読むときは v1 も受け付ける。
 const CardCode = (() => {
+  // カードページ（card/）の公開先。来場者のスマホが自分の回線で開く（.github/workflows/card-pages.yml）。
+  const PAGE_URL = "https://ry0py.com/BulletLiDARBattle/";
   const VERSION = 2;
   const PATH_STEP = 2; // 0.1 秒おきの軌跡を 2 つに 1 つへ間引く（0.2 秒おき）
   const DIFFICULTIES = ["Easy", "Medium", "Hard"];
@@ -107,5 +109,10 @@ const CardCode = (() => {
     };
   }
 
-  return { encode, decode };
+  /** replays/<id>.json の中身 → そのプレイの記録カードを開く公開ページの URL（QR に入れるもの） */
+  async function url(replay) {
+    return PAGE_URL + "#" + await encode(replay);
+  }
+
+  return { encode, decode, url };
 })();

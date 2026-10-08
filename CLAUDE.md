@@ -26,7 +26,7 @@
   （`UserSettingsScene`、D キー。`Tools > LiDAR Battle > Build User Settings Scene` で生成）で行う。再生機能はまだ無い。
   スコアボードは直前 2 プレイの「記録カード」の QR を出す。QR の URL の `#` 以降にプレイのデータを圧縮して入れ
   （形式は `Tools/ScoreBoard/card/cardcode.js`）、来場者のスマホが自分の回線で公開ページ（`card/` をこのリポジトリの GitHub Pages に置いたもの。
-  URL はスコアボードの `CARD_URL`）を開き、その場で画像を描いて保存する。展示 PC はオフラインのまま。
+  URL は `cardcode.js` の `PAGE_URL`）を開き、その場で画像を描いて保存する。展示 PC はオフラインのまま。
   公開は `.github/workflows/card-pages.yml` が main への push で自動で行う（`card/` を変えたら push するだけ）。会場のネットが悪いので
   インターネットには頼らない（GAS・DB は使わない）。スプレッドシートへは必要なら後で取り込む。
 
