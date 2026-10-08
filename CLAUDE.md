@@ -23,8 +23,11 @@
   `Tools/ScoreBoard/` のスコアボード（難易度別に被弾回数ごとの人数。10 回以上はまとめる）がブラウザで表示する。
   詳細（被弾ごとの時刻・位置・弾の種類・撃ち方、0.1 秒おきの SOUL 座標）は再生用に `replays/<id>.json` へ。
   デバッグモード（`GameSession.DebugMode`、既定 true、PlayerPrefs に保存）は記録に残すだけ。切り替えはユーザー設定シーン
-  （`UserSettingsScene`、D キー。`Tools > LiDAR Battle > Build User Settings Scene` で生成）で行う。再生機能はまだ無い。
-  スコアボードは直前 2 プレイの「記録カード」の QR を出す。QR の URL の `#` 以降にプレイのデータを圧縮して入れ
+  （`UserSettingsScene`、D キー。`Tools > LiDAR Battle > Build User Settings Scene` で生成）で行う。ゲーム内の再生機能はまだ無い（スコアボードで直前のプレイだけ再生する）。
+  プレイ中（バトルの 60 秒）は、スコアボードの被弾ランキングの代わりに「LiDAR の視界」（点群・検出したハート・SOUL）を出す。
+  Unity の `Flow/LiveFeed` が 0.1 秒おきに `live.json` を書き、3 秒更新が無ければ（または終了時に）ランキングに戻る。
+  右の列は直前のプレイの「記録カード」の QR と、その下でそのプレイを 2 倍速で繰り返し再生する。
+  カードにはその日の同じ難易度での「今日の ◯人中 ◯位」も載る（QR を作るときに展示 PC で計算）。QR の URL の `#` 以降にプレイのデータを圧縮して入れ
   （形式は `Tools/ScoreBoard/card/cardcode.js`）、来場者のスマホが自分の回線で公開ページ（`card/` をこのリポジトリの GitHub Pages に置いたもの。
   URL は `cardcode.js` の `PAGE_URL`）を開き、その場で画像を描いて保存する。展示 PC はオフラインのまま。
   公開は `.github/workflows/card-pages.yml` が main への push で自動で行う（`card/` を変えたら push するだけ）。
@@ -62,7 +65,7 @@
 | Mapping | `LidarBattle.Mapping` | 物理座標 → 正規化盤面座標 | `ICoordinateMapper`, `RectCoordinateMapper` |
 | Input | `LidarBattle.Input` | SOUL の入力源を抽象化 | `IHeartInputSource`, `HeartInputSelector`（キーボード → LiDAR → カメラの順に選ぶ）, `KeyboardInputSource`, `LidarInputSource`, `CameraInputSource` |
 | Battle | `LidarBattle.Battle` | 弾幕ゲーム本体 | `SoulController`, `BulletBoard`, `BattleClock`, `BulletSystem`, `Bullet`, `BulletType`（弾の種類）, `FirePattern`（飛ばし方）, `ShotTrack`/`ShotClip`（Timeline 発射）, `ScoreKeeper`, `BattleDebug`, 見た目だけの `HitFeedback`/`SoulView`/`ScannerEye`/`ScanSweep` |
-| Flow | `LidarBattle.Flow` | ゲームの進行（会話→難易度選択→バトル→結果） | `SelectFlow`, `DifficultyOption`, `BattleFlow`, `GameSession` |
+| Flow | `LidarBattle.Flow` | ゲームの進行（会話→難易度選択→バトル→結果） | `SelectFlow`, `DifficultyOption`, `BattleFlow`, `GameSession`, `BattleTestFlow`（弾幕テスト） |
 | UI | `LidarBattle.UI` | 会話表示・立ち絵・日本語フォント | `DialogueBox`, `DialogueTrack`/`DialogueClip`（Timeline セリフ）, `PortraitView`/`PortraitSet`（立ち絵）, `PortraitTrack`/`PortraitClip`（Timeline 表情切り替え）, `PortraitMotionTrack`/`PortraitMotionClip`（Timeline 立ち絵の動き）, `JapaneseFontApplier` |
 | Audio | `LidarBattle.Audio` | BGM・SE・セリフ音の再生（常駐・自動生成） | `GameAudio` |
 | Config | `LidarBattle.Config` | 接続/キャリブレーションの設定 | `LidarSettings` |
@@ -77,7 +80,7 @@ LiDAR シミュレーション（実機なしで検出手法を真値と比較�
 
 - C# スクリプト: `Assets/Scripts/<層名>/` （上表の名前空間と一致させる）
 - Prefab: `Assets/Prefabs/`
-- シーン: `Assets/Scenes/Actual/`（本番で使う。メインは `BattleScene`）と `Assets/Scenes/Test/`（試作・開発用。ハート用・スキャナー版・`LidarSimScene`）
+- シーン: `Assets/Scenes/Actual/`（本番で使う。メインは `BattleScene`）と `Assets/Scenes/Test/`（試作・開発用。ハート用・スキャナー版・`LidarSimScene`・`BattleTestScene`）
 - 設定アセット: `Assets/Settings/`（`LidarSettings` や `BulletType`/`FirePattern` の `.asset` 等）
 - ScriptableObject 定義クラス: `Assets/Scripts/Config/`（弾幕用の `BulletType`/`FirePattern` は例外で
   `Assets/Scripts/Battle/`。理由は bullet-system.md。立ち絵の `PortraitSet` も表情の enum ごと UI 層に置く）
@@ -87,7 +90,9 @@ LiDAR シミュレーション（実機なしで検出手法を真値と比較�
 - カメラ検出スクリプト: `Tools/CameraTracker/`（Unity の外で動かす Python。`Assets/` には置かない）
 - スコアボード: `Tools/ScoreBoard/`（`python Tools/ScoreBoard/serve.py` で LAN に配信。同じ PC は localhost:8000）。
   `localhost:8000/` は本番のプレイだけ、`localhost:8000/debug`（`/?debug` と同じ）はデバッグモードのプレイだけを出す。
-  記録の編集・削除は管理画面 `localhost:8000/admin.html`（`admin.html`。この PC からだけ開ける）
+  記録の編集・削除（チェックでまとめて削除）・仮データの作成・QR の表示は管理画面 `localhost:8000/admin.html`（`admin.html`。この PC からだけ開ける）。
+  ユーザー設定シーンの S でサーバーを起動（ブラウザで開く）、C でカメラ検出（`aruco_tracker.py`）を起動する。
+  起動中は 5 秒長押しで止まり、ゲームを終えると一緒に止まる（`Flow/ToolProcess`。`python` が PATH にあること）。
 
 ## Unity Editor 操作のルール
 
@@ -135,12 +140,20 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
     弾は `Assets/Art/Bullets/` の素材（Kenney, CC0）を着色し、Bloom/Vignette（`Assets/Settings/Scanner/ScannerVolume.asset`）で発光させる。
 - 結果（2026-10-08）: スコアはやめて被弾回数だけ（`ScoreKeeper`）。被弾回数はドキドキ感のためプレイ中は出さず、終了時の会話で「被弾は ○ 回でした」とだけ出す。バトル中の左下は今の難易度。
 - 運用ショートカット（`Flow/OperatorShortcuts`、キー 5 秒長押し・表示なし。円柱用・ハート用それぞれの組の中で移る）: バトルは R でやり直し・P で選択へ、
-  選択は E/M/H で難易度を選んでバトルへ・L で `LidarLiveScene` へ・U で `UserSettingsScene` へ、`LidarLiveScene`/`UserSettingsScene` は P で直前の選択へ。
+  選択は E/M/H で難易度を選んでバトルへ・L で `LidarLiveScene` へ・U で `UserSettingsScene` へ・T（デバッグモードのときだけ、2 秒）で `BattleTestScene` へ、
+  `LidarLiveScene`/`UserSettingsScene`/`BattleTestScene` は P で直前の選択へ。
 - 音（2026-10-08）: `GameAudio` が鳴らす。BGM はセレクト用（ポップ）とバトル用（ポップ＋緊迫感、全難易度共通）。
   SE は被弾・選択中（ゲージが溜まるほど高く）・難易度決定・バトル開始・敵のセリフ音（アンダーテール風の「ポポポ」。
   ピッチは Easy 1.0 / Medium 0.85 / Hard 0.7）。音源はすべて `python Tools/AudioGen/generate_audio.py` で合成した自作。
 - 立ち絵（2026-10-08。Easy は sake・Medium は idle・Hard は inu。元画像は `Resource/`。inu はベースのみで黒線を白に変換済み）: 会話ボックスの左に `PortraitView`。表情はベース・口あけ・技・笑顔・負け顔の 5 種で、
   難易度ごとに `Assets/Settings/Portraits/{Easy,Medium,Hard}.asset`（`PortraitSet`）に画像を割り当てる。詳細は game-flow.md。
-- 弾幕の「技」を 8 秒の Timeline として 23 個用意した（`Assets/Timelines/Attacks/`、`Tools > LiDAR Battle > Build Attack Library`）。
-  難易度別 Timeline にはまだ組み込んでいない（将来ランダムに再生するかも）。詳細は bullet-system.md。
-- 未実装: 弾の寿命。
+- 弾幕（2026-10-08）: 8 秒の「技」を 15 個（`AttackLibraryBuilder`）。うち本番で使うのは盤面の全体を動き回らせる 12 個
+  （安置 `SafeZone`・うねる一本道 `Corridor`/`CorridorSide`・縮む輪・すき間のある壁・花火→ホーミングなど）。
+  安置は半透明の緑のシートに「あんぜん」（盤面の子の `SafeZoneView`、Timeline の `SafeZoneTrack` が出す）で、少したつとシートの外が弾で埋まる。
+  4 本どれにも安置と道が入り（道は 1 本の中で縦 `Corridor` か横 `CorridorSide` の 1 種類だけ）、残りの 5 枠は 1 本ごとに使う技を変える。
+  技は重ねない（重ねると確実によけられなくなる）。並びの表は全難易度で共通で、難易度で変わるのは弾の速さ・数・発射間隔・すき間の幅だけ。
+  技が切り替わる直前に盤面の弾を全部消す（`ClearClip`）。
+  本番の Timeline は難易度ごとに 4 本（`Assets/Timelines/Battle/Easy1〜Hard4`、`BattleTimelineBuilder` が技を 8 秒ずつ 7 個並べる）で、
+  列で前のプレイを見て覚えられないよう `BattleFlow` が毎回ランダムに 1 本選ぶ（前回と同じものは避ける。どれを選んだかは記録の `timeline`）。
+  作り直しは `Tools > LiDAR Battle > Build Battle Timelines`（技の 8 秒版は `Build Attack Library`）。技も 12 本も弾幕テストシーン（`BattleTestScene`、
+  `Tools > LiDAR Battle > Build Battle Test Scene`）でドロップダウンから選んで確かめる。詳細は bullet-system.md。

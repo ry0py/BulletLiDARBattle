@@ -16,6 +16,8 @@ namespace LidarBattle.Battle
         [SerializeField] private int _sortingOrder = 10;
         [Tooltip("弾を進める固定ステップ（秒）。フレームレートに依らず毎回同じ弾道にするため")]
         [SerializeField] private float _stepTime = 1f / 60f;
+        [Tooltip("寿命のある弾が消える前に薄くなっていく秒数")]
+        [SerializeField] private float _fadeSeconds = 0.4f;
 
         public event Action<Bullet> Hit;
         public event Action<Bullet> Grazed;
@@ -40,7 +42,7 @@ namespace LidarBattle.Battle
         public void Fire(BulletType type, FirePattern pattern, Vector2 boardPosition, int shotIndex, System.Random random)
         {
             var origin = _board.NormalizedToWorld(boardPosition);
-            pattern.GetShots(origin, _soul.Position, shotIndex, random, _shots);
+            pattern.GetShots(origin, _soul.Position, new Rect(_board.Min, _board.Size), shotIndex, random, _shots);
 
             foreach (var (offset, angle) in _shots)
             {
@@ -86,8 +88,11 @@ namespace LidarBattle.Battle
                 var b = _active[i];
                 b.Age += dt;
                 b.Pattern.Move(b, dt, target);
+                SwitchPattern(b);
 
-                if (_board.IsOutside(b.Position, _cullMargin))
+                // 寿命のある弾は寿命で消す（盤面の外から入ってくる Converge の輪などを途中で消さないため）。
+                float lifetime = b.Pattern.Lifetime;
+                if (lifetime > 0f ? b.Age >= lifetime : _board.IsOutside(b.Position, _cullMargin))
                 {
                     _pool.Release(b);
                     _active[i] = _active[^1];
@@ -95,7 +100,24 @@ namespace LidarBattle.Battle
                     continue;
                 }
                 b.View.transform.position = b.Position;
+                if (lifetime > 0f && lifetime - b.Age < _fadeSeconds)
+                {
+                    var color = b.Type.Color;
+                    color.a *= (lifetime - b.Age) / _fadeSeconds;
+                    b.View.color = color;
+                }
             }
+        }
+
+        /// <summary>FirePattern.Next があれば、NextTime 秒たった弾をその飛び方に切り替える（経過時間は 0 から数え直す）。</summary>
+        private static void SwitchPattern(Bullet b)
+        {
+            var next = b.Pattern.Next;
+            if (next == null || b.Age < b.Pattern.NextTime) return;
+            b.Pattern = next;
+            b.Origin = b.Position;
+            b.Speed = next.Speed;
+            b.Age = 0f;
         }
 
         private void CheckSoul()

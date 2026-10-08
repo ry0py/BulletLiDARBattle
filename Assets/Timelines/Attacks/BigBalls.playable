@@ -1,6 +1,24 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-6283869164041978964
+--- !u!114 &-8738688919686195889
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
+  m_Name: ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
+  _bulletType: {fileID: 11400000, guid: d819d728002762047964fcfa3fab24cc, type: 2}
+  _pattern: {fileID: 11400000, guid: 7c141a65e9a280049a73a16efe18c7b5, type: 2}
+  _position: {x: 0.5, y: 1.15}
+  _interval: 1.8
+  _useFixedSeed: 1
+  _seed: 0
+--- !u!114 &-8070991645839914032
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -24,10 +42,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 0
     m_ClipIn: 0
-    m_Asset: {fileID: 5827482005112567064}
+    m_Asset: {fileID: -8738688919686195889}
     m_Duration: 7
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -6283869164041978964}
+    m_ParentTrack: {fileID: -8070991645839914032}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -92,24 +110,6 @@ MonoBehaviour:
     m_DisplayName: BigRing
   m_Markers:
     m_Objects: []
---- !u!114 &-1969843731564507194
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
-  m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
-  _bulletType: {fileID: 11400000, guid: 96e86401fc9019e45b8c2d120201ab09, type: 2}
-  _pattern: {fileID: 11400000, guid: 3ae91be3216a02c46ae798b1a7a83122, type: 2}
-  _position: {x: 0.5, y: 1.15}
-  _interval: 1.8
-  _useFixedSeed: 1
-  _seed: 90
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,15 +124,33 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.TimelineAsset
   m_Version: 0
   m_Tracks:
-  - {fileID: -6283869164041978964}
-  - {fileID: 1014089768584298971}
+  - {fileID: -8070991645839914032}
+  - {fileID: 3127471625063007014}
   m_FixedDuration: 8
   m_EditorSettings:
     m_Framerate: 60
     m_ScenePreview: 1
   m_DurationMode: 1
   m_MarkerTrack: {fileID: 0}
---- !u!114 &1014089768584298971
+--- !u!114 &2660838972510211720
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
+  m_Name: ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
+  _bulletType: {fileID: 11400000, guid: 10cff2dbb2b90a9408dcddcac0b5f75a, type: 2}
+  _pattern: {fileID: 11400000, guid: 3ae91be3216a02c46ae798b1a7a83122, type: 2}
+  _position: {x: 0.5, y: 1.15}
+  _interval: 1.8
+  _useFixedSeed: 1
+  _seed: 90
+--- !u!114 &3127471625063007014
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -156,10 +174,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 0.9
     m_ClipIn: 0
-    m_Asset: {fileID: -1969843731564507194}
+    m_Asset: {fileID: 2660838972510211720}
     m_Duration: 6
     m_TimeScale: 1
-    m_ParentTrack: {fileID: 1014089768584298971}
+    m_ParentTrack: {fileID: 3127471625063007014}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -224,21 +242,3 @@ MonoBehaviour:
     m_DisplayName: AimedFan5
   m_Markers:
     m_Objects: []
---- !u!114 &5827482005112567064
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
-  m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
-  _bulletType: {fileID: 11400000, guid: d819d728002762047964fcfa3fab24cc, type: 2}
-  _pattern: {fileID: 11400000, guid: 7c141a65e9a280049a73a16efe18c7b5, type: 2}
-  _position: {x: 0.5, y: 1.15}
-  _interval: 1.8
-  _useFixedSeed: 1
-  _seed: 0

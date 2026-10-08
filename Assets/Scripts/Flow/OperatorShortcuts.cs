@@ -10,16 +10,19 @@ namespace LidarBattle.Flow
     /// <summary>
     /// 展示運用のためのキー長押しショートカット（表示は出さない）。起動時に自動で作られ、シーンをまたいで残る。
     /// バトル: [R] やり直し / [P] 選択シーンへ。
-    /// 選択: [E][M][H] 難易度を選んでバトルへ / [L] LiDAR 確認シーンへ / [U] ユーザー設定シーンへ。
-    /// LidarLiveScene・UserSettingsScene: [P] 直前に使っていた選択シーンへ。
+    /// 選択: [E][M][H] 難易度を選んでバトルへ / [L] LiDAR 確認シーンへ / [U] ユーザー設定シーンへ /
+    /// [T] 弾幕テストシーンへ（デバッグモードのときだけ。開発中に何度も使うので 2 秒）。
+    /// LidarLiveScene・UserSettingsScene・BattleTestScene: [P] 直前に使っていた選択シーンへ。
     /// 選択とバトルのシーンは組（円柱用 SelectScene/BattleScene、ハート用 HeartSelectScene/HeartBattleScene）で扱い、
     /// 組の中だけで移る。
     /// </summary>
     public sealed class OperatorShortcuts : MonoBehaviour
     {
         private const float HoldSeconds = 5f;
+        private const float TestHoldSeconds = 2f;
         private const string DebugScene = "LidarLiveScene";
         private const string SettingsScene = "UserSettingsScene";
+        private const string TestScene = "BattleTestScene";
 
         // (選択シーン, バトルシーン) の組。
         private static readonly (string Select, string Battle)[] ScenePairs =
@@ -28,9 +31,9 @@ namespace LidarBattle.Flow
             ("HeartSelectScene", "HeartBattleScene"),
         };
 
-        private static string s_lastSelectScene = ScenePairs[0].Select; // LiDAR 確認・ユーザー設定シーンから戻る先
+        private static string s_lastSelectScene = ScenePairs[0].Select; // LiDAR 確認・ユーザー設定・弾幕テストシーンから戻る先
 
-        private static readonly Key[] Keys = { Key.R, Key.P, Key.E, Key.M, Key.H, Key.L, Key.U };
+        private static readonly Key[] Keys = { Key.R, Key.P, Key.E, Key.M, Key.H, Key.L, Key.U, Key.T };
 
         private Key _heldKey = Key.None;
         private Action _action;
@@ -71,7 +74,7 @@ namespace LidarBattle.Flow
         {
             if (_action == null) return;
             _heldSeconds += Time.unscaledDeltaTime;
-            if (_heldSeconds < HoldSeconds) return;
+            if (_heldSeconds < (_heldKey == Key.T ? TestHoldSeconds : HoldSeconds)) return;
 
             Action action = _action;
             _action = null;
@@ -80,7 +83,8 @@ namespace LidarBattle.Flow
 
         private static Action ActionFor(string scene, Key key)
         {
-            if (scene == DebugScene || scene == SettingsScene) return key == Key.P ? () => Load(s_lastSelectScene) : null;
+            if (scene == DebugScene || scene == SettingsScene || scene == TestScene)
+                return key == Key.P ? () => Load(s_lastSelectScene) : null;
 
             foreach (var (select, battle) in ScenePairs)
             {
@@ -101,7 +105,8 @@ namespace LidarBattle.Flow
                         Key.M => () => StartBattle(battle, Difficulty.Medium),
                         Key.H => () => StartBattle(battle, Difficulty.Hard),
                         Key.L => () => OpenDebugScene(select),
-                        Key.U => () => OpenSettingsScene(select),
+                        Key.U => () => OpenFromSelect(select, SettingsScene),
+                        Key.T when GameSession.DebugMode => () => OpenFromSelect(select, TestScene),
                         _ => null,
                     };
                 }
@@ -124,10 +129,11 @@ namespace LidarBattle.Flow
             Load(DebugScene);
         }
 
-        private static void OpenSettingsScene(string fromSelectScene)
+        /// <summary>[P] で fromSelectScene に戻れるシーンへ移る。</summary>
+        private static void OpenFromSelect(string fromSelectScene, string scene)
         {
             s_lastSelectScene = fromSelectScene;
-            Load(SettingsScene);
+            Load(scene);
         }
 
         private static void Load(string scene)

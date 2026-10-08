@@ -33,13 +33,22 @@
     align-items: baseline;
     justify-content: space-between;
   }
+  /* 見出しの字（Zen Old Mincho Black, OFL）。オフラインで使うため「被弾ランキング」の字だけ抜き出して fonts/ に置いている */
+  @font-face {
+    font-family: "Zen Old Mincho";
+    font-weight: 900;
+    src: url("fonts/ZenOldMincho-title.woff2") format("woff2");
+  }
   h1 {
     margin: 0;
+    font-family: "Zen Old Mincho", "BIZ UDGothic", "MS Gothic", "Yu Gothic UI", monospace;
+    font-weight: 900;
+    text-shadow: 0 0 .25em rgba(255, 255, 255, .55), 0 0 .05em #fff; /* 白いまま光らせて豪華に */
     font-size: 5vh;
     letter-spacing: .15em;
   }
   #total { font-size: 2.6vh; color: var(--dim); }
-  h1 .debug { margin-left: .6em; padding: 0 .4em; font-size: 2.6vh; letter-spacing: .1em; color: #000; background: var(--new); vertical-align: middle; }
+  h1 .debug { text-shadow: none; margin-left: .6em; padding: 0 .4em; font-size: 2.6vh; letter-spacing: .1em; color: #000; background: var(--new); vertical-align: middle; }
   #total b { color: var(--fg); font-size: 3.4vh; }
 
   main {
@@ -51,27 +60,27 @@
   }
   .board {
     border: 4px solid var(--line);
-    padding: 2vh 1.5vw;
+    padding: 1.5vh 1.5vw;
     display: flex;
     flex-direction: column;
     min-height: 0;
   }
   .board h2 {
-    margin: 0 0 1.5vh;
+    margin: 0 0 1vh;
     font-size: 4vh;
     text-align: center;
     letter-spacing: .1em;
     color: var(--c);
   }
   .board h2 small { display: block; font-size: 2vh; color: var(--dim); letter-spacing: 0; margin-top: .5vh; }
-  ol { list-style: none; margin: 0; padding: 0; flex: 1; display: flex; flex-direction: column; gap: .6vh; }
+  ol { list-style: none; margin: 0; padding: 0; flex: 1; display: flex; flex-direction: column; gap: .3vh; }
   li {
     flex: 1;
     display: grid;
-    grid-template-columns: 5.6em 1fr 2.6em; /* 1 列目は「10回以上」のバッジが入る幅 */
+    grid-template-columns: 5.6em 1fr 2.6em; /* 1 列目は「15回以上」のバッジが入る幅 */
     align-items: center;
     gap: .6vw;
-    font-size: 2.8vh;
+    font-size: 2.4vh;
     padding: 0 .6vw;
     border-bottom: 1px dashed #333;
   }
@@ -85,9 +94,9 @@
     font-weight: bold;
     white-space: nowrap;
   }
-  li .bar { height: 1.6vh; background: var(--c); min-width: 2px; }
+  li .bar { height: 1.3vh; background: var(--c); min-width: 2px; }
   li .count { text-align: right; font-weight: bold; }
-  li .count small { font-size: 1.8vh; font-weight: normal; color: var(--dim); margin-left: .2em; }
+  li .count small { font-size: 1.6vh; font-weight: normal; color: var(--dim); margin-left: .2em; }
   li.zero .bar { background: #333; }
   li.zero .count { color: #444; }
 
@@ -133,29 +142,36 @@
   }
   .cards h2 { margin: 0; font-size: 3.4vh; color: var(--new); text-align: center; }
   .cards h2 small { display: block; font-size: 1.9vh; color: var(--dim); margin-top: .5vh; }
-  .card { flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; align-items: center; gap: .8vh; }
+  /* 上半分に直前のプレイの QR、下半分にそのプレイの再生 */
+  .card, .replay { flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; align-items: center; gap: .8vh; }
   .card img { flex: 1; min-height: 0; max-width: 100%; aspect-ratio: 1; image-rendering: pixelated; }
   .card img:not([src]) { visibility: hidden; }
-  .card p { margin: 0; font-size: 2.2vh; white-space: nowrap; }
-  .card p .label { color: var(--new); margin-right: .5em; }
+  .card img[src] { outline: .5vh solid var(--new); }
+  .card p { margin: 0; font-size: 2.2vh; white-space: nowrap; display: flex; align-items: center; gap: .5em; }
+  .card p .label { color: var(--new); }
+  .replay h3 { margin: 0; font-size: 2.2vh; color: var(--dim); font-weight: normal; }
+  .replay canvas { flex: 1; min-height: 0; width: 100%; }
 
-  footer {
-    border: 4px solid var(--line);
-    padding: 1.8vh 2vw;
-    font-size: 3.2vh;
-    display: flex;
-    align-items: center;
-    gap: 1.2em;
-    min-height: 9vh;
-  }
-  footer .label { color: var(--new); }
-  footer .heart { color: var(--hard); }
-  #status { margin-left: auto; font-size: 1.8vh; color: #555; }
+  /* プレイ中は被弾ランキングの代わりに LiDAR の視界（live.json）を出す */
+  .live { display: none; grid-column: span 3; border: 4px solid var(--line); padding: 1.5vh 1.5vw; flex-direction: column; gap: 1vh; min-height: 0; }
+  .live-info { font-size: 3.4vh; display: flex; align-items: baseline; gap: .8em; }
+  .live-info .difficulty { font-size: 4.4vh; font-weight: bold; letter-spacing: .1em; }
+  .live-info b { font-size: 4.4vh; }
+  .live canvas { flex: 1; min-height: 0; width: 100%; }
+  .live .legend { margin: 0; font-size: 2vh; color: var(--dim); }
+  .live .legend span { margin-right: 2em; }
+  .live-title { display: none; }
+  body.playing .board, body.playing .rank-title { display: none; }
+  body.playing .live { display: flex; }
+  body.playing .live-title { display: inline; }
+
+  #status { margin-left: auto; margin-right: 2em; font-size: 1.8vh; color: var(--hard); }
 </style>
 </head>
 <body>
 <header>
-  <h1>被弾ランキング</h1>
+  <h1><span class="rank-title">被弾ランキング</span><span class="live-title">LiDAR の視界</span></h1>
+  <span id="status"></span>
   <div id="total">これまでの挑戦 <b>0</b> 回</div>
 </header>
 
@@ -163,23 +179,23 @@
   <section class="board" data-difficulty="Easy" style="--c: var(--easy)"><h2>EASY<small>被弾回数ごとの人数</small></h2><ol></ol></section>
   <section class="board" data-difficulty="Medium" style="--c: var(--medium)"><h2>MEDIUM<small>被弾回数ごとの人数</small></h2><ol></ol></section>
   <section class="board" data-difficulty="Hard" style="--c: var(--hard)"><h2>HARD<small>被弾回数ごとの人数</small></h2><ol></ol></section>
+  <section class="live">
+    <div class="live-info"></div>
+    <canvas></canvas>
+    <p class="legend"><span style="color: #4dc3ff">● LiDAR が見ている点</span><span style="color: var(--new)">◯ 見つけたハート</span><span style="color: var(--fg)">● SOUL</span><span style="color: #ff5aa0">■ LiDAR</span></p>
+  </section>
   <section class="cards">
     <h2>記録カード<small>スマホで読み取って保存</small></h2>
     <div class="card"><img alt=""><p></p></div>
-    <div class="card"><img alt=""><p></p></div>
+    <div class="replay"><h3>さっきのプレイ</h3><canvas></canvas></div>
   </section>
 </main>
 
-<footer>
-  <span class="heart">&#9829;</span>
-  <span id="latest">まだ挑戦者はいません</span>
-  <span id="status"></span>
-</footer>
-
 <script src="qrcode.js"></script>
 <script src="card/cardcode.js"></script>
+<script src="cardqr.js"></script>
 <script>
-  const MAX_HITS = 10;     // この回数以上はまとめて「○回以上」の 1 行にする
+  const MAX_HITS = 15;     // この回数以上はまとめて「○回以上」の 1 行にする
   const POLL_MS = 3000;    // plays.jsonl を読み直す間隔
   // 本番は localhost:8000/ のまま。?debug を付けるとデバッグモードのプレイだけを出す（本番のプレイは出さない）。
   const DEBUG_VIEW = new URLSearchParams(location.search).has("debug");
@@ -216,7 +232,6 @@
 
   function render(plays) {
     const latest = plays[plays.length - 1];
-    if (latest) latest.latest = true;
     document.querySelector("#total b").textContent = plays.length;
 
     for (const board of document.querySelectorAll(".board")) {
@@ -237,52 +252,201 @@
       });
     }
 
-    document.getElementById("latest").innerHTML = latest
-      ? `<span class="label">さっきの挑戦</span> ${clock(latest.time)} ／ ${latest.difficulty} ／ `
-        + `被弾 <b>${latest.hits}</b> 回`
-        + (latest.hits === 0 ? ' <span class="label">ノーミス！</span>' : "")
-      : "まだ挑戦者はいません";
-
     renderCards(plays);
   }
 
-  // 直前 2 プレイの記録カードの QR。replays/<id>.json を読み、データごと URL に入れる。
-  const qrCache = new Map(); // id → Promise<QR 画像の data URL>
+  // 直前のプレイの記録カードの QR（作り方は cardqr.js）と、そのプレイの再生。
+  // 同じプレイなら作り直さない（失敗したときだけ次の読み直しでやり直す）。
+  let cardKey = null;
 
-  function cardQr(id) {
-    if (!qrCache.has(id)) {
-      const job = (async () => {
-        const res = await fetch(`replays/${id}.json`, { cache: "no-store" });
-        if (!res.ok) throw new Error(res.status);
-        const url = await CardCode.url(await res.json());
-        const qr = qrcode(0, "L");
-        qr.addData(url, "Byte");
-        qr.make();
-        return qr.createDataURL(1, 3);
-      })();
-      job.catch(() => qrCache.delete(id)); // 失敗したら次に描き直すときにやり直す
-      qrCache.set(id, job);
+  async function renderCards(plays) {
+    const p = plays.filter(p => p.id).at(-1);
+    const card = document.querySelector(".card");
+    const img = card.querySelector("img");
+    const key = p ? `${p.id} ${p.difficulty} ${p.hits}` : ""; // 管理画面で直したら作り直す
+    if (key === cardKey) return;
+    cardKey = key;
+    card.querySelector("p").innerHTML = p
+      ? `<span class="label">さっき</span>${clock(p.time)} ${p.difficulty} 被弾${p.hits}回`
+      : "";
+    img.removeAttribute("src");
+    replay = null;
+    if (!p) return;
+    try {
+      const [src, data] = await Promise.all([cardQrDataUrl(p.id), fetchReplay(p.id)]);
+      if (cardKey !== key) return;
+      img.src = src;
+      replay = toReplay(data);
+    } catch {
+      if (cardKey === key) cardKey = null;
     }
-    return qrCache.get(id);
   }
 
-  function renderCards(plays) {
-    const recent = plays.filter(p => p.id).slice(-2).reverse();
-    document.querySelectorAll(".card").forEach(async (card, i) => {
-      const p = recent[i];
-      const img = card.querySelector("img");
-      card.dataset.id = p?.id ?? "";
-      card.querySelector("p").innerHTML = p
-        ? `<span class="label">${i === 0 ? "さっき" : "その前"}</span>${clock(p.time)} ${p.difficulty} 被弾${p.hits}回`
-        : "";
-      if (!p) { img.removeAttribute("src"); return; }
-      try {
-        const src = await cardQr(p.id);
-        if (card.dataset.id === p.id) img.src = src;
-      } catch {
-        img.removeAttribute("src");
+  // canvas の描画サイズを表示サイズに合わせ、[2D コンテキスト, 幅, 高さ, 1 CSS px の実ピクセル数] を返す。
+  function fitCanvas(canvas) {
+    const dpr = window.devicePixelRatio || 1;
+    const w = Math.round(canvas.clientWidth * dpr), h = Math.round(canvas.clientHeight * dpr);
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    return [canvas.getContext("2d"), w, h, dpr];
+  }
+
+  const textFont = (vh, dpr) => `${vh * innerHeight / 100 * dpr}px "BIZ UDGothic", "MS Gothic", monospace`;
+
+  function cross(g, x, y, r) {
+    g.beginPath(); g.moveTo(x - r, y - r); g.lineTo(x + r, y + r); g.moveTo(x + r, y - r); g.lineTo(x - r, y + r); g.stroke();
+  }
+
+  // ---- さっきのプレイの再生（下半分。ずっと繰り返す） ----
+  const REPLAY_SPEED = 2;  // 何倍速で流すか
+  const REPLAY_HOLD = 3;   // 最後まで流したあと止めておく秒数（実時間）
+  let replay = null;       // toReplay の結果
+  let replayStart = 0;
+
+  // replays/<id>.json → 盤面の正規化座標（0〜1、y は上向き）にした軌跡と被弾
+  function toReplay(r) {
+    const [bx, by, bw, bh] = r.board;
+    const norm = ([x, y]) => [(x - bx) / bw, (y - by) / bh];
+    const hits = r.hitEvents.slice(0, r.hits ?? r.hitEvents.length).map(h => ({ t: h.t, p: norm([h.x, h.y]) }));
+    replayStart = performance.now();
+    return { aspect: bw / bh, interval: r.pathInterval, path: r.path.map(norm), hits, duration: r.path.length * r.pathInterval };
+  }
+
+  function drawReplay(now) {
+    requestAnimationFrame(drawReplay);
+    const [g, w, h, dpr] = fitCanvas(document.querySelector(".replay canvas"));
+    g.clearRect(0, 0, w, h);
+    if (!replay) return;
+
+    const r = replay;
+    const loop = r.duration + REPLAY_HOLD * REPLAY_SPEED;
+    const t = Math.min(r.duration, ((now - replayStart) / 1000 * REPLAY_SPEED) % loop);
+    const textH = 3.5 * innerHeight / 100 * dpr; // 下の文字の段
+    const bh = Math.min(w / r.aspect, h - textH), bw = bh * r.aspect;
+    const bx = (w - bw) / 2, by = (h - textH - bh) / 2; // 盤面と下の文字をまとめて上下の真ん中に
+    const X = u => bx + u * bw, Y = v => by + (1 - v) * bh;
+
+    g.strokeStyle = "#fff"; g.lineWidth = 2 * dpr;
+    g.strokeRect(bx, by, bw, bh);
+
+    // ここまでの軌跡
+    const n = Math.min(r.path.length, Math.floor(t / r.interval) + 1);
+    g.strokeStyle = "#4dc3ff"; g.lineWidth = 2 * dpr; g.lineJoin = "round";
+    g.beginPath();
+    for (let i = 0; i < n; i++) i === 0 ? g.moveTo(X(r.path[i][0]), Y(r.path[i][1])) : g.lineTo(X(r.path[i][0]), Y(r.path[i][1]));
+    g.stroke();
+
+    // ここまでの被弾。当たった直後は赤い輪が広がる
+    let hitCount = 0;
+    g.strokeStyle = "#ff3b3b"; g.lineWidth = 2.5 * dpr;
+    for (const hit of r.hits) {
+      if (hit.t > t) continue;
+      hitCount++;
+      const x = X(hit.p[0]), y = Y(hit.p[1]), age = (t - hit.t) / REPLAY_SPEED;
+      cross(g, x, y, 6 * dpr);
+      if (age < 0.6) {
+        g.globalAlpha = 1 - age / 0.6;
+        g.beginPath(); g.arc(x, y, (8 + age * 50) * dpr, 0, Math.PI * 2); g.stroke();
+        g.globalAlpha = 1;
       }
-    });
+    }
+
+    // 今の SOUL
+    const [u, v] = r.path[n - 1] ?? [0.5, 0.5];
+    g.fillStyle = "#fff";
+    g.beginPath(); g.arc(X(u), Y(v), 5 * dpr, 0, Math.PI * 2); g.fill();
+
+    g.font = textFont(2.1, dpr);
+    g.textBaseline = "bottom";
+    g.textAlign = "left";
+    g.fillStyle = "#ddd";
+    g.fillText(`${Math.floor(t)} / ${Math.round(r.duration)} 秒`, bx, by + bh + textH);
+    g.textAlign = "right";
+    g.fillStyle = hitCount ? "#ff5a5a" : "#ddd";
+    g.fillText(`被弾 ${hitCount} 回`, bx + bw, by + bh + textH);
+  }
+  requestAnimationFrame(drawReplay);
+
+  // ---- プレイ中の LiDAR の視界（Unity の Flow/LiveFeed が書く live.json。座標は盤面の正規化座標 × 1000） ----
+  const LIVE_POLL_MS = 100;
+  const VIEW_MARGIN = 0.3; // Unity が点を送ってくる範囲（盤面の外側にこれだけ）
+  const COLORS = { Easy: "var(--easy)", Medium: "var(--medium)", Hard: "var(--hard)" };
+  let playing = false;
+
+  function drawLive(d) {
+    document.querySelector(".live-info").innerHTML =
+      `<span class="difficulty" style="color: ${COLORS[d.difficulty]}">${d.difficulty.toUpperCase()}</span>`
+      + `<span>プレイ中</span><span>残り <b>${d.remaining}</b> 秒</span>`;
+
+    const [g, w, h, dpr] = fitCanvas(document.querySelector(".live canvas"));
+    g.clearRect(0, 0, w, h);
+    const aspect = d.aspect / 1000;
+    const pt = ([x, y]) => [x / 1000, y / 1000];
+    const sensor = d.sensor && pt(d.sensor);
+
+    // 見せる範囲: 盤面の周りと LiDAR の位置。横は物理の長さの比（aspect）で伸ばす
+    let u0 = -VIEW_MARGIN, u1 = 1 + VIEW_MARGIN, v0 = -VIEW_MARGIN, v1 = 1 + VIEW_MARGIN;
+    if (sensor) {
+      u0 = Math.min(u0, sensor[0] - 0.05); u1 = Math.max(u1, sensor[0] + 0.05);
+      v0 = Math.min(v0, sensor[1] - 0.05); v1 = Math.max(v1, sensor[1] + 0.05);
+    }
+    const scale = Math.min(w / ((u1 - u0) * aspect), h / (v1 - v0));
+    const ox = (w - (u1 - u0) * aspect * scale) / 2, oy = (h - (v1 - v0) * scale) / 2;
+    const X = u => ox + (u - u0) * aspect * scale, Y = v => oy + (v1 - v) * scale;
+
+    // 盤面（方眼と枠）
+    g.strokeStyle = "#1c1c1c"; g.lineWidth = dpr;
+    for (let i = 1; i < 8; i++) {
+      g.beginPath(); g.moveTo(X(i / 8), Y(0)); g.lineTo(X(i / 8), Y(1)); g.stroke();
+      g.beginPath(); g.moveTo(X(0), Y(i / 8)); g.lineTo(X(1), Y(i / 8)); g.stroke();
+    }
+    g.strokeStyle = "#fff"; g.lineWidth = 3 * dpr;
+    g.strokeRect(X(0), Y(1), X(1) - X(0), Y(0) - Y(1));
+
+    if (d.lidar) {
+      const pts = d.points;
+      // LiDAR から点へのレーザー（うすく）と点
+      g.strokeStyle = "rgba(77, 195, 255, .08)"; g.lineWidth = dpr;
+      g.beginPath();
+      for (let i = 0; i < pts.length; i += 2) { g.moveTo(X(sensor[0]), Y(sensor[1])); g.lineTo(X(pts[i] / 1000), Y(pts[i + 1] / 1000)); }
+      g.stroke();
+      g.fillStyle = "#4dc3ff";
+      const s = 4 * dpr;
+      for (let i = 0; i < pts.length; i += 2) g.fillRect(X(pts[i] / 1000) - s / 2, Y(pts[i + 1] / 1000) - s / 2, s, s);
+
+      g.fillStyle = "#ff5aa0";
+      g.fillRect(X(sensor[0]) - 8 * dpr, Y(sensor[1]) - 8 * dpr, 16 * dpr, 16 * dpr);
+
+      if (d.heart) {
+        const [u, v] = pt(d.heart);
+        g.strokeStyle = "#ffe14d"; g.lineWidth = 3 * dpr;
+        g.beginPath(); g.arc(X(u), Y(v), 22 * dpr, 0, Math.PI * 2); g.stroke();
+      }
+    } else {
+      g.fillStyle = "#8a8a8a"; g.font = textFont(3, dpr);
+      g.textAlign = "center"; g.textBaseline = "middle";
+      g.fillText("LiDAR につながっていません", X(0.5), Y(0.5));
+    }
+
+    const [su, sv] = pt(d.soul);
+    g.fillStyle = "#fff";
+    g.beginPath(); g.arc(X(su), Y(sv), 9 * dpr, 0, Math.PI * 2); g.fill();
+  }
+
+  async function pollLive() {
+    try {
+      const res = await fetch("live.json", { cache: "no-store" });
+      if (res.ok) { // 503 は Unity が書き換え中なので今の表示のまま
+        const d = await res.json();
+        const now = d.state === "playing";
+        if (now) drawLive(d);
+        if (now !== playing) {
+          playing = now;
+          document.body.classList.toggle("playing", playing);
+          if (!playing) poll(); // 終わったらすぐ結果を出す
+        }
+      }
+    } catch { /* サーバーが止まっているときは poll() が知らせる */ }
+    setTimeout(pollLive, LIVE_POLL_MS);
   }
 
   async function poll() {
@@ -301,6 +465,7 @@
 
   poll();
   setInterval(poll, POLL_MS);
+  pollLive();
 </script>
 </body>
 </html>

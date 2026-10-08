@@ -32,6 +32,13 @@
   header .tools { margin-left: auto; display: flex; gap: 8px; align-items: center; }
   p.note { margin: 0 0 16px; color: var(--dim); font-size: 13px; line-height: 1.6; }
   #status { min-height: 1.4em; margin: 0 0 8px; color: var(--accent); }
+  /* 仮データを作る・選んだものをまとめて削除する段 */
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 0 0 12px; padding: 10px 12px; border: 1px solid var(--line); }
+  .bar .group { display: flex; align-items: center; gap: 8px; }
+  .bar .group + .group { margin-left: auto; }
+  .bar label { color: var(--dim); display: flex; align-items: center; gap: 6px; }
+  th.pick, td.pick { width: 1px; padding-right: 0; }
+  tr.picked { background: #1d1d2a; }
   #status.error { color: var(--hard); }
 
   table { width: 100%; border-collapse: collapse; }
@@ -44,7 +51,7 @@
   th.sorted.desc::after { content: " ▼"; }
   td.num, th.num { text-align: right; }
   tr.dirty { background: #2a2600; }
-  tr.latest td:first-child::after { content: "最新"; margin-left: 8px; font-size: 11px; color: #000; background: var(--accent); padding: 1px 6px; }
+  tr.latest td.time::after { content: "最新"; margin-left: 8px; font-size: 11px; color: #000; background: var(--accent); padding: 1px 6px; }
   .id { color: var(--dim); font-size: 12px; }
 
   select, input, button { font: inherit; color: var(--fg); background: #111; border: 1px solid #555; padding: 4px 8px; }
@@ -60,6 +67,13 @@
   button.delete { color: var(--hard); }
   a.card { color: var(--fg); border: 1px solid #555; padding: 4px 8px; text-decoration: none; }
   a.card:hover { border-color: var(--fg); }
+
+  /* 「QR」で出す大きな QR。どこかを押すか Esc で閉じる */
+  #qr { position: fixed; inset: 0; background: rgba(0, 0, 0, .9); display: none; flex-direction: column; align-items: center; justify-content: center; gap: 16px; cursor: pointer; }
+  #qr.open { display: flex; }
+  #qr img { width: min(70vh, 90vw); background: #fff; image-rendering: pixelated; }
+  #qr p { margin: 0; font-size: 22px; }
+  #qr small { color: var(--dim); }
   .actions { display: flex; gap: 6px; }
   .empty { color: var(--dim); text-align: center; padding: 32px; }
   .scroll { overflow-x: auto; }
@@ -75,6 +89,11 @@
         <option value="">すべての難易度</option>
         <option>Easy</option><option>Medium</option><option>Hard</option>
       </select>
+      <select id="mode-filter" aria-label="本番・デバッグで絞り込み">
+        <option value="">本番もデバッグも</option>
+        <option value="real">本番のみ</option>
+        <option value="debug">デバッグのみ</option>
+      </select>
       <button id="reload">再読み込み</button>
     </span>
   </header>
@@ -82,12 +101,26 @@
     変えた行は黄色になり、「保存」で plays.jsonl に書き込みます（直前の内容は plays.jsonl.bak に残ります）。
     削除したプレイの再生データは replays/deleted/ に移します。列の見出しを押すと並べ替えます（表示だけで、ファイルの順は変わりません）。
     被弾回数を変えると記録カードの回数も変わります（減らすと × 印も先頭からその数だけ。元の記録は消えないので、戻せば元どおり）。
+    「仮データ」は今の時刻のプレイを足します（軌跡と被弾の位置は作り物）。デバッグにしておくと本番のスコアボードには出ません。
   </p>
   <p id="status"></p>
+  <div class="bar">
+    <span class="group">
+      仮データ
+      <select id="new-difficulty" aria-label="仮データの難易度"><option>Easy</option><option>Medium</option><option>Hard</option></select>
+      <label>被弾 <input id="new-hits" type="number" min="0" max="999" value="3"></label>
+      <label><input id="new-debug" type="checkbox" checked> デバッグ</label>
+      <button id="create">作る</button>
+    </span>
+    <span class="group">
+      <button id="delete-picked" class="delete" disabled>選択したものを削除</button>
+    </span>
+  </div>
   <div class="scroll">
     <table>
       <thead>
         <tr>
+          <th class="pick"><input id="pick-all" type="checkbox" aria-label="表示中のものをすべて選ぶ"></th>
           <th data-key="time">日時</th>
           <th data-key="difficulty">難易度</th>
           <th data-key="hits" class="num">被弾</th>
@@ -100,8 +133,11 @@
     </table>
   </div>
 </div>
+<div id="qr" title="押すと閉じる"><img alt="記録カードの QR"><p></p><small>スマホで読み取ると記録カードが開きます（押すか Esc で閉じる）</small></div>
 
+<script src="qrcode.js"></script>
 <script src="card/cardcode.js"></script>
+<script src="cardqr.js"></script>
 <script>
   const DIFFICULTIES = ["Easy", "Medium", "Hard"];
   const POLL_MS = 5000; // 変更中の行が無いときだけ読み直す
@@ -109,6 +145,7 @@
   let plays = [];
   let sort = { key: "time", desc: true };
   const edits = new Map(); // id → まだ保存していない変更
+  const picked = new Set(); // 左のチェックで選んだ id（まとめて削除する）
 
   // スコアボードと同じ読み方。壊れた行と id の無い行（編集できない）は出さない。
   function parse(text) {
@@ -149,10 +186,17 @@
     return (sort.desc ? -d : d) || b.time.localeCompare(a.time);
   }
 
+  // 絞り込みは保存済みの値で見る（編集中の行が消えないように）
+  function visible() {
+    const filter = document.getElementById("filter").value;
+    const mode = document.getElementById("mode-filter").value;
+    return plays.filter(p => (!filter || p.difficulty === filter)
+                          && (!mode || (mode === "debug") === !!p.debug));
+  }
+
   function render() {
     const latestId = plays.length ? plays[plays.length - 1].id : null;
-    const filter = document.getElementById("filter").value;
-    const shown = plays.filter(p => !filter || p.difficulty === filter).sort(compare);
+    const shown = visible().sort(compare);
 
     const counts = DIFFICULTIES.map(d => `${d} ${plays.filter(p => p.difficulty === d).length}`).join(" ／ ");
     document.getElementById("summary").innerHTML = `全 <b>${plays.length}</b> 件（${counts}）`;
@@ -162,12 +206,21 @@
       th.classList.toggle("desc", th.dataset.key === sort.key && sort.desc);
     }
 
+    // 消えた記録の選択は外す。見出しのチェックは「表示中がすべて選ばれているか」
+    for (const id of picked) if (!plays.some(p => p.id === id)) picked.delete(id);
+    const pickAll = document.getElementById("pick-all");
+    pickAll.checked = shown.length > 0 && shown.every(p => picked.has(p.id));
+    pickAll.indeterminate = !pickAll.checked && shown.some(p => picked.has(p.id));
+    const deletePicked = document.getElementById("delete-picked");
+    deletePicked.disabled = !picked.size;
+    deletePicked.textContent = picked.size ? `選択した ${picked.size} 件を削除` : "選択したものを削除";
+
     const tbody = document.querySelector("tbody");
     tbody.replaceChildren(...shown.map(p => row(p, p.id === latestId)));
     if (!shown.length) {
       const tr = tbody.insertRow();
       const td = tr.insertCell();
-      td.colSpan = 6;
+      td.colSpan = 7;
       td.className = "empty";
       td.textContent = plays.length ? "この難易度の記録はありません" : "まだ記録がありません";
     }
@@ -178,8 +231,18 @@
     const tr = document.createElement("tr");
     tr.classList.toggle("dirty", edits.has(p.id));
     tr.classList.toggle("latest", latest);
+    tr.classList.toggle("picked", picked.has(p.id));
+
+    const pick = document.createElement("input");
+    pick.type = "checkbox";
+    pick.checked = picked.has(p.id);
+    pick.onchange = () => { if (pick.checked) picked.add(p.id); else picked.delete(p.id); render(); };
+    const pickCell = tr.insertCell();
+    pickCell.className = "pick";
+    pickCell.append(pick);
 
     const time = tr.insertCell();
+    time.className = "time";
     time.textContent = p.time.replace("T", " ");
 
     const difficulty = document.createElement("select");
@@ -214,7 +277,7 @@
     save.disabled = !edits.has(p.id);
     const revert = button("戻す", "", () => { edits.delete(p.id); render(); });
     revert.disabled = !edits.has(p.id);
-    actions.append(cardLink(p), save, revert, button("削除", "delete", () => remove(p)));
+    actions.append(cardLink(p), button("QR", "", () => showQr(p)), save, revert, button("削除", "delete", () => remove(p)));
     tr.insertCell().append(actions);
     return tr;
   }
@@ -247,9 +310,7 @@
       e.preventDefault();
       const tab = window.open("about:blank", "_blank"); // await の後だとポップアップとして止められるので先に開く
       try {
-        const res = await fetch(`replays/${p.id}.json`, { cache: "no-store" });
-        if (!res.ok) throw new Error(res.status);
-        tab.location = await CardCode.url(await res.json());
+        tab.location = await cardUrl(p.id);
       } catch {
         tab?.close();
         setStatus(`記録カードを開けませんでした（再生データがありません）: ${label(p)}`, true);
@@ -257,6 +318,21 @@
     };
     return a;
   }
+
+  // そのプレイの記録カードの QR を画面いっぱいに出す（スコアボードで読み逃した人に見せる用）。
+  async function showQr(p) {
+    const box = document.getElementById("qr");
+    try {
+      box.querySelector("img").src = await cardQrDataUrl(p.id);
+    } catch {
+      return setStatus(`QR を作れませんでした（再生データがありません）: ${label(p)}`, true);
+    }
+    box.querySelector("p").textContent = label(p);
+    box.classList.add("open");
+  }
+  const closeQr = () => document.getElementById("qr").classList.remove("open");
+  document.getElementById("qr").onclick = closeQr;
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeQr(); });
 
   const label = p => `${p.time.replace("T", " ")} ${p.difficulty} 被弾${p.hits}回`;
 
@@ -281,6 +357,48 @@
     await load();
   }
 
+  // 選んだものをまとめて削除。1 回の書き換えなので、plays.jsonl.bak は削除の直前の内容になる。
+  async function removePicked() {
+    const ids = [...picked];
+    if (!ids.length || !confirm(`選択した ${ids.length} 件の記録を削除しますか？`)) return;
+    const res = await fetch("api/plays/delete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    });
+    if (!res.ok) return setStatus(`削除できませんでした（${res.status}）`, true);
+    for (const id of ids) { picked.delete(id); edits.delete(id); }
+    setStatus(`${ids.length} 件を削除しました`);
+    await load();
+  }
+
+  // 仮データ（今の時刻のプレイ）を足す。カードと QR を試せるよう、軌跡と被弾の位置はサーバーが作る。
+  async function createTest() {
+    const fields = {
+      difficulty: document.getElementById("new-difficulty").value,
+      hits: Math.max(0, Math.min(999, Math.round(Number(document.getElementById("new-hits").value) || 0))),
+      debug: document.getElementById("new-debug").checked,
+    };
+    const res = await fetch("api/plays/new", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(fields),
+    });
+    if (!res.ok) return setStatus(`仮データを作れませんでした（${res.status}）`, true);
+    const { id } = await res.json();
+    setStatus(`仮データを作りました: ${id} ${fields.difficulty} 被弾${fields.hits}回${fields.debug ? "（デバッグ）" : "（本番）"}`);
+    await load();
+  }
+
+  document.getElementById("pick-all").onchange = e => {
+    for (const p of visible()) {
+      if (e.target.checked) picked.add(p.id); else picked.delete(p.id);
+    }
+    render();
+  };
+  document.getElementById("delete-picked").onclick = removePicked;
+  document.getElementById("create").onclick = createTest;
+
   for (const th of document.querySelectorAll("th[data-key]")) {
     th.onclick = () => {
       const key = th.dataset.key;
@@ -289,6 +407,7 @@
     };
   }
   document.getElementById("filter").onchange = render;
+  document.getElementById("mode-filter").onchange = render;
   document.getElementById("reload").onclick = () => { edits.clear(); setStatus(""); load(); };
 
   load();

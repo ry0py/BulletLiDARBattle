@@ -18,6 +18,10 @@ MonoBehaviour:
   _spread: 15
   _spiralStep: 10
   _width: 5
+  _gap: 1
+  _gapMode: 0
+  _radius: 1.5
+  _holeSize: {x: 1.5, y: 1}
   _move: 0
   _speed: 1.2
   _acceleration: 0
@@ -30,3 +34,6 @@ MonoBehaviour:
   _stopTime: 0.6
   _waitTime: 0.4
   _gravity: 3
+  _lifetime: 0
+  _next: {fileID: 0}
+  _nextTime: 1

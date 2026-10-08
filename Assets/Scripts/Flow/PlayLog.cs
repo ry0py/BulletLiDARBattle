@@ -22,7 +22,8 @@ namespace LidarBattle.Flow
         {
             string id = r.StartedAt.ToString("yyyyMMdd-HHmmss", Inv);
             string head = $"\"id\":\"{id}\",\"time\":\"{r.StartedAt.ToString("yyyy-MM-ddTHH:mm:ss", Inv)}\","
-                        + $"\"difficulty\":\"{r.Difficulty}\",\"hits\":{r.Hits.Count},\"debug\":{(r.DebugMode ? "true" : "false")}";
+                        + $"\"difficulty\":\"{r.Difficulty}\",\"timeline\":\"{r.Timeline}\",\"hits\":{r.Hits.Count},"
+                        + $"\"debug\":{(r.DebugMode ? "true" : "false")}";
             try
             {
                 // 要約より先に詳細を書く（要約が見えた時点で詳細もある）。

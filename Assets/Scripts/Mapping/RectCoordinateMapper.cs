@@ -48,13 +48,23 @@ namespace LidarBattle.Mapping
 
         public Vector2 ToNormalized(Vector2 physicalM)
         {
+            Vector2 n = ToNormalizedUnclamped(physicalM);
+            return new Vector2(Mathf.Clamp01(n.x), Mathf.Clamp01(n.y));
+        }
+
+        /// <summary>ToNormalized のクランプしない版。盤面の外は 0..1 の外になる（点群の表示用）。</summary>
+        public Vector2 ToNormalizedUnclamped(Vector2 physicalM)
+        {
             Vector2 r = ToAligned(physicalM);
             // min > max (負のサイズ) なら自然に反転する。
             float nx = (r.x - _min.x) / _size.x;
             float ny = (r.y - _min.y) / _size.y;
             if (_invertX) nx = 1f - nx;
             if (_invertY) ny = 1f - ny;
-            return new Vector2(Mathf.Clamp01(nx), Mathf.Clamp01(ny));
+            return new Vector2(nx, ny);
         }
+
+        /// <summary>キャリブレーション矩形の横 / 縦（物理の長さの比）。</summary>
+        public float Aspect => Mathf.Abs(_size.x / _size.y);
     }
 }

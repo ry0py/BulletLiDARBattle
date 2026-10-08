@@ -29,6 +29,8 @@ namespace LidarBattle.Flow
 
         public DateTime StartedAt { get; } = DateTime.Now;
         public Difficulty Difficulty { get; }
+        /// <summary>再生した弾幕の Timeline の名前（難易度ごとに何本かからランダムに選ぶため）。</summary>
+        public string Timeline { get; }
         public bool DebugMode { get; }
         /// <summary>盤面の左下（ワールド座標）と大きさ。軌跡を盤面に重ねて描くのに使う。</summary>
         public Rect Board { get; }
@@ -38,9 +40,10 @@ namespace LidarBattle.Flow
 
         private float _time;
 
-        public PlayRecorder(Difficulty difficulty, bool debugMode, Rect board)
+        public PlayRecorder(Difficulty difficulty, string timeline, bool debugMode, Rect board)
         {
             Difficulty = difficulty;
+            Timeline = timeline;
             DebugMode = debugMode;
             Board = board;
         }

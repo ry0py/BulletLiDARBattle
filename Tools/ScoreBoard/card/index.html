@@ -35,8 +35,10 @@
     display: none;
   }
   p { margin: 0; color: var(--dim); font-size: 14px; text-align: center; }
-  /* 見出しのすぐ下に寄せる（body の gap を詰める） */
-  p.thanks { margin-top: -10px; color: var(--fg); font-size: 16px; }
+  /* 見出しのすぐ下に寄せる（body の gap を詰める）。
+     大きさはカードの難易度（MEDIUM など）の字に合わせる。カードは幅 1080 に 96px で描き、幅 540px までに縮めて出す。
+     入りきらないときは「ありがとう！」の前で折り返す（keep-all と <wbr>） */
+  p.thanks { margin-top: -10px; color: var(--fg); font-size: min(48px, calc((100vw - 32px) * 96 / 1080)); font-weight: bold; line-height: 1.3; word-break: keep-all; }
   /* 保存（黄色）と並ぶので、こちらは枠だけにして目立ちすぎないようにする */
   a.link {
     width: 100%;
@@ -53,7 +55,7 @@
 </head>
 <body>
 <h1>あなたの記録</h1>
-<p class="thanks">プレイしてありがとう！</p>
+<p class="thanks">プレイしてくれて<wbr>ありがとう！</p>
 <img id="card" alt="記録カード">
 <button id="save">画像を保存</button>
 <!-- 新しいタブで開き、記録カードのページは残す -->
@@ -70,7 +72,8 @@
   const FONT = '"Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif';
 
   const pad2 = n => String(n).padStart(2, "0");
-  const dateText = d => `${d.getFullYear()}.${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}  ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
+  // 年はタイトル（工大祭2026）にあるので出さない
+  const dateText = d => `${pad2(d.getMonth() + 1)}.${pad2(d.getDate())}  ${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
 
   const font = (size, weight = "normal") => `${weight} ${size}px ${FONT}`;
   // 見出し用。読み込めなかったら FONT に落ちる。
@@ -137,6 +140,32 @@
     g.fillText(count, PAD, sy + 50);
     g.font = font(56);
     g.fillText("回", ux, sy + 50);
+    g.restore();
+    return x1;
+  }
+
+  // その日の順位（右寄せ）。1〜3 位は数字と「位」を金・銀・銅に光らせる。
+  function drawRank(g, rank, total, sy) {
+    const x1 = W - PAD;
+    g.fillStyle = "#8a8a8a";
+    g.font = font(34);
+    g.textAlign = "right";
+    g.fillText(`今日の ${total}人中`, x1, sy - 100);
+    g.textAlign = "left";
+
+    const num = String(rank);
+    g.font = font(56);
+    const ux = x1 - g.measureText("位").width;
+    g.font = font(120, "bold");
+    const x0 = ux - 20 - g.measureText(num).width;
+
+    g.save();
+    g.fillStyle = "#fff";
+    const glow = GLOWS[rank]?.(g, x0, x1);
+    if (glow) { g.fillStyle = glow.fill; g.shadowColor = glow.shadow; g.shadowBlur = 30; }
+    g.fillText(num, x0, sy + 50);
+    g.font = font(56);
+    g.fillText("位", ux, sy + 50);
     g.restore();
   }
 
@@ -213,15 +242,14 @@
     g.fillStyle = "#8a8a8a";
     g.fillText("○ スタート   ● ゴール   ✕ 被弾", bx, by + bh + 44);
 
-    // 被弾回数
-    drawCount(g, rec.count, sy);
+    // 被弾回数（右にその日の順位。ノーミスはその間）
+    const countRight = drawCount(g, rec.count, sy);
     if (rec.count === 0) {
       g.fillStyle = "#ffe14d";
       g.font = font(72, "bold");
-      g.textAlign = "right";
-      g.fillText("ノーミス！", W - PAD, sy + 40);
-      g.textAlign = "left";
+      g.fillText("ノーミス！", countRight + 40, sy + 40);
     }
+    if (rec.total > 0) drawRank(g, rec.rank, rec.total, sy);
 
     // 被弾したタイミング
     const duration = Math.max(1, n * rec.interval);

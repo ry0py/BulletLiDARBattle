@@ -65,15 +65,16 @@ namespace LidarBattle.EditorTools
 
         // ───────── 弾・Timeline ─────────
 
-        private static TimelineAsset[] BuildTimelines()
+        /// <summary>難易度ごとに数本の Timeline（[Difficulty][何本目]）を作る。中身は BattleTimelineBuilder。</summary>
+        private static TimelineAsset[][] BuildTimelines()
         {
-            var white = MakeBulletType("White", Color.white);
-            var yellow = MakeBulletType("Yellow", new Color(1f, 0.9f, 0.2f));
-            return BuildTimelines(TimelineDir, white, yellow);
+            MakeBulletType("White", Color.white);
+            MakeBulletType("Yellow", new Color(1f, 0.9f, 0.2f));
+            return BattleTimelineBuilder.Build();
         }
 
         /// <summary>
-        /// 難易度別の Timeline を timelineDir に作る。弾幕の中身（飛ばし方・タイミング・セリフ）は見た目のテーマに依らず共通で、
+        /// スキャナー版の難易度別 Timeline（難易度ごとに 1 本）を timelineDir に作る。弾幕の中身（飛ばし方・タイミング・セリフ）は見た目のテーマに依らず共通で、
         /// 弾の見た目だけを white（主弾）と yellow（差し色の弾）で差し替える。FirePattern は BulletDir で共有する。
         /// </summary>
         internal static TimelineAsset[] BuildTimelines(string timelineDir, BulletType white, BulletType yellow)
@@ -110,6 +111,7 @@ namespace LidarBattle.EditorTools
                 Say(d, p, 20, 3, "まだまだ！");
                 Attack(p, shake, 40, 2);
                 Say(d, p, 45, 3, "あと少し！");
+                Roam(tl, 0.1f, (5, 20), (23, 45), (48, 60));
             });
 
             var medium = MakeTimeline($"{timelineDir}/Medium", tl =>
@@ -128,6 +130,7 @@ namespace LidarBattle.EditorTools
                 Say(d, p, 20, 3, "なかなかやるね", PortraitExpression.Smile);
                 Attack(p, shake, 25, 2);
                 Say(d, p, 45, 3, "あと少し！");
+                Roam(tl, 0.15f, (5, 20), (23, 45), (48, 60));
             });
 
             var hard = MakeTimeline($"{timelineDir}/Hard", tl =>
@@ -147,6 +150,7 @@ namespace LidarBattle.EditorTools
                 Say(d, p, 25, 3, "よけられるかな？", PortraitExpression.Smile);
                 Attack(p, shake, 35, 2);
                 Say(d, p, 50, 3, "あと少し！");
+                Roam(tl, 0.2f, (5, 25), (28, 50), (53, 60));
             });
 
             return new[] { easy, medium, hard };
@@ -191,7 +195,7 @@ namespace LidarBattle.EditorTools
         /// セリフ・表情・立ち絵の動きのトラックを作る。後半（30 秒〜）は全難易度共通で立ち絵をふわふわ上下させる。
         /// 震えは別トラックにする（同じトラックで重ねると、足し合わせずにクロスフェードになるため）。
         /// </summary>
-        private static (DialogueTrack, PortraitTrack, PortraitMotionTrack) MakeTalkTracks(TimelineAsset timeline)
+        internal static (DialogueTrack, PortraitTrack, PortraitMotionTrack) MakeTalkTracks(TimelineAsset timeline)
         {
             var dialogue = timeline.CreateTrack<DialogueTrack>(null, "Dialogue");
             var portrait = timeline.CreateTrack<PortraitTrack>(null, "Portrait");
@@ -201,8 +205,29 @@ namespace LidarBattle.EditorTools
             return (dialogue, portrait, shake);
         }
 
+        // 立ち絵が歩き回る範囲（元の位置からの横のずれ、px）。左は画面の端、右は右上の残り時間の手前まで。
+        private const float RoamLeft = -300f;
+        private const float RoamRight = 860f;
+        private const double RoamEase = 1.5;
+
+        /// <summary>
+        /// セリフの無い間（spans の各区間）、立ち絵に画面の上を左右に大きく行き来させる。会話ボックスはセリフの間しか出ないので重ならない。
+        /// 区間の前後 RoamEase 秒で元の位置との間を移動するので、区間の終わりはセリフの始まりにそろえてよい。
+        /// </summary>
+        internal static void Roam(TimelineAsset timeline, float frequency, params (double start, double end)[] spans)
+        {
+            var track = timeline.CreateTrack<PortraitMotionTrack>(null, "Portrait Roam");
+            foreach (var (start, end) in spans)
+            {
+                var clip = Move(track, start, end - start - 0.5, PortraitMotion.Roam, (RoamRight - RoamLeft) / 2f, frequency);
+                clip.easeInDuration = RoamEase;
+                clip.easeOutDuration = RoamEase;
+                Set(clip.asset, ("_center", new Vector2((RoamLeft + RoamRight) / 2f, 0f)));
+            }
+        }
+
         /// <summary>技を出す顔にして、その間は小刻みに震わせる。</summary>
-        private static void Attack(PortraitTrack portrait, PortraitMotionTrack shake, double start, double duration)
+        internal static void Attack(PortraitTrack portrait, PortraitMotionTrack shake, double start, double duration)
         {
             Face(portrait, start, duration, PortraitExpression.Attack);
             Move(shake, start, duration, PortraitMotion.Shake, 6f, 25f);
@@ -220,7 +245,7 @@ namespace LidarBattle.EditorTools
         }
 
         /// <summary>セリフを出し、その間は立ち絵を expression（既定は口をあけた顔）にする。</summary>
-        private static void Say(DialogueTrack track, PortraitTrack portrait, double start, double duration, string text,
+        internal static void Say(DialogueTrack track, PortraitTrack portrait, double start, double duration, string text,
             PortraitExpression expression = PortraitExpression.Talk)
         {
             var clip = track.CreateClip<DialogueClip>();
@@ -299,6 +324,7 @@ namespace LidarBattle.EditorTools
 
             var bullets = new GameObject("BulletSystem").AddComponent<BulletSystem>();
             Set(bullets, ("_clock", common.Clock), ("_board", common.Board), ("_soul", common.Soul));
+            MakeSafeZone(common.Board);
 
             var score = bullets.gameObject.AddComponent<ScoreKeeper>();
             Set(score, ("_bullets", bullets));
@@ -324,7 +350,9 @@ namespace LidarBattle.EditorTools
             Set(feedback, ("_bullets", bullets), ("_camera", common.Camera), ("_overlay", flashImage));
 
             var flow = new GameObject("BattleFlow").AddComponent<BattleFlow>();
-            Set(flow, ("_director", director), ("_timelines", timelines), ("_clock", common.Clock), ("_bullets", bullets),
+            Set(flow, ("_director", director), ("_easyTimelines", timelines[(int)Difficulty.Easy]),
+                ("_mediumTimelines", timelines[(int)Difficulty.Medium]), ("_hardTimelines", timelines[(int)Difficulty.Hard]),
+                ("_clock", common.Clock), ("_bullets", bullets),
                 ("_score", score), ("_dialogue", common.Dialogue), ("_portrait", common.Portrait), ("_portraitSets", portraitSets),
                 ("_timeLabel", timeLabel), ("_difficultyLabel", difficultyLabel), ("_selectSceneName", "SelectScene"));
 
@@ -464,6 +492,31 @@ namespace LidarBattle.EditorTools
             var option = go.AddComponent<DifficultyOption>();
             Set(option, ("_difficulty", difficulty), ("_soul", soul), ("_size", size), ("_gauge", pivot));
             return option;
+        }
+
+        /// <summary>
+        /// 安置のシート（半透明の緑の長方形に「あんぜん」）を盤面の子に作る。ふだんは隠しておき、Timeline の SafeZoneTrack が出す。
+        /// 枠（0, 1）より手前、弾（10）・SOUL（19, 20）より奥に描く。
+        /// </summary>
+        private static void MakeSafeZone(BulletBoard board)
+        {
+            var go = new GameObject("SafeZone");
+            go.transform.SetParent(board.transform, false);
+            var sheet = MakeSpriteObject("Sheet", go.transform, _square, new Color(0.3f, 1f, 0.45f, 0.35f), 3);
+
+            var label = new GameObject("Label").AddComponent<TextMeshPro>();
+            label.transform.SetParent(go.transform, false);
+            label.text = "あんぜん";
+            label.alignment = TextAlignmentOptions.Center;
+            label.color = new Color(0.8f, 1f, 0.85f, 0.9f);
+            label.enableAutoSizing = true;
+            label.fontSizeMin = 0.5f;
+            label.fontSizeMax = 3f;
+            label.sortingOrder = 4;
+
+            var view = go.AddComponent<SafeZoneView>();
+            Set(view, ("_board", board), ("_sheet", sheet.GetComponent<SpriteRenderer>()), ("_label", label));
+            go.SetActive(false);
         }
 
         // ───────── 部品 ─────────

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using LidarBattle.Config;
 using LidarBattle.LiDAR;
 using LidarBattle.Mapping;
@@ -28,12 +29,25 @@ namespace LidarBattle.Input
         private static int s_backgroundFramesLeft;
         private static bool s_showStatus; // 展示中は出さない。[F1] で表示（シーンをまたいで保持）
 
+        /// <summary>ViewPoints に入れる範囲。盤面（正規化座標 0..1）をこれだけ広げる。</summary>
+        private const float ViewMargin = 0.3f;
+
         private RectCoordinateMapper _mapper;
         private int _lastScanCount = -1;
         private bool _detected;
         private Vector2 _positionM;
+        private readonly List<Vector2> _viewPoints = new(1100);
 
         private static bool LidarActive => s_sensor != null && s_sensor.IsConnected;
+
+        // スコアボードの「LiDAR の視界」用（Flow/LiveFeed）。座標はどれも盤面の正規化座標（盤面の外は 0..1 の外）。
+        public bool IsActive => LidarActive;
+        /// <summary>最新のスキャンの点のうち盤面の付近のもの（背景も含む生の点）。</summary>
+        public IReadOnlyList<Vector2> ViewPoints => _viewPoints;
+        public bool HasHeart => LidarActive && _detected;
+        public Vector2 HeartNormalized => _mapper.ToNormalized(_positionM);
+        public Vector2 SensorNormalized => _mapper.ToNormalizedUnclamped(Vector2.zero);
+        public float BoardAspect => _mapper.Aspect;
 
         private void Awake()
         {
@@ -92,6 +106,7 @@ namespace LidarBattle.Input
             HandleKeys();
             if (!LidarActive || s_sensor.ScanCount == _lastScanCount || !s_sensor.TryGetLatestScan(out LidarScan scan)) return;
             _lastScanCount = s_sensor.ScanCount;
+            CollectViewPoints(scan);
 
             if (s_backgroundFramesLeft > 0)
             {
@@ -101,6 +116,17 @@ namespace LidarBattle.Input
                 return;
             }
             _detected = s_smoothed.TryTrack(scan, out _positionM);
+        }
+
+        private void CollectViewPoints(LidarScan scan)
+        {
+            _viewPoints.Clear();
+            for (int i = 0; i < scan.Count; i++)
+            {
+                Vector2 n = _mapper.ToNormalizedUnclamped(scan[i].ToCartesian());
+                if (n.x >= -ViewMargin && n.x <= 1f + ViewMargin && n.y >= -ViewMargin && n.y <= 1f + ViewMargin)
+                    _viewPoints.Add(n);
+            }
         }
 
         public bool TryReadTarget(Vector2 currentNormalized, float deltaTime, out Vector2 target)

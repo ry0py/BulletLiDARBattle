@@ -19,6 +19,8 @@ namespace LidarBattle.Battle
         private float _invincibleTimer;
 
         public Vector2 Position => transform.position;
+        /// <summary>入力源と同じ正規化座標（0..1 = SOUL の可動範囲）での今の位置。</summary>
+        public Vector2 Normalized => _board.WorldToNormalized(Position, _halfSize);
         public float HitRadius => _hitRadius;
         public float GrazeRadius => _grazeRadius;
         public bool IsInvincible => _invincibleTimer > 0f;
