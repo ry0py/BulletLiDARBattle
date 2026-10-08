@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: FireworkMedium
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.FirePattern
   _shape: 0
-  _count: 14
+  _count: 10
   _angle: 0
   _spread: 15
   _spiralStep: 10

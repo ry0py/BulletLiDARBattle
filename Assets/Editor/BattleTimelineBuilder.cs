@@ -105,26 +105,31 @@ namespace LidarBattle.EditorTools
             }
         }
 
-        /// <summary>セリフ（最初・半ば・終わり近く）と立ち絵の表情・動き。セリフの無い間は立ち絵が画面の上を歩き回る。</summary>
+        /// <summary>
+        /// セリフ（最初・半ば・終わり近く）と立ち絵の表情・動き。セリフの無い間は立ち絵が画面の上を歩き回る。
+        /// 口調は Easy がやさしく、Medium はやわらかいけれど少し厳しく、Hard は厳しく。
+        /// </summary>
         private static void AddTalk(TimelineAsset timeline, Difficulty d)
         {
             var (dialogue, p, shake) = MakeTalkTracks(timeline);
             switch (d)
             {
                 case Difficulty.Easy:
-                    Say(dialogue, p, 0, 3, "いくよ！");
-                    Say(dialogue, p, 27, 3, "まだまだ！");
+                    Say(dialogue, p, 0, 3, "がんばっテ！");
+                    Say(dialogue, p, 27, 3, "じょうずだネ！そのちょうしだヨ！", PortraitExpression.Smile);
+                    Say(dialogue, p, 51, 3, "あと少しだヨ、ファイト！");
                     break;
                 case Difficulty.Medium:
-                    Say(dialogue, p, 0, 3, "いくよ！");
-                    Say(dialogue, p, 27, 3, "なかなかやるね", PortraitExpression.Smile);
+                    Say(dialogue, p, 0, 3, "さあ、始めよう～～！。がんばってね");
+                    Say(dialogue, p, 27, 3, "なかなかやるね～～。でも油断は禁物だよ～～", PortraitExpression.Smile);
+                    Say(dialogue, p, 51, 3, "あと少し。最後まで気を抜かないで～～");
                     break;
                 default:
-                    Say(dialogue, p, 0, 3, "本気でいくよ！");
-                    Say(dialogue, p, 27, 3, "よけられるかな？", PortraitExpression.Smile);
+                    Say(dialogue, p, 0, 3, "本気でいくがお。ついてこられる？");
+                    Say(dialogue, p, 27, 3, "その程度？まだまだこれからだ、がお", PortraitExpression.Smile);
+                    Say(dialogue, p, 51, 3, "あと少し……バイバイ");
                     break;
             }
-            Say(dialogue, p, 51, 3, "あと少し！");
             Attack(p, shake, 3, 2);
             Attack(p, shake, 35, 2);
             Roam(timeline, d switch { Difficulty.Easy => 0.1f, Difficulty.Medium => 0.15f, _ => 0.2f }, (5, 27), (30, 51), (54, 60));

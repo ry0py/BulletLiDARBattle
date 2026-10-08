@@ -15,6 +15,20 @@ namespace LidarBattle.Flow
     /// <summary>バトルシーンの進行: 難易度の Timeline を再生 → 制限時間で終了 → エンディング会話 → 選択シーンへ。</summary>
     public class BattleFlow : MonoBehaviour
     {
+        /// <summary>エンディングの最後の行。被弾が MaxHits 回以下なら使う（上から順に見て最初に合ったもの）。</summary>
+        [System.Serializable]
+        private struct HitLine
+        {
+            public int MaxHits;
+            [TextArea] public string Text;
+
+            public HitLine(int maxHits, string text)
+            {
+                MaxHits = maxHits;
+                Text = text;
+            }
+        }
+
         [SerializeField] private PlayableDirector _director;
         [Tooltip("Difficulty の順（Easy, Medium, Hard）。下の候補が空の難易度だけ使う")]
         [SerializeField] private TimelineAsset[] _timelines = new TimelineAsset[3];
@@ -41,11 +55,31 @@ namespace LidarBattle.Flow
         [SerializeField] private TMP_Text _difficultyLabel;
         [Tooltip("{0} に難易度名（Easy, Medium, Hard）が入る。リッチテキスト可")]
         [SerializeField] private string _difficultyFormat = "難易度 {0}";
-        [Tooltip("{0} = 被弾回数")]
-        [SerializeField, TextArea] private string[] _endingLines =
+        [Header("エンディングの会話（{0} = 被弾回数）。口調は Easy がやさしく、Medium は少し厳しく、Hard は厳しく")]
+        [SerializeField, TextArea] private string[] _easyEndingLines = { "遊んでくれてありがとウ！" };
+        [SerializeField, TextArea] private string[] _mediumEndingLines = { "おつかれ～～。いい動きだったよ～～" };
+        [SerializeField, TextArea] private string[] _hardEndingLines = { "……これでおわりがお。やるじゃないがぉ" };
+        [Tooltip("会話の最後に足す 1 行を被弾回数で選ぶ。上から順に見て、被弾が MaxHits 回以下の最初の行。どれにも合わなければ最後の行")]
+        [SerializeField] private HitLine[] _easyLastLines =
         {
-            "ゲームをプレイしてくれてありがとう！",
-            "被弾は {0} 回でした",
+            new(0, "被弾は {0} 回だったヨ。すごイ！かんぺきだネ！"),
+            new(5, "被弾は {0} 回だったヨ。よくがんばったネ！"),
+            new(10, "被弾は {0} 回だったヨ。つぎはもっとよけられるヨ！"),
+            new(int.MaxValue, "被弾は {0} 回だったヨ。また遊びにきてネ！"),
+        };
+        [SerializeField] private HitLine[] _mediumLastLines =
+        {
+            new(0, "被弾は {0} 回。ノーミスなんてすごいね～～"),
+            new(5, "被弾は {0} 回。次はもっと減らせるはず～～"),
+            new(10, "被弾は {0} 回。まだまだのびしろあるよ～～"),
+            new(int.MaxValue, "被弾は {0} 回。もう少しがんばろうね～～"),
+        };
+        [SerializeField] private HitLine[] _hardLastLines =
+        {
+            new(0, "被弾は {0} 回。……完敗がお。おそれいったがお"),
+            new(5, "被弾は {0} 回。次はもっと厳しくいくがお"),
+            new(10, "被弾は {0} 回。まだまだ甘いがお"),
+            new(int.MaxValue, "被弾は {0} 回。出直してくるがお"),
         };
         [SerializeField] private float _lineHoldSeconds = 2f;
         [SerializeField] private string _selectSceneName = "SelectScene";
@@ -101,12 +135,33 @@ namespace LidarBattle.Flow
             LiveFeed.WriteIdle();
             if (_portrait != null) _portrait.Show(_endingExpression);
 
-            var lines = new string[_endingLines.Length];
-            for (int i = 0; i < lines.Length; i++)
-                lines[i] = string.Format(_endingLines[i], _score.Hits);
-            yield return _dialogue.PlayAuto(lines, _lineHoldSeconds);
+            yield return _dialogue.PlayAuto(EndingLines(GameSession.Difficulty, _score.Hits), _lineHoldSeconds);
 
             SceneManager.LoadScene(_selectSceneName);
+        }
+
+        /// <summary>エンディングの会話。難易度ごとの行のあとに、被弾回数で選んだ 1 行を足す。</summary>
+        private string[] EndingLines(Difficulty difficulty, int hits)
+        {
+            var (first, last) = difficulty switch
+            {
+                Difficulty.Easy => (_easyEndingLines, _easyLastLines),
+                Difficulty.Medium => (_mediumEndingLines, _mediumLastLines),
+                _ => (_hardEndingLines, _hardLastLines),
+            };
+            var lines = new string[first.Length + (last.Length > 0 ? 1 : 0)];
+            for (int i = 0; i < first.Length; i++) lines[i] = string.Format(first[i], hits);
+            if (last.Length == 0) return lines;
+
+            var chosen = last[^1];
+            foreach (var line in last)
+            {
+                if (hits > line.MaxHits) continue;
+                chosen = line;
+                break;
+            }
+            lines[^1] = string.Format(chosen.Text, hits);
+            return lines;
         }
 
         /// <summary>難易度の候補からランダムに 1 本選ぶ（候補が 2 本以上なら前回と違うもの）。候補が無ければ _timelines。</summary>

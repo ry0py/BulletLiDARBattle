@@ -233,7 +233,7 @@ namespace LidarBattle.EditorTools
         /// <summary>花火。上の縁で弾けて放物線を描いた破片が、少したつと自機を追いかけ（ホーミング）、一定秒で消える。</summary>
         private static void Fireworks(Lanes l, double t, Difficulty d)
         {
-            var (count, chaseSpeed, turnRate) = Pick(d, (8, 1f, 25f), (14, 1.5f, 45f), (16, 1.7f, 60f));
+            var (count, chaseSpeed, turnRate) = Pick(d, (8, 1f, 25f), (10, 1.5f, 45f), (16, 1.7f, 60f));
             var chase = P($"FireworkChase{d}", ("_move", MoveType.Homing),
                 ("_speed", chaseSpeed), ("_turnRate", turnRate), ("_lifetime", 2.5f));
             var firework = P($"Firework{d}", ("_shape", ShotShape.Ring), ("_count", count), ("_move", MoveType.Gravity),

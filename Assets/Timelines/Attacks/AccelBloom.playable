@@ -1,6 +1,24 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8919478467728988782
+--- !u!114 &-7081122175416148090
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
+  m_Name: ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
+  _bulletType: {fileID: 11400000, guid: 10cff2dbb2b90a9408dcddcac0b5f75a, type: 2}
+  _pattern: {fileID: 11400000, guid: d92ccb391f86e5c48b40b7974c707a82, type: 2}
+  _position: {x: 0.5, y: 1.15}
+  _interval: 0
+  _useFixedSeed: 1
+  _seed: 220
+--- !u!114 &-6187213715119407688
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -18,7 +36,7 @@ MonoBehaviour:
   _interval: 0
   _useFixedSeed: 1
   _seed: 440
---- !u!114 &-8807686637567873457
+--- !u!114 &-1558036856130041241
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -36,7 +54,46 @@ MonoBehaviour:
   _interval: 0
   _useFixedSeed: 1
   _seed: 330
---- !u!114 &-8128721119291086637
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
+  m_Name: AccelBloom
+  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.TimelineAsset
+  m_Version: 0
+  m_Tracks:
+  - {fileID: 2929569661578237600}
+  m_FixedDuration: 8
+  m_EditorSettings:
+    m_Framerate: 60
+    m_ScenePreview: 1
+  m_DurationMode: 1
+  m_MarkerTrack: {fileID: 0}
+--- !u!114 &914754626042679207
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
+  m_Name: ShotClip
+  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
+  _bulletType: {fileID: 11400000, guid: 10cff2dbb2b90a9408dcddcac0b5f75a, type: 2}
+  _pattern: {fileID: 11400000, guid: d92ccb391f86e5c48b40b7974c707a82, type: 2}
+  _position: {x: 0.5, y: 1.15}
+  _interval: 0
+  _useFixedSeed: 1
+  _seed: 550
+--- !u!114 &2929569661578237600
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -60,10 +117,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 0
     m_ClipIn: 0
-    m_Asset: {fileID: -2095370467138425751}
+    m_Asset: {fileID: 9115079770921400406}
     m_Duration: 0.1
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -8128721119291086637}
+    m_ParentTrack: {fileID: 2929569661578237600}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -129,10 +186,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 1.1
     m_ClipIn: 0
-    m_Asset: {fileID: 1861168397084911625}
+    m_Asset: {fileID: 7360503850092111971}
     m_Duration: 0.1
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -8128721119291086637}
+    m_ParentTrack: {fileID: 2929569661578237600}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -198,10 +255,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 2.2
     m_ClipIn: 0
-    m_Asset: {fileID: -691753162696721662}
+    m_Asset: {fileID: -7081122175416148090}
     m_Duration: 0.1
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -8128721119291086637}
+    m_ParentTrack: {fileID: 2929569661578237600}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -267,10 +324,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 3.3000000000000003
     m_ClipIn: 0
-    m_Asset: {fileID: -8807686637567873457}
+    m_Asset: {fileID: -1558036856130041241}
     m_Duration: 0.1
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -8128721119291086637}
+    m_ParentTrack: {fileID: 2929569661578237600}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -336,10 +393,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 4.4
     m_ClipIn: 0
-    m_Asset: {fileID: -8919478467728988782}
+    m_Asset: {fileID: -6187213715119407688}
     m_Duration: 0.1
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -8128721119291086637}
+    m_ParentTrack: {fileID: 2929569661578237600}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -405,10 +462,10 @@ MonoBehaviour:
   - m_Version: 1
     m_Start: 5.5
     m_ClipIn: 0
-    m_Asset: {fileID: 2129634741162685185}
+    m_Asset: {fileID: 914754626042679207}
     m_Duration: 0.1
     m_TimeScale: 1
-    m_ParentTrack: {fileID: -8128721119291086637}
+    m_ParentTrack: {fileID: 2929569661578237600}
     m_EaseInDuration: 0
     m_EaseOutDuration: 0
     m_BlendInDuration: 0
@@ -473,64 +530,7 @@ MonoBehaviour:
     m_DisplayName: AccelBloom
   m_Markers:
     m_Objects: []
---- !u!114 &-2095370467138425751
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
-  m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
-  _bulletType: {fileID: 11400000, guid: 10cff2dbb2b90a9408dcddcac0b5f75a, type: 2}
-  _pattern: {fileID: 11400000, guid: d92ccb391f86e5c48b40b7974c707a82, type: 2}
-  _position: {x: 0.1, y: 1.15}
-  _interval: 0
-  _useFixedSeed: 1
-  _seed: 0
---- !u!114 &-691753162696721662
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ad220863d2aaef45be90bb8ea3abf83, type: 3}
-  m_Name: ShotClip
-  m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
-  _bulletType: {fileID: 11400000, guid: 10cff2dbb2b90a9408dcddcac0b5f75a, type: 2}
-  _pattern: {fileID: 11400000, guid: d92ccb391f86e5c48b40b7974c707a82, type: 2}
-  _position: {x: 0.5, y: 1.15}
-  _interval: 0
-  _useFixedSeed: 1
-  _seed: 220
---- !u!114 &11400000
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bfda56da833e2384a9677cd3c976a436, type: 3}
-  m_Name: AccelBloom
-  m_EditorClassIdentifier: Unity.Timeline::UnityEngine.Timeline.TimelineAsset
-  m_Version: 0
-  m_Tracks:
-  - {fileID: -8128721119291086637}
-  m_FixedDuration: 8
-  m_EditorSettings:
-    m_Framerate: 60
-    m_ScenePreview: 1
-  m_DurationMode: 1
-  m_MarkerTrack: {fileID: 0}
---- !u!114 &1861168397084911625
+--- !u!114 &7360503850092111971
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -548,7 +548,7 @@ MonoBehaviour:
   _interval: 0
   _useFixedSeed: 1
   _seed: 110
---- !u!114 &2129634741162685185
+--- !u!114 &9115079770921400406
 MonoBehaviour:
   m_ObjectHideFlags: 1
   m_CorrespondingSourceObject: {fileID: 0}
@@ -562,7 +562,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Battle.ShotClip
   _bulletType: {fileID: 11400000, guid: 10cff2dbb2b90a9408dcddcac0b5f75a, type: 2}
   _pattern: {fileID: 11400000, guid: d92ccb391f86e5c48b40b7974c707a82, type: 2}
-  _position: {x: 0.5, y: 1.15}
+  _position: {x: 0.1, y: 1.15}
   _interval: 0
   _useFixedSeed: 1
-  _seed: 550
+  _seed: 0
