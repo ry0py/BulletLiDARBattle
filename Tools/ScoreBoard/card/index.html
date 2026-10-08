@@ -35,6 +35,8 @@
     display: none;
   }
   p { margin: 0; color: var(--dim); font-size: 14px; text-align: center; }
+  /* 見出しのすぐ下に寄せる（body の gap を詰める） */
+  p.thanks { margin-top: -10px; color: var(--fg); font-size: 16px; }
   /* 保存（黄色）と並ぶので、こちらは枠だけにして目立ちすぎないようにする */
   a.link {
     width: 100%;
@@ -51,6 +53,7 @@
 </head>
 <body>
 <h1>あなたの記録</h1>
+<p class="thanks">プレイしてありがとう！</p>
 <img id="card" alt="記録カード">
 <button id="save">画像を保存</button>
 <!-- 新しいタブで開き、記録カードのページは残す -->
