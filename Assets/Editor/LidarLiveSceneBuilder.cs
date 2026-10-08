@@ -15,7 +15,7 @@ namespace LidarBattle.EditorTools
     /// </summary>
     public static class LidarLiveSceneBuilder
     {
-        private const string ScenePath = "Assets/Scenes/LidarLiveScene.unity";
+        private const string ScenePath = "Assets/Scenes/Actual/LidarLiveScene.unity";
         private const string SettingsPath = "Assets/Settings/LidarSettings.asset";
 
         [MenuItem("Tools/LiDAR Battle/Build LiDAR Live Scene")]

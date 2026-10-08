@@ -76,7 +76,7 @@ LiDAR シミュレーション（実機なしで検出手法を真値と比較�
 
 - C# スクリプト: `Assets/Scripts/<層名>/` （上表の名前空間と一致させる）
 - Prefab: `Assets/Prefabs/`
-- シーン: `Assets/Scenes/`（メインは `BattleScene`）
+- シーン: `Assets/Scenes/Actual/`（本番で使う。メインは `BattleScene`）と `Assets/Scenes/Test/`（試作・開発用。ハート用・スキャナー版・`LidarSimScene`）
 - 設定アセット: `Assets/Settings/`（`LidarSettings` や `BulletType`/`FirePattern` の `.asset` 等）
 - ScriptableObject 定義クラス: `Assets/Scripts/Config/`（弾幕用の `BulletType`/`FirePattern` は例外で
   `Assets/Scripts/Battle/`。理由は bullet-system.md。立ち絵の `PortraitSet` も表情の enum ごと UI 層に置く）
@@ -85,7 +85,7 @@ LiDAR シミュレーション（実機なしで検出手法を真値と比較�
 - 音源: `Assets/Resources/Audio/`（`GameAudio` が名前で読む）。生成スクリプトは `Tools/AudioGen/generate_audio.py`
 - カメラ検出スクリプト: `Tools/CameraTracker/`（Unity の外で動かす Python。`Assets/` には置かない）
 - スコアボード: `Tools/ScoreBoard/`（`python Tools/ScoreBoard/serve.py` で LAN に配信。同じ PC は localhost:8000）。
-  `localhost:8000/` は本番のプレイだけ、`localhost:8000/?debug` はデバッグモードのプレイだけを出す。
+  `localhost:8000/` は本番のプレイだけ、`localhost:8000/debug`（`/?debug` と同じ）はデバッグモードのプレイだけを出す。
   記録の編集・削除は管理画面 `localhost:8000/admin.html`（`admin.html`。この PC からだけ開ける）
 
 ## Unity Editor 操作のルール

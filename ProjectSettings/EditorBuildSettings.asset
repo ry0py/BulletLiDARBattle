@@ -6,28 +6,28 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SelectScene.unity
+    path: Assets/Scenes/Actual/SelectScene.unity
     guid: 98d37061ce9e3bd41ae04844e9ab4e9b
   - enabled: 1
-    path: Assets/Scenes/BattleScene.unity
+    path: Assets/Scenes/Actual/BattleScene.unity
     guid: 82220034e149d3c4689adcf1fa4f9b14
   - enabled: 1
-    path: Assets/Scenes/ScannerSelectScene.unity
+    path: Assets/Scenes/Test/ScannerSelectScene.unity
     guid: 5926e8c167241ae409f61ec21831e12d
   - enabled: 1
-    path: Assets/Scenes/ScannerBattleScene.unity
+    path: Assets/Scenes/Test/ScannerBattleScene.unity
     guid: eb05f71e0376d5545b4a8c25626b606b
   - enabled: 1
-    path: Assets/Scenes/LidarLiveScene.unity
+    path: Assets/Scenes/Actual/LidarLiveScene.unity
     guid: 56f32659bf080ca4aa538c6baefb4952
   - enabled: 1
-    path: Assets/Scenes/HeartSelectScene.unity
+    path: Assets/Scenes/Test/HeartSelectScene.unity
     guid: 202d8b55af0ee9b498fdc6578b974c99
   - enabled: 1
-    path: Assets/Scenes/HeartBattleScene.unity
+    path: Assets/Scenes/Test/HeartBattleScene.unity
     guid: 9ea218338fc440040bcee6933781c487
   - enabled: 1
-    path: Assets/Scenes/UserSettingsScene.unity
+    path: Assets/Scenes/Actual/UserSettingsScene.unity
     guid: e967ce9b0f011de43963f01ccc85355b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}

@@ -23,10 +23,13 @@ namespace LidarBattle.EditorTools
         private const string HeartSettingsPath = "Assets/Settings/LidarSettings_Heart.asset";
         private const float HeartRadiusM = 0.040f; // 幅 9 cm のハート（lidar-simulation.md で最も偏りが小さかった値）
 
-        private const string SelectScene = "SelectScene";
-        private const string BattleScene = "BattleScene";
+        // 元は本番用（Actual）、コピー先は試作用（Test）のフォルダ。
+        private const string SelectScenePath = "Assets/Scenes/Actual/SelectScene.unity";
+        private const string BattleScenePath = "Assets/Scenes/Actual/BattleScene.unity";
         private const string HeartSelectScene = "HeartSelectScene";
         private const string HeartBattleScene = "HeartBattleScene";
+        private const string HeartSelectScenePath = "Assets/Scenes/Test/" + HeartSelectScene + ".unity";
+        private const string HeartBattleScenePath = "Assets/Scenes/Test/" + HeartBattleScene + ".unity";
 
         [MenuItem("Tools/LiDAR Battle/Copy Scenes for Heart")]
         public static void Copy()
@@ -38,11 +41,11 @@ namespace LidarBattle.EditorTools
                 EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
                 EnsureHeartSettings();
 
-                CopyScene(SelectScene, HeartSelectScene, flow => Set(flow, ("_battleSceneName", HeartBattleScene)));
-                CopyScene(BattleScene, HeartBattleScene, flow => Set(flow, ("_selectSceneName", HeartSelectScene)));
+                CopyScene(SelectScenePath, HeartSelectScenePath, flow => Set(flow, ("_battleSceneName", HeartBattleScene)));
+                CopyScene(BattleScenePath, HeartBattleScenePath, flow => Set(flow, ("_selectSceneName", HeartSelectScene)));
 
                 EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-                AddToBuildSettings(ScenePath(HeartSelectScene), ScenePath(HeartBattleScene));
+                AddToBuildSettings(HeartSelectScenePath, HeartBattleScenePath);
                 AssetDatabase.SaveAssets();
                 Debug.Log("[HeartSceneCopier] 完了");
             }
@@ -70,10 +73,10 @@ namespace LidarBattle.EditorTools
         private static void CopyScene(string source, string destination, Action<MonoBehaviour> patchFlow)
         {
             // AssetDatabase.CopyAsset は毎回新しい GUID を振るので、ファイルの中身だけ上書きして GUID を保つ。
-            File.Copy(ScenePath(source), ScenePath(destination), overwrite: true);
-            AssetDatabase.ImportAsset(ScenePath(destination), ImportAssetOptions.ForceUpdate);
+            File.Copy(source, destination, overwrite: true);
+            AssetDatabase.ImportAsset(destination, ImportAssetOptions.ForceUpdate);
 
-            var scene = EditorSceneManager.OpenScene(ScenePath(destination));
+            var scene = EditorSceneManager.OpenScene(destination);
             var settings = AssetDatabase.LoadAssetAtPath<LidarSettings>(HeartSettingsPath); // シーンを開いた後に読む
             var lidars = Object.FindObjectsByType<LidarInputSource>(FindObjectsSortMode.None);
             if (lidars.Length == 0) throw new InvalidOperationException($"{source} に LidarInputSource がありません。");
@@ -87,7 +90,5 @@ namespace LidarBattle.EditorTools
             EditorSceneManager.MarkSceneDirty(scene);
             EditorSceneManager.SaveScene(scene);
         }
-
-        private static string ScenePath(string name) => $"Assets/Scenes/{name}.unity";
     }
 }

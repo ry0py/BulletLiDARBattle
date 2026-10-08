@@ -29,8 +29,8 @@ namespace LidarBattle.EditorTools
         internal const string BulletDir = "Assets/Settings/Bullets";
         private const string TimelineDir = "Assets/Timelines";
         private const string PortraitDir = "Assets/Settings/Portraits";
-        private const string SelectScenePath = "Assets/Scenes/SelectScene.unity";
-        private const string BattleScenePath = "Assets/Scenes/BattleScene.unity";
+        private const string SelectScenePath = "Assets/Scenes/Actual/SelectScene.unity";
+        private const string BattleScenePath = "Assets/Scenes/Actual/BattleScene.unity";
 
         private static readonly Color SoulColor = new(0.55f, 0.55f, 0.55f);
         private const float SoulOutlineScale = 1.25f; // 白いふちの太さ（本体に対する倍率）

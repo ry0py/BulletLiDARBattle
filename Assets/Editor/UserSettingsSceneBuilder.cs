@@ -15,7 +15,7 @@ namespace LidarBattle.EditorTools
     /// </summary>
     public static class UserSettingsSceneBuilder
     {
-        private const string ScenePath = "Assets/Scenes/UserSettingsScene.unity";
+        private const string ScenePath = "Assets/Scenes/Actual/UserSettingsScene.unity";
 
         [MenuItem("Tools/LiDAR Battle/Build User Settings Scene")]
         public static void Build()
