@@ -22,7 +22,8 @@
   要約（開始時刻・難易度・被弾回数・デバッグモードか）は `plays.jsonl` に 1 行ずつ追記し、
   `Tools/ScoreBoard/` のスコアボード（難易度別に被弾回数ごとの人数。10 回以上はまとめる）がブラウザで表示する。
   詳細（被弾ごとの時刻・位置・弾の種類・撃ち方、0.1 秒おきの SOUL 座標）は再生用に `replays/<id>.json` へ。
-  デバッグモード（`GameSession.DebugMode`、既定 true）は記録に残すだけで、切り替え手段・再生機能はまだ無い。
+  デバッグモード（`GameSession.DebugMode`、既定 true、PlayerPrefs に保存）は記録に残すだけ。切り替えはユーザー設定シーン
+  （`UserSettingsScene`、D キー。`Tools > LiDAR Battle > Build User Settings Scene` で生成）で行う。再生機能はまだ無い。
   スコアボードは直前 2 プレイの「記録カード」の QR を出す。QR の URL の `#` 以降にプレイのデータを圧縮して入れ
   （形式は `Tools/ScoreBoard/card/cardcode.js`）、来場者のスマホが自分の回線で公開ページ（`card/` をこのリポジトリの GitHub Pages に置いたもの。
   URL はスコアボードの `CARD_URL`）を開き、その場で画像を描いて保存する。展示 PC はオフラインのまま。
@@ -132,7 +133,7 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
     弾は `Assets/Art/Bullets/` の素材（Kenney, CC0）を着色し、Bloom/Vignette（`Assets/Settings/Scanner/ScannerVolume.asset`）で発光させる。
 - 結果（2026-10-08）: スコアはやめて被弾回数だけ（`ScoreKeeper`）。被弾回数はドキドキ感のためプレイ中は出さず、終了時の会話で「被弾は ○ 回でした」とだけ出す。バトル中の左下は今の難易度。
 - 運用ショートカット（`Flow/OperatorShortcuts`、キー 5 秒長押し・表示なし。円柱用・ハート用それぞれの組の中で移る）: バトルは R でやり直し・P で選択へ、
-  選択は E/M/H で難易度を選んでバトルへ・L で `LidarLiveScene` へ、`LidarLiveScene` は P で直前の選択へ。
+  選択は E/M/H で難易度を選んでバトルへ・L で `LidarLiveScene` へ・U で `UserSettingsScene` へ、`LidarLiveScene`/`UserSettingsScene` は P で直前の選択へ。
 - 音（2026-10-08）: `GameAudio` が鳴らす。BGM はセレクト用（ポップ）とバトル用（ポップ＋緊迫感、全難易度共通）。
   SE は被弾・選択中（ゲージが溜まるほど高く）・難易度決定・バトル開始・敵のセリフ音（アンダーテール風の「ポポポ」。
   ピッチは Easy 1.0 / Medium 0.85 / Hard 0.7）。音源はすべて `python Tools/AudioGen/generate_audio.py` で合成した自作。

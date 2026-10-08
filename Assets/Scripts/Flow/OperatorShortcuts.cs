@@ -9,8 +9,9 @@ namespace LidarBattle.Flow
 {
     /// <summary>
     /// 展示運用のためのキー長押しショートカット（表示は出さない）。起動時に自動で作られ、シーンをまたいで残る。
-    /// バトル: [R] やり直し / [P] 選択シーンへ。選択: [E][M][H] 難易度を選んでバトルへ / [L] LiDAR 確認シーンへ。
-    /// LidarLiveScene: [P] 直前に使っていた選択シーンへ。
+    /// バトル: [R] やり直し / [P] 選択シーンへ。
+    /// 選択: [E][M][H] 難易度を選んでバトルへ / [L] LiDAR 確認シーンへ / [U] ユーザー設定シーンへ。
+    /// LidarLiveScene・UserSettingsScene: [P] 直前に使っていた選択シーンへ。
     /// 選択とバトルのシーンは組（円柱用 SelectScene/BattleScene、ハート用 HeartSelectScene/HeartBattleScene）で扱い、
     /// 組の中だけで移る。
     /// </summary>
@@ -18,6 +19,7 @@ namespace LidarBattle.Flow
     {
         private const float HoldSeconds = 5f;
         private const string DebugScene = "LidarLiveScene";
+        private const string SettingsScene = "UserSettingsScene";
 
         // (選択シーン, バトルシーン) の組。
         private static readonly (string Select, string Battle)[] ScenePairs =
@@ -26,9 +28,9 @@ namespace LidarBattle.Flow
             ("HeartSelectScene", "HeartBattleScene"),
         };
 
-        private static string s_lastSelectScene = ScenePairs[0].Select; // LiDAR 確認シーンから戻る先
+        private static string s_lastSelectScene = ScenePairs[0].Select; // LiDAR 確認・ユーザー設定シーンから戻る先
 
-        private static readonly Key[] Keys = { Key.R, Key.P, Key.E, Key.M, Key.H, Key.L };
+        private static readonly Key[] Keys = { Key.R, Key.P, Key.E, Key.M, Key.H, Key.L, Key.U };
 
         private Key _heldKey = Key.None;
         private Action _action;
@@ -78,7 +80,7 @@ namespace LidarBattle.Flow
 
         private static Action ActionFor(string scene, Key key)
         {
-            if (scene == DebugScene) return key == Key.P ? () => Load(s_lastSelectScene) : null;
+            if (scene == DebugScene || scene == SettingsScene) return key == Key.P ? () => Load(s_lastSelectScene) : null;
 
             foreach (var (select, battle) in ScenePairs)
             {
@@ -99,6 +101,7 @@ namespace LidarBattle.Flow
                         Key.M => () => StartBattle(battle, Difficulty.Medium),
                         Key.H => () => StartBattle(battle, Difficulty.Hard),
                         Key.L => () => OpenDebugScene(select),
+                        Key.U => () => OpenSettingsScene(select),
                         _ => null,
                     };
                 }
@@ -119,6 +122,12 @@ namespace LidarBattle.Flow
             LidarInputSource.Shutdown();
             GameAudio.StopBgm(); // 確認シーンは無音でよい。選択シーンに戻ると SelectFlow が流し直す
             Load(DebugScene);
+        }
+
+        private static void OpenSettingsScene(string fromSelectScene)
+        {
+            s_lastSelectScene = fromSelectScene;
+            Load(SettingsScene);
         }
 
         private static void Load(string scene)

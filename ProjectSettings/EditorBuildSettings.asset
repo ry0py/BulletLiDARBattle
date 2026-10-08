@@ -26,6 +26,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/HeartBattleScene.unity
     guid: 9ea218338fc440040bcee6933781c487
+  - enabled: 1
+    path: Assets/Scenes/UserSettingsScene.unity
+    guid: e967ce9b0f011de43963f01ccc85355b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
