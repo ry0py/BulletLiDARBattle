@@ -58,7 +58,7 @@
 <script src="cardcode.js"></script>
 <script>
   const TITLE = "弾幕ゲーム in 工大祭2026";
-  const CREDIT = "制作: ry0py ／ イラスト: ○○"; // ○○ はイラストの人の名前に差し替える
+  const CREDIT = "制作: りょうぴ ／ イラスト: 世界のたまちゃん・ヨーダ";
   const W = 1080, PAD = 60; // 高さは盤面の縦横比で決まる（draw）
   const COLORS = { Easy: "#5be37d", Medium: "#ffb43b", Hard: "#ff5a5a" };
   const FONT = '"Hiragino Sans", "Noto Sans JP", "Yu Gothic UI", sans-serif';
@@ -205,8 +205,9 @@
     g.fillText("0秒", PAD, ty + 54);
     g.textAlign = "right";
     g.fillText(`${Math.round(duration)}秒`, W - PAD, ty + 54);
+    g.textAlign = "center";
+    g.fillText("被弾したタイミング", W / 2, ty + 54);
     g.textAlign = "left";
-    g.fillText("被弾したタイミング", PAD + 90, ty + 54);
 
     // クレジット（右下に小さく。秒数の行とは段を分ける）
     g.fillStyle = "#666"; g.font = font(20);
@@ -249,7 +250,7 @@
       a.download = name;
       a.click();
     };
-    message.textContent = "画像を長押ししても保存できます";
+    message.remove(); // 読み込めたら「読み込み中…」は要らない
   }
 
   main();
