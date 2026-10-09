@@ -1,0 +1,55 @@
+/* 展示の掲示物（A4 縦 1 枚）。印刷前提なので白い紙に黒、色はゲームと同じ難易度の色だけ使う */
+@page { size: A4; margin: 0; }
+:root {
+  --ink: #111;
+  --dim: #868e96;
+  --easy: #2f9e44;
+  --medium: #f08c00;
+  --hard: #e03131;
+  --yellow: #ffd43b;
+  --blue: #1c7ed6;
+  --pink: #e64980;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #ced4da; }
+body {
+  font-family: "Noto Sans JP", "BIZ UDPGothic", "Yu Gothic", sans-serif;
+  color: var(--ink);
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+@media print { html, body { background: #fff; } }
+
+.page {
+  width: 210mm;
+  height: 297mm;
+  margin: 0 auto;
+  background: #fff;
+  padding: 8mm 10mm 6mm;
+  display: flex;
+  flex-direction: column;
+  gap: 3mm;
+  overflow: hidden;
+}
+
+h2.sec { display: flex; align-items: center; gap: 2.5mm; margin: 0 0 1.5mm; font-size: 5.4mm; font-weight: 900; letter-spacing: .04em; }
+h2.sec span { display: grid; place-items: center; width: 7mm; height: 7mm; border-radius: 1.5mm; background: var(--ink); color: #fff; font-size: 4.4mm; }
+h2.sec small { font-size: 3.4mm; font-weight: 700; color: var(--dim); }
+svg.figure { display: block; width: 100%; }
+
+/* SVG の文字（単位は viewBox。1 = 実寸 1mm になるよう幅を合わせている図が多い） */
+svg text { font-family: "Noto Sans JP", "BIZ UDPGothic", sans-serif; }
+svg .cap { font-size: 3.2px; font-weight: 700; fill: var(--dim); }
+svg .lbl { font-size: 3.6px; font-weight: 900; }
+svg .small { font-size: 3px; font-weight: 700; }
+svg .tiny { font-size: 2.6px; font-weight: 700; }
+svg .nano { font-size: 2px; font-weight: 700; }
+svg .badge { fill: var(--ink); }
+svg .badge-t { font-size: 3.4px; font-weight: 900; fill: #fff; text-anchor: middle; }
+svg .scr { font-size: 3.2px; font-weight: 700; fill: #fff; }
+svg .scr-s { font-size: 2.3px; font-weight: 900; }
+svg .scr-l { font-size: 5px; font-weight: 700; fill: #fff; }
+
+/* 掲示物のタイトル（あそびかた・画面のみかたで共通） */
+.hero h1 { margin: .3mm 0 0; font-size: 8mm; font-weight: 900; letter-spacing: .05em; line-height: 1.15; }
+.hero h1 small { font-size: 4.4mm; font-weight: 900; margin: 0 .5mm; color: #ced4da; }

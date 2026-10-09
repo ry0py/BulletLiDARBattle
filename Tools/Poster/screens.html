@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>画面のみかた</title>
+<link rel="stylesheet" href="poster.css">
+<style>
+  .hero { background: var(--ink); color: #fff; border-radius: 3mm; padding: 3.5mm 6mm; }
+  .hero .kicker { font-size: 3.6mm; color: var(--yellow); font-weight: 700; letter-spacing: .1em; }
+  .hero p { margin: 1mm 0 0; font-size: 3.8mm; font-weight: 700; color: #ced4da; }
+
+  .screen { display: grid; grid-template-columns: 118mm 1fr; gap: 4mm; align-items: start; }
+  .screen svg { display: block; width: 100%; border-radius: 1.5mm; }
+  ol.callouts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1.6mm; }
+  ol.callouts li { display: grid; grid-template-columns: 6mm 1fr; gap: 2mm; align-items: start; }
+  ol.callouts .n { display: grid; place-items: center; width: 6mm; height: 6mm; border-radius: 50%; background: var(--yellow); border: .4mm solid var(--ink); font-weight: 900; font-size: 3.4mm; }
+  ol.callouts b { display: block; font-size: 3.7mm; font-weight: 900; line-height: 1.3; }
+  ol.callouts span { display: block; font-size: 3mm; line-height: 1.45; color: #343a40; }
+  .chip { display: inline-block; width: 3mm; height: 3mm; border-radius: 50%; vertical-align: -.3mm; margin-right: 1mm; }
+
+  .tip { margin-top: 2.5mm; border-left: 1.2mm solid var(--hard); background: #fff5f5; padding: 1.8mm 2.5mm; font-size: 3mm; line-height: 1.5; font-weight: 700; }
+  .note { font-size: 2.8mm; color: var(--dim); text-align: right; margin-top: 1mm; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <header class="hero">
+    <div class="kicker">弾幕ゲーム in 工大祭 2026</div>
+    <h1>ゲームのとなりの画面のみかた</h1>
+    <p>「記録ボード」と「LiDAR の視界」は、ゲームと同時に動いているもう 2 つの画面です。</p>
+  </header>
+
+  <!-- 全体のつながり -->
+  <section>
+    <h2 class="sec"><span>0</span>3 つの画面のつながり</h2>
+    <svg viewBox="0 0 190 42" class="figure" style="height: 42mm" aria-label="LiDAR からゲーム PC へ、ゲーム PC から 3 つの画面へ">
+      <defs>
+        <marker id="a0" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#111"/></marker>
+      </defs>
+      <!-- フィールドと LiDAR -->
+      <rect x="2" y="12" width="30" height="20" rx="1" fill="#f8f9fa" stroke="#111" stroke-width=".7"/>
+      <rect x="0" y="19" width="5" height="6" rx=".8" fill="#e64980" stroke="#111" stroke-width=".4"/>
+      <g stroke="#74c0fc" stroke-width=".3"><line x1="5" y1="22" x2="32" y2="13"/><line x1="5" y1="22" x2="32" y2="22"/><line x1="5" y1="22" x2="32" y2="31"/><line x1="5" y1="22" x2="21" y2="18"/></g>
+      <circle cx="22" cy="18" r="2.2" fill="#495057" stroke="#111" stroke-width=".5"/>
+      <text x="17" y="9" class="small" text-anchor="middle">フィールドと LiDAR</text>
+      <text x="17" y="37" class="tiny" text-anchor="middle" fill="#868e96">駒の位置を測る</text>
+      <path d="M34 22 H 43" stroke="#111" stroke-width="1.3" marker-end="url(#a0)"/>
+      <!-- ゲーム PC -->
+      <rect x="46" y="8" width="40" height="28" rx="2" fill="#fff" stroke="#111" stroke-width=".8"/>
+      <text x="66" y="16" class="lbl" text-anchor="middle">ゲーム PC</text>
+      <text x="66" y="21.5" class="tiny" text-anchor="middle">駒の位置 → 自機を動かす</text>
+      <text x="66" y="25.5" class="tiny" text-anchor="middle">プレイの記録をこの PC に保存</text>
+      <text x="66" y="29.5" class="tiny" text-anchor="middle">記録・視界をページで配信</text>
+      <!-- 3 つの画面 -->
+      <path d="M87 16 C 95 16, 95 7, 106 7" fill="none" stroke="#111" stroke-width=".9" marker-end="url(#a0)"/>
+      <path d="M87 22 H 106" fill="none" stroke="#111" stroke-width=".9" marker-end="url(#a0)"/>
+      <path d="M87 28 C 95 28, 95 37, 106 37" fill="none" stroke="#111" stroke-width=".9" marker-end="url(#a0)"/>
+      <g>
+        <rect x="109" y="2" width="16" height="10" rx=".8" fill="#111"/>
+        <rect x="112" y="4" width="10" height="6.6" fill="none" stroke="#fff" stroke-width=".3"/><circle cx="117" cy="7.3" r=".9" fill="#868e96" stroke="#fff" stroke-width=".2"/>
+        <text x="128" y="6.6" class="lbl">ゲーム画面</text><text x="128" y="10.6" class="tiny" fill="#495057">弾をよける。プレイする人が見る画面</text>
+      </g>
+      <g>
+        <rect x="109" y="17" width="16" height="10" rx=".8" fill="#111"/>
+        <g fill="#51cf66"><rect x="110.5" y="19.5" width="3" height=".6"/><rect x="110.5" y="21" width="4" height=".6"/></g>
+        <g fill="#ffa94d"><rect x="115" y="19.5" width="2" height=".6"/><rect x="115" y="21" width="3.5" height=".6"/></g>
+        <rect x="119.8" y="18.6" width="4" height="7" fill="none" stroke="#ffd43b" stroke-width=".3"/>
+        <text x="128" y="21.6" class="lbl">A 記録ボード</text><text x="128" y="25.6" class="tiny" fill="#495057">みんなの被弾回数と、記録カードの QR</text>
+      </g>
+      <g>
+        <rect x="109" y="32" width="16" height="10" rx=".8" fill="#111"/>
+        <rect x="113" y="34" width="9" height="6" fill="none" stroke="#fff" stroke-width=".3"/>
+        <rect x="110.5" y="36.3" width="1.4" height="1.4" fill="#e64980"/>
+        <g fill="#4dc3ff"><rect x="117.3" y="35.6" width=".5" height=".5"/><rect x="117" y="36.4" width=".5" height=".5"/><rect x="117.2" y="37.2" width=".5" height=".5"/><rect x="121.5" y="34.5" width=".5" height=".5"/><rect x="121.5" y="38.8" width=".5" height=".5"/></g>
+        <circle cx="118" cy="36.7" r="1.2" fill="none" stroke="#ffd43b" stroke-width=".25"/>
+        <text x="128" y="36.6" class="lbl">B LiDAR の視界</text><text x="128" y="40.6" class="tiny" fill="#495057">センサーが今見ているものを、そのまま映す</text>
+      </g>
+    </svg>
+  </section>
+
+  <!-- A 記録ボード -->
+  <section>
+    <h2 class="sec"><span>A</span>記録ボード<small>みんなの結果</small></h2>
+    <div class="screen">
+      <svg id="board" viewBox="0 0 160 90" aria-label="記録ボードの画面の見本"></svg>
+      <ol class="callouts">
+        <li><span class="n">1</span><div><b>難易度ごとの表</b><span>被弾した回数ごとの人数。上ほど当たらなかった人。</span></div></li>
+        <li><span class="n">2</span><div><b>いま終わったプレイが点滅</b><span>自分がどこに入ったかすぐわかる。</span></div></li>
+        <li><span class="n">3</span><div><b>記録カードの QR</b><span>直前のプレイ。スマホで読むと、今日の順位つきのカードを保存できる。</span></div></li>
+        <li><span class="n">4</span><div><b>さっきのプレイ</b><span>自機の動きと弾を 2 倍速でくり返し再生。</span></div></li>
+        <li><span class="n">5</span><div><b>これまでの挑戦回数</b></div></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- B LiDAR の視界 -->
+  <section>
+    <h2 class="sec"><span>B</span>LiDAR の視界<small>センサーが見ている世界</small></h2>
+    <div class="screen">
+      <svg id="live" viewBox="0 0 160 90" aria-label="LiDAR の視界の画面の見本"></svg>
+      <ol class="callouts">
+        <li><span class="n">1</span><div><b><i class="chip" style="background: #e64980; border-radius: 0"></i>LiDAR（センサー）</b><span>レーザーで物までの距離を測る（1 秒に 40 回）。フィールドの左はしにある。</span></div></li>
+        <li><span class="n">2</span><div><b><i class="chip" style="background: #4dc3ff"></i>青い点＝レーザーが当たった所</b><span>駒のふちや壁が、点の並びとして見える。</span></div></li>
+        <li><span class="n">3</span><div><b><i class="chip" style="border: .5mm solid #f2b600"></i>黄色い丸＝見つけた駒</b><span>点の並びから駒と同じ大きさの円を探して、位置を決める。</span></div></li>
+        <li><span class="n">4</span><div><b><i class="chip" style="background: #868e96"></i>白い丸＝ゲームの自機</b><span>黄色い丸を追いかけて動く。</span></div></li>
+        <li><span class="n">5</span><div><b>白い枠＝盤面</b><span>実物のフィールド（30 × 20 cm）と同じ形。</span></div></li>
+        <li><span class="n">6</span><div><b>バトル中だけ動く</b><span>難易度と残り秒数。バトル以外は待機の表示。</span></div></li>
+      </ol>
+    </div>
+    <div class="tip">フィールドに手を入れると、手も青い点として映ります。センサーが手を駒とまちがえると、自機がワープしてしまいます。</div>
+    <div class="note">※ 画面の図はイメージです</div>
+  </section>
+</div>
+<script src="poster.js"></script>
+<script>
+  // 2 つの画面の見本を描く（本物の index.html / live.html の配置と色に合わせている）
+  function badge(svg, n, x, y) {
+    el(svg, "circle", { cx: x, cy: y, r: 3.2, fill: "#ffd43b", stroke: "#111", "stroke-width": .5 });
+    el(svg, "text", { x, y: y + 1.25, "text-anchor": "middle", "font-size": 3.6, "font-weight": 900, fill: "#111" }).textContent = n;
+  }
+  function text(svg, s, attrs) { el(svg, "text", attrs).textContent = s; }
+
+  // A 記録ボード
+  (() => {
+    const svg = document.getElementById("board");
+    const defs = el(svg, "defs", {});
+    const grad = (id, stops) => {
+      const g = el(defs, "linearGradient", { id });
+      stops.forEach((c, i) => el(g, "stop", { offset: i / (stops.length - 1), "stop-color": c }));
+    };
+    grad("rainbow", ["#ff4d4d", "#ffb43b", "#ffe14d", "#5be37d", "#4dc3ff", "#9b6bff"]);
+    grad("gold", ["#a8720a", "#ffd34d", "#fff7c8", "#ffd34d", "#a8720a"]);
+    grad("silver", ["#7c7c7c", "#d6d6d6", "#ffffff", "#d6d6d6", "#7c7c7c"]);
+    grad("bronze", ["#6e3612", "#c98450", "#f4c79c", "#c98450", "#6e3612"]);
+    el(svg, "rect", { width: 160, height: 90, fill: "#000" });
+    text(svg, "被弾ランキング", { x: 5, y: 9, "font-size": 5.2, "font-weight": 900, fill: "#fff", "letter-spacing": .6 });
+    text(svg, "これまでの挑戦", { x: 136, y: 8.5, "font-size": 2.4, fill: "#8a8a8a", "text-anchor": "end" });
+    text(svg, "128 回", { x: 155, y: 8.5, "font-size": 3.2, "font-weight": 900, fill: "#fff", "text-anchor": "end" });
+
+    const boards = [
+      { name: "EASY", c: "#5be37d", counts: [9, 12, 10, 8, 6, 3, 2, 2, 1, 0, 1, 0, 0, 0, 0, 0] },
+      { name: "MEDIUM", c: "#ffb43b", counts: [2, 4, 6, 9, 7, 6, 4, 3, 2, 1, 1, 0, 0, 1, 0, 0] },
+      { name: "HARD", c: "#ff5a5a", counts: [0, 1, 1, 2, 3, 4, 5, 3, 3, 2, 1, 1, 0, 1, 0, 2] },
+    ];
+    const special = ["url(#rainbow)", "url(#gold)", "url(#silver)", "url(#bronze)"];
+    boards.forEach((b, k) => {
+      const x = 5 + k * 37, w = 34, top = 23, rowH = 62 / 16, max = Math.max(...b.counts);
+      el(svg, "rect", { x, y: 12, width: w, height: 74, fill: "none", stroke: "#fff", "stroke-width": .6 });
+      text(svg, b.name, { x: x + w / 2, y: 17.6, "font-size": 3.8, "font-weight": 900, fill: b.c, "text-anchor": "middle", "letter-spacing": .4 });
+      text(svg, "被弾回数ごとの人数", { x: x + w / 2, y: 20.6, "font-size": 1.6, fill: "#8a8a8a", "text-anchor": "middle" });
+      b.counts.forEach((n, h) => {
+        const y = top + h * rowH;
+        if (k === 1 && h === 4) el(svg, "rect", { x: x + .6, y: y + .1, width: w - 1.2, height: rowH - .2, fill: "#2a2600", stroke: "#ffe14d", "stroke-width": .4 });
+        el(svg, "line", { x1: x + 1, x2: x + w - 1, y1: y + rowH, y2: y + rowH, stroke: "#333", "stroke-width": .15, "stroke-dasharray": ".6 .4" });
+        const label = h === 15 ? "15回以上" : `${h}回`;
+        el(svg, "rect", { x: x + 1.5, y: y + .6, width: h === 15 ? 8.6 : 6, height: 2.6, rx: 1.3, fill: special[h] ?? "#444" });
+        text(svg, label, { x: x + 2.4, y: y + 2.5, "font-size": 1.7, "font-weight": 700, fill: h < 4 ? "#111" : "#ddd" });
+        const zero = n === 0;
+        el(svg, "rect", { x: x + 11, y: y + 1.4, width: Math.max(.3, 16 * n / max), height: 1.1, fill: zero ? "#333" : special[h] ?? b.c });
+        text(svg, String(n), { x: x + w - 3.6, y: y + 2.6, "font-size": 2, "font-weight": 900, fill: zero ? "#444" : "#fff", "text-anchor": "end" });
+        text(svg, "人", { x: x + w - 1.4, y: y + 2.6, "font-size": 1.4, fill: "#8a8a8a", "text-anchor": "end" });
+      });
+    });
+
+    // 右の列: 記録カードの QR と、さっきのプレイ
+    const cx = 116, cw = 39;
+    el(svg, "rect", { x: cx, y: 12, width: cw, height: 74, fill: "none", stroke: "#ffe14d", "stroke-width": .6 });
+    text(svg, "記録カード", { x: cx + cw / 2, y: 17.6, "font-size": 3.4, "font-weight": 900, fill: "#ffe14d", "text-anchor": "middle" });
+    text(svg, "スマホで読み取って保存", { x: cx + cw / 2, y: 20.6, "font-size": 1.6, fill: "#8a8a8a", "text-anchor": "middle" });
+    const qr = el(svg, "g", { "data-x": cx + 8, "data-y": 23, "data-size": 23 });
+    drawFakeQr(qr);
+    el(svg, "rect", { x: cx + 7.4, y: 22.4, width: 24.2, height: 24.2, fill: "none", stroke: "#ffe14d", "stroke-width": .5 });
+    text(svg, "さっき", { x: cx + 3.5, y: 50.5, "font-size": 1.9, "font-weight": 700, fill: "#ffe14d" });
+    text(svg, "14:32 Medium 被弾4回", { x: cx + 10, y: 50.5, "font-size": 1.9, fill: "#fff" });
+    text(svg, "さっきのプレイ", { x: cx + cw / 2, y: 56, "font-size": 1.9, fill: "#8a8a8a", "text-anchor": "middle" });
+    const rx = cx + 4.5, ry = 59, rw = 30, rh = 20;
+    el(svg, "rect", { x: rx, y: ry, width: rw, height: rh, fill: "none", stroke: "#fff", "stroke-width": .4 });
+    el(svg, "path", { d: `M${rx + 6} ${ry + 15} C ${rx + 9} ${ry + 5}, ${rx + 15} ${ry + 17}, ${rx + 19} ${ry + 9} S ${rx + 24} ${ry + 6}, ${rx + 22} ${ry + 12}`, fill: "none", stroke: "#4dc3ff", "stroke-width": .5 });
+    el(svg, "circle", { cx: rx + 22, cy: ry + 12, r: 1.1, fill: "#fff" });
+    const rand = rng(3);
+    for (let i = 0; i < 14; i++) el(svg, "circle", { cx: rx + 2 + rand() * (rw - 4), cy: ry + 2 + rand() * (rh - 4), r: .45, fill: "#fff" });
+
+    badge(svg, 1, 8, 15.5);
+    badge(svg, 2, 78.5, 40.5);
+    badge(svg, 3, 119.5, 26);
+    badge(svg, 4, 119.5, 62);
+    badge(svg, 5, 114, 6.5);
+  })();
+
+  // B LiDAR の視界（live.html と同じ見せ方: 盤面の外側 0.3 まで、横は 3:2）
+  (() => {
+    const svg = document.getElementById("live");
+    el(svg, "rect", { width: 160, height: 90, fill: "#000" });
+    text(svg, "LiDAR の視界", { x: 5, y: 9, "font-size": 5.2, "font-weight": 900, fill: "#fff", "letter-spacing": .6 });
+    text(svg, "EASY", { x: 50, y: 9, "font-size": 4.4, "font-weight": 900, fill: "#5be37d" });
+    text(svg, "プレイ中", { x: 64, y: 9, "font-size": 3.2, fill: "#fff" });
+    text(svg, "残り", { x: 79, y: 9, "font-size": 3.2, fill: "#fff" });
+    text(svg, "42", { x: 86, y: 9, "font-size": 4.4, "font-weight": 900, fill: "#fff" });
+    text(svg, "秒", { x: 92.5, y: 9, "font-size": 3.2, fill: "#fff" });
+    el(svg, "rect", { x: 5, y: 12, width: 150, height: 68, fill: "none", stroke: "#fff", "stroke-width": .6 });
+
+    const S = 42.5, X = u => 29 + (u + 0.3) * 1.5 * S, Y = v => 12 + (1.3 - v) * S;
+    for (let i = 1; i < 8; i++) {
+      el(svg, "line", { x1: X(i / 8), x2: X(i / 8), y1: Y(0), y2: Y(1), stroke: "#2b2b2b", "stroke-width": .2 });
+      el(svg, "line", { x1: X(0), x2: X(1), y1: Y(i / 8), y2: Y(i / 8), stroke: "#2b2b2b", "stroke-width": .2 });
+    }
+    el(svg, "rect", { x: X(0), y: Y(1), width: X(1) - X(0), height: Y(0) - Y(1), fill: "none", stroke: "#fff", "stroke-width": .6 });
+
+    // 駒（半径 2 cm）と、フィールドの壁（盤面のすぐ外）にレーザーを当てる
+    const sx = X(-0.167), sy = Y(0.5), px = X(0.62), py = Y(0.62), pr = 0.1 * S;
+    const wallR = X(1.04), wallT = Y(1.06), wallB = Y(-0.06);
+    const rand = rng(11), pts = [];
+    for (let a = -62; a <= 62; a += 1.2) {
+      const dx = Math.cos(a * Math.PI / 180), dy = -Math.sin(a * Math.PI / 180);
+      let t = Infinity;
+      // 円との交点
+      const fx = sx - px, fy = sy - py, b = fx * dx + fy * dy, c = fx * fx + fy * fy - pr * pr, disc = b * b - c;
+      if (disc >= 0) t = -b - Math.sqrt(disc);
+      if (dx > 0) t = Math.min(t, (wallR - sx) / dx);
+      if (dy < 0) t = Math.min(t, (wallT - sy) / dy);
+      if (dy > 0) t = Math.min(t, (wallB - sy) / dy);
+      t += (rand() - 0.5) * 0.5;
+      pts.push([sx + dx * t, sy + dy * t]);
+    }
+    pts.forEach(([x, y]) => el(svg, "line", { x1: sx, y1: sy, x2: x, y2: y, stroke: "rgba(77,195,255,.13)", "stroke-width": .2 }));
+    pts.forEach(([x, y]) => el(svg, "rect", { x: x - .45, y: y - .45, width: .9, height: .9, fill: "#4dc3ff" }));
+    el(svg, "rect", { x: sx - 1.6, y: sy - 1.6, width: 3.2, height: 3.2, fill: "#ff5aa0" });
+    el(svg, "circle", { cx: px, cy: py, r: 4.6, fill: "none", stroke: "#ffe14d", "stroke-width": .55 });
+    el(svg, "circle", { cx: px + .8, cy: py + .5, r: 1.6, fill: "#fff" });
+
+    const legend = [["● LiDAR が見ている点", "#4dc3ff"], ["◯ 見つけたハート", "#ffe14d"], ["● SOUL", "#fff"], ["■ LiDAR", "#ff5aa0"]];
+    [5, 36, 59, 72].forEach((lx, i) => text(svg, legend[i][0], { x: lx, y: 85.5, "font-size": 2.4, fill: legend[i][1] }));
+
+    badge(svg, 1, sx, sy - 5.5);
+    badge(svg, 2, X(1.04) + 5, Y(0.2));
+    badge(svg, 3, px + 7.5, py - 4.5);
+    badge(svg, 4, px + 5, py + 6.5);
+    badge(svg, 5, X(0) + 4, Y(1) + 4);
+    badge(svg, 6, 100, 6.5);
+  })();
+</script>
+</body>
+</html>
