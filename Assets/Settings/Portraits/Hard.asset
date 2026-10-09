@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Hard
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.UI.PortraitSet
   _base: {fileID: 21300000, guid: 874c25937ae6ae649a32cb6f644a8d64, type: 3}
-  _talk: {fileID: 0}
-  _attack: {fileID: 0}
-  _smile: {fileID: 0}
-  _defeat: {fileID: 0}
+  _talk: {fileID: 21300000, guid: dcd9951dce6e4daab21f6cb3a1adfa2f, type: 3}
+  _attack: {fileID: 21300000, guid: 55b5fc29d2f74442aecbb4da4bbeb59d, type: 3}
+  _smile: {fileID: 21300000, guid: 56c9b72d0c2a452ab686238841880df9, type: 3}
+  _defeat: {fileID: 21300000, guid: 757c216703b149a387704328877c271e, type: 3}
