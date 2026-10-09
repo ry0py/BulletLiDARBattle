@@ -208,10 +208,6 @@ namespace LidarBattle.EditorTools
         // 立ち絵が歩き回る範囲（元の位置からの横のずれ、px）。左は画面の端、右は右上の残り時間の手前まで。
         private const float RoamLeft = -300f;
         private const float RoamRight = 860f;
-        // バトルでは立ち絵が盤面の左の列にいるので、列の中を上下に歩き回る（元の位置からの縦のずれ、px）。
-        // 上は元の位置（列の上端）、下は左下の難易度表示の手前まで。
-        private const float ClimbTop = 0f;
-        private const float ClimbBottom = -720f;
         private const double RoamEase = 1.5;
 
         /// <summary>
@@ -219,22 +215,14 @@ namespace LidarBattle.EditorTools
         /// 区間の前後 RoamEase 秒で元の位置との間を移動するので、区間の終わりはセリフの始まりにそろえてよい。
         /// </summary>
         internal static void Roam(TimelineAsset timeline, float frequency, params (double start, double end)[] spans)
-            => Wander(timeline, PortraitMotion.Roam, new Vector2((RoamLeft + RoamRight) / 2f, 0f), (RoamRight - RoamLeft) / 2f, frequency, spans);
-
-        /// <summary>Roam の上下版。バトルの立ち絵（盤面の左の列）用。</summary>
-        internal static void Climb(TimelineAsset timeline, float frequency, params (double start, double end)[] spans)
-            => Wander(timeline, PortraitMotion.Climb, new Vector2(0f, (ClimbTop + ClimbBottom) / 2f), (ClimbTop - ClimbBottom) / 2f, frequency, spans);
-
-        private static void Wander(TimelineAsset timeline, PortraitMotion motion, Vector2 center, float amplitude, float frequency,
-            (double start, double end)[] spans)
         {
             var track = timeline.CreateTrack<PortraitMotionTrack>(null, "Portrait Roam");
             foreach (var (start, end) in spans)
             {
-                var clip = Move(track, start, end - start - 0.5, motion, amplitude, frequency);
+                var clip = Move(track, start, end - start - 0.5, PortraitMotion.Roam, (RoamRight - RoamLeft) / 2f, frequency);
                 clip.easeInDuration = RoamEase;
                 clip.easeOutDuration = RoamEase;
-                Set(clip.asset, ("_center", center));
+                Set(clip.asset, ("_center", new Vector2((RoamLeft + RoamRight) / 2f, 0f)));
             }
         }
 
@@ -320,6 +308,8 @@ namespace LidarBattle.EditorTools
             EditorSceneManager.SaveScene(scene, SelectScenePath);
         }
 
+        private const float BattleZoom = 1.2f;
+
         private static void BuildBattleScene()
         {
             var scene = EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -327,15 +317,10 @@ namespace LidarBattle.EditorTools
             // アンロードされ、SerializedProperty で代入しても null になる（シーンに fileID: 0 で保存される）。
             var timelines = BuildTimelines();
             var portraitSets = LoadPortraitSets();
-            // 盤面は実物のフィールド (30 cm × 20 cm) と同じ 3:2。技は盤面の大きさ (ワールド単位) に合わせて作ってあるので
-            // 盤面は広げずに、カメラを寄せて画面の上で大きく見せる。実物を動かした量に対して SOUL が小さく動くと
-            // 感度が悪く感じるので、画面の高さの 84%（下端 30 px 〜 上の会話の帯の手前）まで使う。
             var boardCenter = new Vector2(0f, -1.8f);
-            var common = BuildCommon(boardCenter, new Vector2(4.8f, 3.2f), boardCenter, frameBorder: 0.03f);
-            var camera = common.Camera.GetComponent<Camera>();
-            camera.orthographicSize = 1.905f;
-            camera.transform.position = new Vector3(0f, boardCenter.y + 0.2f, -10f);
-            LayoutBattleUi(common);
+            var common = BuildCommon(boardCenter, new Vector2(5f, 3.2f), boardCenter);
+            // 盤面を画面の上で 1.2 倍に見せる（技は盤面のワールドの大きさに合わせてあるので、盤面は広げずにカメラを寄せる）。
+            common.Camera.GetComponent<Camera>().orthographicSize = 5f / BattleZoom;
 
             var director = new GameObject("Director").AddComponent<PlayableDirector>();
             director.playOnAwake = false;
@@ -350,7 +335,7 @@ namespace LidarBattle.EditorTools
 
             // 左下に今の難易度。被弾回数はドキドキ感のためプレイ中は出さず、終了時の会話でだけ出す。
             var difficultyLabel = MakeText(common.Canvas, "DifficultyLabel", new Vector2(0f, 0f), new Vector2(0f, 0f),
-                new Vector2(20f, 20f), new Vector2(260f, 70f), 28f);
+                new Vector2(20f, 20f), new Vector2(420f, 70f), 32f);
 
             // 右上に残り時間（会話ボックスより右の空き。左は立ち絵）。
             var timeLabel = MakeText(common.Canvas, "TimeLabel", new Vector2(1f, 1f), new Vector2(1f, 1f),
@@ -366,8 +351,8 @@ namespace LidarBattle.EditorTools
             flashImage.color = new Color(1f, 0f, 0f, 0f);
             flashImage.raycastTarget = false;
             var feedback = new GameObject("HitFeedback").AddComponent<HitFeedback>();
-            // カメラを寄せた分 (1.905 / 5) だけ揺れも小さくし、画面上の揺れ幅を前と同じにする。
-            Set(feedback, ("_bullets", bullets), ("_camera", common.Camera), ("_overlay", flashImage), ("_shakeAmplitude", 0.06f));
+            Set(feedback, ("_bullets", bullets), ("_camera", common.Camera), ("_overlay", flashImage),
+                ("_shakeAmplitude", 0.15f / BattleZoom)); // 寄せた分だけ揺れを小さくし、画面上の揺れ幅をそろえる
 
             var flow = new GameObject("BattleFlow").AddComponent<BattleFlow>();
             Set(flow, ("_director", director), ("_easyTimelines", timelines[(int)Difficulty.Easy]),
@@ -391,7 +376,7 @@ namespace LidarBattle.EditorTools
         }
 
         /// <summary>両シーン共通: カメラ・ライト・時間・枠・SOUL・入力 (LiDAR / キーボード)・会話ボックス。</summary>
-        private static Common BuildCommon(Vector2 boardCenter, Vector2 boardSize, Vector2 soulStart, float frameBorder = 0.08f)
+        private static Common BuildCommon(Vector2 boardCenter, Vector2 boardSize, Vector2 soulStart)
         {
             var camera = new GameObject("Main Camera").AddComponent<Camera>();
             camera.tag = "MainCamera";
@@ -408,7 +393,7 @@ namespace LidarBattle.EditorTools
             var board = new GameObject("BulletBoard").AddComponent<BulletBoard>();
             board.transform.position = boardCenter;
             Set(board, ("_size", boardSize));
-            MakeFrame(board.transform, boardSize, frameBorder, 0);
+            MakeFrame(board.transform, boardSize, 0.08f, 0);
 
             // キーボード → LiDAR → カメラ (ArUco) の順に、位置を出せた入力源を使う（HeartInputSelector）。
             var keyboard = new GameObject("Input").AddComponent<KeyboardInputSource>();
@@ -481,32 +466,6 @@ namespace LidarBattle.EditorTools
             var portrait = rect.gameObject.AddComponent<PortraitView>();
             Set(portrait, ("_image", image));
             return portrait;
-        }
-
-        /// <summary>
-        /// バトルは盤面が画面のほとんどを占めるので、会話ボックスを上端の細い帯（盤面の上）に、
-        /// 立ち絵を盤面の左の空き（1920×1080 で幅 約 280 px）に移す。
-        /// </summary>
-        private static void LayoutBattleUi(Common common)
-        {
-            var box = (RectTransform)common.Dialogue.transform;
-            box.anchorMin = new Vector2(0.2f, 1f);
-            box.anchorMax = new Vector2(0.8f, 1f);
-            box.offsetMin = new Vector2(0f, -133f);
-            box.offsetMax = new Vector2(0f, -18f);
-            var label = box.GetComponentInChildren<TextMeshProUGUI>();
-            label.fontSize = 40f;
-            label.enableAutoSizing = true; // 長いセリフは 2 行に縮めて帯に収める
-            label.fontSizeMin = 24f;
-            label.fontSizeMax = 40f;
-            label.rectTransform.offsetMin = new Vector2(24f, 8f);
-            label.rectTransform.offsetMax = new Vector2(-24f, -8f);
-
-            // 立ち絵は正方形なので 240 px 角。元の位置は列の上端で、Timeline の Climb で列の中を上下する。
-            var portrait = (RectTransform)common.Portrait.transform;
-            portrait.anchorMin = portrait.anchorMax = new Vector2(0f, 1f);
-            portrait.offsetMin = new Vector2(20f, -270f);
-            portrait.offsetMax = new Vector2(260f, -30f);
         }
 
         private static DifficultyOption MakeOption(Transform parent, Difficulty difficulty, string label, Vector2 position,

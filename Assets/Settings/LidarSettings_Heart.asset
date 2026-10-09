@@ -35,8 +35,8 @@ MonoBehaviour:
   DeadbandM: 0.002
   MaxJumpM: 0.1
   MaxHoldFrames: 5
-  PhysicalMin: {x: 0.05, y: -0.1}
-  PhysicalMax: {x: 0.35, y: 0.1}
+  PhysicalMin: {x: 0.05, y: -0.08}
+  PhysicalMax: {x: 0.31, y: 0.08}
   RotationDeg: 0
   InvertX: 0
   InvertY: 0
