@@ -2,6 +2,7 @@
 
 Unity が書く plays.jsonl・replays/<id>.json・live.json（Application.persistentDataPath）と index.html を配る。
 同じ PC なら http://localhost:8000/ 、別の PC からは表示される http://<IP>:8000/ を開く。
+LiDAR の点群（プレイ中の視界）は別の PC で http://<IP>:8000/live を開いて出す（live.html）。
 記録の編集・削除・仮データの作成は管理画面 http://localhost:8000/admin.html から（この PC からだけ）。
 
     python Tools/ScoreBoard/serve.py                 # 既定の場所の plays.jsonl を配る
@@ -159,6 +160,10 @@ def make_handler(log_path: Path):
                 self.send_response(302)  # デバッグ表示は index.html に ?debug を付けたもの
                 self.send_header("Location", "/?debug")
                 self.end_headers()
+            elif path.rstrip("/") == "/live":
+                self.send_response(302)  # LiDAR の視界は live.html
+                self.send_header("Location", "/live.html")
+                self.end_headers()
             elif path == "/admin.html" and not self.is_local():
                 self.send_error(403)
             else:
@@ -249,7 +254,7 @@ def make_handler(log_path: Path):
 
         def send_live(self, file: Path):
             """プレイ中の様子。無い・古いときはプレイしていない扱い。
-            Unity が置き換えている最中で読めなければ 503（スコアボードは前の表示のままにする）。"""
+            Unity が置き換えている最中で読めなければ 503（live.html は前の表示のままにする）。"""
             try:
                 fresh = time.time() - file.stat().st_mtime < LIVE_STALE_SECONDS
             except OSError:

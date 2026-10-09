@@ -8,8 +8,8 @@ using UnityEngine;
 namespace LidarBattle.Flow
 {
     /// <summary>
-    /// プレイ中の様子（LiDAR の点群・検出したハート・SOUL・残り時間）を live.json に書き、スコアボードに見せる。
-    /// スコアボードはこれが新しい間だけ「LiDAR の視界」を出し、それ以外は被弾ランキングを出す。
+    /// プレイ中の様子（LiDAR の点群・検出したハート・SOUL・残り時間）を live.json に書く。
+    /// スコアボードのサーバーが配り、別の PC の live.html（「LiDAR の視界」）がこれが新しい間だけ点群を出す。
     /// 座標は盤面の正規化座標を 1000 倍した整数（文字列を作らずに書くため）。
     /// </summary>
     public sealed class LiveFeed
@@ -71,7 +71,7 @@ namespace LidarBattle.Flow
             Write(_sb.Append('}').ToString());
         }
 
-        /// <summary>プレイが終わったら呼ぶ。スコアボードがすぐ被弾ランキングに戻る（呼ばれなくても数秒で戻る）。</summary>
+        /// <summary>プレイが終わったら呼ぶ。live.html がすぐ待機の表示に戻る（呼ばれなくても数秒で戻る）。</summary>
         public static void WriteIdle() => Write("{\"state\":\"idle\"}");
 
         private static void Write(string json)

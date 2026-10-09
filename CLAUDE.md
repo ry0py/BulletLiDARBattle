@@ -24,8 +24,9 @@
   詳細（被弾ごとの時刻・位置・弾の種類・撃ち方、0.1 秒おきの SOUL 座標）は再生用に `replays/<id>.json` へ。
   デバッグモード（`GameSession.DebugMode`、既定 true、PlayerPrefs に保存）は記録に残すだけ。切り替えはユーザー設定シーン
   （`UserSettingsScene`、D キー。`Tools > LiDAR Battle > Build User Settings Scene` で生成）で行う。ゲーム内の再生機能はまだ無い（スコアボードで直前のプレイだけ再生する）。
-  プレイ中（バトルの 60 秒）は、スコアボードの被弾ランキングの代わりに「LiDAR の視界」（点群・検出したハート・SOUL）を出す。
-  Unity の `Flow/LiveFeed` が 0.1 秒おきに `live.json` を書き、3 秒更新が無ければ（または終了時に）ランキングに戻る。
+  スコアボードは常に被弾ランキングを出す。プレイ中（バトルの 60 秒）の「LiDAR の視界」（点群・検出したハート・SOUL）は
+  別の PC で `http://<展示 PC の IP>:8000/live`（`live.html`）を開いて出す。Unity の `Flow/LiveFeed` が 0.1 秒おきに `live.json` を書き、
+  3 秒更新が無ければ（または終了時に）待機の表示に戻る。
   右の列は直前のプレイの「記録カード」の QR と、その下でそのプレイを 2 倍速で繰り返し再生する。
   カードにはその日の同じ難易度での「今日の ◯人中 ◯位」も載る（QR を作るときに展示 PC で計算）。QR の URL の `#` 以降にプレイのデータを圧縮して入れ
   （形式は `Tools/ScoreBoard/card/cardcode.js`）、来場者のスマホが自分の回線で公開ページ（`card/` をこのリポジトリの GitHub Pages に置いたもの。

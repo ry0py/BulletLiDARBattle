@@ -40,7 +40,7 @@ namespace LidarBattle.Input
 
         private static bool LidarActive => s_sensor != null && s_sensor.IsConnected;
 
-        // スコアボードの「LiDAR の視界」用（Flow/LiveFeed）。座標はどれも盤面の正規化座標（盤面の外は 0..1 の外）。
+        // 別の PC の「LiDAR の視界」（live.html）用（Flow/LiveFeed）。座標はどれも盤面の正規化座標（盤面の外は 0..1 の外）。
         public bool IsActive => LidarActive;
         /// <summary>最新のスキャンの点のうち盤面の付近のもの（背景も含む生の点）。</summary>
         public IReadOnlyList<Vector2> ViewPoints => _viewPoints;
