@@ -7,7 +7,6 @@ namespace LidarBattle.Tracking
 {
     /// <summary>
     /// 「最も近い点を核に、半径内の点を 1 クラスタとみなす」処理の唯一の実装 (DRY)。
-    /// 重心だけ欲しい検出器と、点集合そのものが欲しい検出器 (円当てはめ) の両方から使う。
     /// 核のクラスタが最小点数に満たなければ (ノイズの孤立点)、その点群を除いて次に近い核を試す。
     /// </summary>
     public static class NearestClusterFinder

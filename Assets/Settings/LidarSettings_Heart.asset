@@ -22,15 +22,17 @@ MonoBehaviour:
   FrontStep: 540
   AngularResolution: 1440
   MinRangeM: 0.06
-  MaxRangeM: 20
+  MaxRangeM: 0.4
   PollIntervalMs: 25
-  ClusterRadiusM: 0.08
-  MinClusterPoints: 3
-  BackgroundMarginM: 0.05
-  BackgroundFrames: 20
   HeartRadiusM: 0.04
-  FitIterations: 5
-  SmoothingAlpha: 0.3
+  CircleToleranceM: 0.01
+  MinCirclePoints: 5
+  MinCircleScore: 0.3
+  FitIterations: 2
+  FilterMinCutoffHz: 0.5
+  FilterBeta: 10
+  FilterDerivCutoffHz: 0.5
+  DeadbandM: 0.002
   MaxJumpM: 0.1
   MaxHoldFrames: 5
   PhysicalMin: {x: 0.05, y: -0.08}

@@ -62,7 +62,7 @@
 | 層 | 名前空間 | 役割 | 主要な型 |
 |----|----------|------|----------|
 | Hardware | `LidarBattle.LiDAR` | センサーから生スキャン取得 | `ILidarSensor`, `LidarScan`, `HokuyoEthernetSensor`, `HokuyoUrgSensor`, `MockLidarSensor`, `SimulatedLidarSensor`（Physics2D レイキャスト） |
-| Tracking | `LidarBattle.Tracking` | スキャンからハート位置を検出 | `IHeartTracker`, `NearestClusterFinder`, `ScanSegmenter`, `NearestClusterTracker`, `SegmentCentroidTracker`, `BackgroundSubtractionTracker`（デコレータ）, `CircleFitTracker`, `SmoothedTracker`（デコレータ） |
+| Tracking | `LidarBattle.Tracking` | スキャンからハート位置を検出 | `IHeartTracker`, `NearestClusterFinder`, `ScanSegmenter`, `NearestClusterTracker`, `SegmentCentroidTracker`, `BackgroundSubtractionTracker`（デコレータ）, `CircleFitTracker`, `RegionFilterTracker`・`SmoothedTracker`（デコレータ）, `LidarTrackerChain`（実機の組み立て） |
 | Mapping | `LidarBattle.Mapping` | 物理座標 → 正規化盤面座標 | `ICoordinateMapper`, `RectCoordinateMapper` |
 | Input | `LidarBattle.Input` | SOUL の入力源を抽象化 | `IHeartInputSource`, `HeartInputSelector`（キーボード → LiDAR → カメラの順に選ぶ）, `KeyboardInputSource`, `LidarInputSource`, `CameraInputSource` |
 | Battle | `LidarBattle.Battle` | 弾幕ゲーム本体 | `SoulController`, `BulletBoard`, `BattleClock`, `BulletSystem`, `Bullet`, `BulletType`（弾の種類）, `FirePattern`（飛ばし方）, `ShotTrack`/`ShotClip`（Timeline 発射）, `ScoreKeeper`, `BattleDebug`, 見た目だけの `HitFeedback`/`SoulView`/`ScannerEye`/`ScanSweep` |

@@ -27,6 +27,9 @@ namespace LidarBattle.Config
         [Tooltip("センサー正面に対応する step")] public int FrontStep = 384;
         [Tooltip("1 周あたりの step 数 (角度分解能)")] public int AngularResolution = 1024;
 
+        /// <summary>step → センサー座標の角度 [rad] (正面 0、反時計回りが正)。</summary>
+        public float StepToAngleRad(int step) => (step - FrontStep) * (Mathf.PI * 2f / AngularResolution);
+
         [Header("有効距離 [m]")]
         public float MinRangeM = 0.02f;
         public float MaxRangeM = 4.0f;
@@ -35,16 +38,17 @@ namespace LidarBattle.Config
         [Tooltip("GD コマンドのポーリング周期 [ms]")] public int PollIntervalMs = 25;
 
         [Header("検出 (Tracking)")]
-        [Tooltip("同一クラスタとみなす半径 [m]")] public float ClusterRadiusM = 0.10f;
-        [Tooltip("ハートと判定する最小点数")] public int MinClusterPoints = 3;
-        [Tooltip("背景よりこれ以上手前なら前景 [m]")] public float BackgroundMarginM = 0.05f;
-        [Tooltip("背景学習に使うスキャン枚数")] public int BackgroundFrames = 20;
         [Tooltip("ハートを円とみなしたときの半径 [m] (スキャン面の高さでの断面幅の半分程度)")] public float HeartRadiusM = 0.040f;
-        public int FitIterations = 5;
+        [Tooltip("円周からこの距離以内の点を表面に当たったとみなす [m]。表面のノイズ (実機で σ 6 mm 程度) より少し大きく")] public float CircleToleranceM = 0.01f;
+        [Tooltip("表面に当たった点がこれより少ない円は採らない")] public int MinCirclePoints = 5;
+        [Tooltip("円らしさの点数 (-1〜1) がこれより低ければ未検出。壁だけのときは 0 付近、円柱は 0.5 以上")] public float MinCircleScore = 0.3f;
+        [Tooltip("見つけた円の中心を、表面に当たった点から求め直す回数")] public int FitIterations = 2;
 
         [Header("平滑化 (震え対策)")]
-        [Tooltip("指数移動平均の係数 (0〜1)。小さいほど震えが減るが遅れる。1 で平滑化なし")]
-        [Range(0.05f, 1f)] public float SmoothingAlpha = 0.3f;
+        [Tooltip("One Euro: 止まっているときのならし具合 [Hz]。小さいほど震えが減るが遅れる")] public float FilterMinCutoffHz = 0.5f;
+        [Tooltip("One Euro: 速く動くほどならしを弱める度合い。大きいほど速い動きの遅れが減るが震えが残る")] public float FilterBeta = 10f;
+        [Tooltip("One Euro: 速さを求めるときのならし具合 [Hz]")] public float FilterDerivCutoffHz = 0.5f;
+        [Tooltip("遊びの半径 [m]。位置がこれ以上ずれたときだけ出力が動く (止まっているときの震え対策)")] public float DeadbandM = 0.002f;
         [Tooltip("1 スキャンでこれ以上飛んだ結果は誤検出とみなし、少しの間直前位置を保つ [m]")] public float MaxJumpM = 0.1f;
         [Tooltip("見失い・飛びのときに直前位置を保つスキャン数")] public int MaxHoldFrames = 5;
 

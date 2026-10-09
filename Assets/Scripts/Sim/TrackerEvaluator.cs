@@ -21,7 +21,7 @@ namespace LidarBattle.Sim
         [Header("共通")]
         [Tooltip("ハートと判定する最小点数")] [SerializeField] private int _minPoints = 3;
 
-        [Header("最近点クラスタ (A, C, D)")]
+        [Header("最近点クラスタ (A, C)")]
         [Tooltip("最近点からこの半径内を 1 クラスタとみなす [m]")] [SerializeField] private float _clusterRadiusM = 0.08f;
 
         [Header("区間分割 (B)")]
@@ -33,12 +33,17 @@ namespace LidarBattle.Sim
         [Tooltip("背景学習に使うスキャン枚数")] [SerializeField] private int _backgroundFrames = 20;
 
         [Header("円当てはめ (D, E)")]
+        [Tooltip("円周からこの距離以内の点を表面に当たったとみなす [m]")] [SerializeField] private float _circleToleranceM = 0.01f;
+        [Tooltip("円らしさの点数がこれより低ければ未検出")] [SerializeField] private float _minCircleScore = 0.3f;
         [Tooltip("ハートを円とみなしたときの半径 [m]。幅 9 cm のハートでは 0.040 で偏りがほぼ 0 になった")]
         [SerializeField] private float _heartRadiusM = 0.040f;
-        [SerializeField] private int _fitIterations = 5;
+        [SerializeField] private int _fitIterations = 2;
 
         [Header("平滑化 (E)")]
-        [SerializeField] [Range(0f, 1f)] private float _smoothAlpha = 0.5f;
+        [SerializeField] private float _filterMinCutoffHz = 0.5f;
+        [SerializeField] private float _filterBeta = 10f;
+        [SerializeField] private float _filterDerivCutoffHz = 0.5f;
+        [SerializeField] private float _deadbandM = 0.002f;
         [Tooltip("これ以上の飛びは一時的に無視 [m]")] [SerializeField] private float _maxJumpM = 0.15f;
         [SerializeField] private int _maxHoldFrames = 5;
 
@@ -71,7 +76,8 @@ namespace LidarBattle.Sim
             var bgNearest = new BackgroundSubtractionTracker(
                 new NearestClusterTracker(_clusterRadiusM, _minPoints), steps, _backgroundMarginM);
             var bgCircle = new BackgroundSubtractionTracker(
-                new CircleFitTracker(_clusterRadiusM, _minPoints, _heartRadiusM, _fitIterations), steps, _backgroundMarginM);
+                new CircleFitTracker(_heartRadiusM, _circleToleranceM, _minPoints, _minCircleScore, _fitIterations,
+                    _simulator.Spec.StepToAngleRad(0), _simulator.Spec.StepToAngleRad(_simulator.Spec.Steps - 1)), steps, _backgroundMarginM);
             _backgrounds = new[] { bgNearest, bgCircle };
 
             _methods = new[]
@@ -80,7 +86,7 @@ namespace LidarBattle.Sim
                 Make("B Segment", new SegmentCentroidTracker(_breakDistM, _minPoints, _maxExtentM), Color.green),
                 Make("C Bg+Nearest", bgNearest, Color.magenta),
                 Make("D Bg+CircleFit", bgCircle, new Color(1f, 0.5f, 0f)),
-                Make("E D+EMA", new SmoothedTracker(bgCircle, _smoothAlpha, _maxJumpM, _maxHoldFrames), Color.white),
+                Make("E D+Smooth", new SmoothedTracker(bgCircle, _filterMinCutoffHz, _filterBeta, _filterDerivCutoffHz, _deadbandM, _maxJumpM, _maxHoldFrames), Color.white),
             };
         }
 

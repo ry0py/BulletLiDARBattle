@@ -1,6 +1,7 @@
 using System;
 using LidarBattle.Config;
 using LidarBattle.LiDAR;
+using LidarBattle.Mapping;
 using LidarBattle.Tracking;
 using TMPro;
 using UnityEngine;
@@ -9,9 +10,9 @@ using UnityEngine.InputSystem;
 namespace LidarBattle.Sim
 {
     /// <summary>
-    /// 実機 LiDAR の動作確認用: 点群を描き、BattleScene と同じ検出器チェーン (背景差分 + 円当てはめ) の結果をマーカーで示す。
+    /// 実機 LiDAR の動作確認用: 点群を描き、BattleScene と同じ検出器 (LidarTrackerChain: 円柱の検出・盤面の外の除外・平滑化) の結果をマーカーで示す。
     /// この GameObject の Transform をセンサー姿勢として使う (正面 +X をワールド上向きにするなら Z 90°)。
-    /// [B] ハートを外した状態で背景を学習 / [C] 背景を消去 / マウスホイールでズーム。
+    /// マウスホイールでズーム。
     /// </summary>
     public sealed class LidarLiveView : MonoBehaviour
     {
@@ -21,9 +22,8 @@ namespace LidarBattle.Sim
         [SerializeField] private TextMeshProUGUI _label;
 
         private HokuyoEthernetSensor _sensor;
-        private BackgroundSubtractionTracker _tracker;
+        private SmoothedTracker _tracker;
         private string _error;
-        private int _backgroundFramesLeft;
         private int _lastScanCount;
         private int _rateScanCount;
         private float _rateTime;
@@ -32,9 +32,11 @@ namespace LidarBattle.Sim
         private void Awake()
         {
             _sensor = new HokuyoEthernetSensor(_settings);
-            _tracker = new BackgroundSubtractionTracker(
-                new CircleFitTracker(_settings.ClusterRadiusM, _settings.MinClusterPoints, _settings.HeartRadiusM, _settings.FitIterations),
-                _settings.AngularResolution, _settings.BackgroundMarginM);
+            _tracker = LidarTrackerChain.Create(_settings, out RegionFilterTracker region);
+            var mapper = new RectCoordinateMapper(_settings.PhysicalMin, _settings.PhysicalMax,
+                _settings.RotationDeg, _settings.InvertX, _settings.InvertY);
+            float margin = _settings.HeartRadiusM; // LidarInputSource と同じく盤面を半径ぶん広げる
+            region.Region = p => mapper.Contains(p, margin);
         }
 
         private void Start()
@@ -59,24 +61,10 @@ namespace LidarBattle.Sim
                 _lastScanCount = _sensor.ScanCount;
                 _view.Show(scan, transform);
 
-                if (_backgroundFramesLeft > 0)
-                {
-                    _tracker.LearnBackground(scan);
-                    _backgroundFramesLeft--;
-                    _marker.enabled = false;
-                }
-                else if (_tracker.TryTrack(scan, out Vector2 positionM))
-                {
-                    _marker.enabled = true;
-                    _marker.transform.position = transform.TransformPoint(positionM);
-                    UpdateLabel(scan.Count, positionM, true);
-                    return;
-                }
-                else
-                {
-                    _marker.enabled = false;
-                }
-                UpdateLabel(scan.Count, Vector2.zero, false);
+                bool detected = _tracker.TryTrack(scan, out Vector2 positionM);
+                _marker.enabled = detected;
+                if (detected) _marker.transform.position = transform.TransformPoint(positionM);
+                UpdateLabel(scan.Count, positionM, detected);
             }
             else if (_error != null || !_sensor.IsConnected)
             {
@@ -86,17 +74,6 @@ namespace LidarBattle.Sim
 
         private void HandleInput()
         {
-            Keyboard keyboard = Keyboard.current;
-            if (keyboard != null)
-            {
-                if (keyboard.bKey.wasPressedThisFrame)
-                {
-                    _tracker.ClearBackground();
-                    _backgroundFramesLeft = _settings.BackgroundFrames;
-                }
-                if (keyboard.cKey.wasPressedThisFrame) _tracker.ClearBackground();
-            }
-
             Mouse mouse = Mouse.current;
             Camera cam = Camera.main;
             if (mouse != null && cam != null)
@@ -120,9 +97,8 @@ namespace LidarBattle.Sim
             string status = _error != null ? $"<color=red>接続失敗: {_error}</color>"
                 : _sensor.IsConnected ? $"接続中 {_settings.HostName} | {_hz:F1} Hz | {points} 点"
                 : "未接続";
-            string background = _backgroundFramesLeft > 0 ? "学習中..." : _tracker.HasBackground ? "学習済み" : "なし (最も近い物体を検出)";
             string heart = detected ? $"x {positionM.x * 1000f:F0} mm, y {positionM.y * 1000f:F0} mm (距離 {positionM.magnitude * 1000f:F0} mm)" : "未検出";
-            _label.text = $"{status}\n背景: {background}\nハート: {heart}\n<color=#00FFFF>水色の線</color> = センサー正面 / 薄い線 = 取得範囲の端\n[B] ハートを外して背景学習  [C] 背景消去  ホイール: ズーム";
+            _label.text = $"{status}\nハート: {heart}\n<color=#00FFFF>水色の線</color> = センサー正面 / 薄い線 = 取得範囲の端\nホイール: ズーム";
         }
     }
 }

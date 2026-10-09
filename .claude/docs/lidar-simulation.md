@@ -40,8 +40,8 @@ UST-20LX の代表値を既定にした Physics2D レイキャスト。数値は
 | A | `NearestClusterTracker` | 最近点を核に半径内の重心 | 壁の端や置物を拾って全滅（誤差 ~400 mm） |
 | B | `SegmentCentroidTracker` | 隣接点距離で区間分割 → 幅 ≤ 上限の最近区間の重心 | ノイズで壁が細切れになり同じく全滅。斜めから見ると手がつながり幅上限で弾かれる |
 | C | `BackgroundSubtractionTracker(A)` | 背景距離（ハート無し）を学習し、手前の点だけを A に渡す | 安定。ただし表面重心なので中心よりセンサー側に ~25 mm 偏る |
-| D | `BackgroundSubtractionTracker(CircleFitTracker)` | 前景の最近点クラスタに既知半径の円を当てはめ中心を推定 | **採用候補**。偏りが消え平均誤差 ~10 mm |
-| E | `SmoothedTracker(D)` | EMA ＋ 飛び・未検出を数フレーム保留 | 最大誤差を半減。遅延と引き換え |
+| D | `BackgroundSubtractionTracker(CircleFitTracker)` | 前景の最近点クラスタに既知半径の円を当てはめ中心を推定 | **採用候補**。偏りが消え平均誤差 ~10 mm。※2026-10-09 に実機で近くの壁を拾ったため、`CircleFitTracker` は「円を仮置きして円らしさで採点」に変更（lidar-integration.md）。実機では背景差分を使わない |
+| E | `SmoothedTracker(D)` | EMA ＋ 飛び・未検出を数フレーム保留（2026-10-09 に EMA を One Euro＋遊びに変更） | 最大誤差を半減。遅延と引き換え |
 
 - 背景差分と平滑化はデコレータ（内側の `IHeartTracker` を差し替え可能）。
 - 最近点クラスタは `NearestClusterFinder` に一本化。核のクラスタが最小点数に満たなければ

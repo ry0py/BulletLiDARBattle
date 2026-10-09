@@ -26,7 +26,6 @@ namespace LidarBattle.LiDAR
 
             into.Clear();
             int step = settings.StartStep;
-            float twoPiOverRes = (Mathf.PI * 2f) / settings.AngularResolution;
 
             // データ行: 各行末はチェックサム 1 文字。空行で終端。
             string line;
@@ -40,7 +39,7 @@ namespace LidarBattle.LiDAR
                 {
                     float distM = Decode3(data[i], data[i + 1], data[i + 2]) * 0.001f;
                     if (distM >= settings.MinRangeM && distM <= settings.MaxRangeM)
-                        into.Add(new LidarMeasurement((step - settings.FrontStep) * twoPiOverRes, distM));
+                        into.Add(new LidarMeasurement(settings.StepToAngleRad(step), distM));
                     step++;
                 }
             }

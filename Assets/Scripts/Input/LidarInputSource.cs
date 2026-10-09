@@ -12,8 +12,8 @@ namespace LidarBattle.Input
     /// <summary>
     /// 実機 LiDAR で検出したハート位置を SOUL の目標にする入力源 (Hardware → Tracking → Mapping の合成点)。
     /// 接続できない / UseLidar=false / 見失い中は位置を出さない（どの入力源を使うかは HeartInputSelector が決める）。
-    /// センサー接続と背景は static に持ち、シーンをまたいでも再接続・再校正しない。
-    /// キー: [B] ハートを外して背景学習 / [1] 今の位置を画面左下に / [2] 今の位置を画面右上に / [F1] 状態表示。
+    /// センサー接続は static に持ち、シーンをまたいでも再接続しない。
+    /// キー: [1] 今の位置を画面左下に / [2] 今の位置を画面右上に / [F1] 状態表示。
     /// </summary>
     [DefaultExecutionOrder(-10)] // SoulController より先にスキャンを読む
     public sealed class LidarInputSource : MonoBehaviour, IHeartInputSource
@@ -22,11 +22,9 @@ namespace LidarBattle.Input
 
         private static HokuyoEthernetSensor s_sensor;
         private static LidarSettings s_connectedSettings; // 接続と検出器を作ったときの設定
-        private static BackgroundSubtractionTracker s_tracker;
         private static RegionFilterTracker s_region;
         private static SmoothedTracker s_smoothed;
         private static string s_error;
-        private static int s_backgroundFramesLeft;
         private static bool s_showStatus; // 展示中は出さない。[F1] で表示（シーンをまたいで保持）
 
         /// <summary>ViewPoints に入れる範囲。盤面（正規化座標 0..1）をこれだけ広げる。</summary>
@@ -35,7 +33,12 @@ namespace LidarBattle.Input
         private RectCoordinateMapper _mapper;
         private int _lastScanCount = -1;
         private bool _detected;
-        private Vector2 _positionM;
+        private Vector2 _positionM; // 画面に出す位置 (スキャンの間を補間したもの)
+        // 位置は 1 秒に約 34 回しか来ないので、届いた位置の間を毎フレームつなぐ (1 スキャンぶん遅れる代わりにカクつかない)。
+        private Vector2 _fromM;
+        private Vector2 _toM;
+        private float _toTime;
+        private float _scanIntervalS = 1f / 34f;
         private readonly List<Vector2> _viewPoints = new(1100);
 
         private static bool LidarActive => s_sensor != null && s_sensor.IsConnected;
@@ -64,10 +67,7 @@ namespace LidarBattle.Input
             s_connectedSettings = settings;
 
             s_sensor = new HokuyoEthernetSensor(settings);
-            s_region = new RegionFilterTracker(
-                new CircleFitTracker(settings.ClusterRadiusM, settings.MinClusterPoints, settings.HeartRadiusM, settings.FitIterations));
-            s_tracker = new BackgroundSubtractionTracker(s_region, settings.AngularResolution, settings.BackgroundMarginM);
-            s_smoothed = new SmoothedTracker(s_tracker, settings.SmoothingAlpha, settings.MaxJumpM, settings.MaxHoldFrames);
+            s_smoothed = LidarTrackerChain.Create(settings, out s_region);
             Application.quitting += Shutdown;
             try { s_sensor.Connect(); }
             catch (Exception e)
@@ -84,11 +84,9 @@ namespace LidarBattle.Input
             s_sensor?.Dispose();
             s_sensor = null;
             s_connectedSettings = null;
-            s_tracker = null;
             s_region = null;
             s_smoothed = null;
             s_error = null;
-            s_backgroundFramesLeft = 0;
         }
 
         private void RebuildMapper()
@@ -96,7 +94,7 @@ namespace LidarBattle.Input
             var mapper = new RectCoordinateMapper(_settings.PhysicalMin, _settings.PhysicalMax,
                 _settings.RotationDeg, _settings.InvertX, _settings.InvertY);
             _mapper = mapper;
-            // PhysicalMin/Max はハート中心の可動範囲なので、表面点が入るよう半径ぶん広げた盤面だけを見る。
+            // PhysicalMin/Max はハート中心の可動範囲。少しはみ出しても拾えるよう半径ぶん広げる。
             float margin = _settings.HeartRadiusM;
             if (s_region != null) s_region.Region = p => mapper.Contains(p, margin);
         }
@@ -104,18 +102,22 @@ namespace LidarBattle.Input
         private void Update()
         {
             HandleKeys();
-            if (!LidarActive || s_sensor.ScanCount == _lastScanCount || !s_sensor.TryGetLatestScan(out LidarScan scan)) return;
-            _lastScanCount = s_sensor.ScanCount;
-            CollectViewPoints(scan);
-
-            if (s_backgroundFramesLeft > 0)
+            if (LidarActive && s_sensor.ScanCount != _lastScanCount && s_sensor.TryGetLatestScan(out LidarScan scan))
             {
-                s_tracker.LearnBackground(scan);
-                s_backgroundFramesLeft--;
-                _detected = false;
-                return;
+                _lastScanCount = s_sensor.ScanCount;
+                CollectViewPoints(scan);
+                bool wasDetected = _detected;
+                _detected = s_smoothed.TryTrack(scan, out Vector2 latest);
+                if (_detected)
+                {
+                    float now = Time.unscaledTime;
+                    _scanIntervalS = Mathf.Lerp(_scanIntervalS, Mathf.Clamp(now - _toTime, 0.01f, 0.1f), 0.1f);
+                    _fromM = wasDetected ? _positionM : latest; // 今出している位置から次の位置へ
+                    _toM = latest;
+                    _toTime = now;
+                }
             }
-            _detected = s_smoothed.TryTrack(scan, out _positionM);
+            if (_detected) _positionM = Vector2.Lerp(_fromM, _toM, (Time.unscaledTime - _toTime) / _scanIntervalS);
         }
 
         private void CollectViewPoints(LidarScan scan)
@@ -143,11 +145,6 @@ namespace LidarBattle.Input
             if (keyboard.f1Key.wasPressedThisFrame) s_showStatus = !s_showStatus;
             if (!LidarActive) return;
 
-            if (keyboard.bKey.wasPressedThisFrame)
-            {
-                s_tracker.ClearBackground();
-                s_backgroundFramesLeft = _settings.BackgroundFrames;
-            }
             if (_detected && keyboard.digit1Key.wasPressedThisFrame) SetCorner(ref _settings.PhysicalMin, "PhysicalMin (左下)");
             if (_detected && keyboard.digit2Key.wasPressedThisFrame) SetCorner(ref _settings.PhysicalMax, "PhysicalMax (右上)");
         }
@@ -169,14 +166,12 @@ namespace LidarBattle.Input
             string lidar = !_settings.UseLidar ? "OFF"
                 : LidarActive ? $"connected {_settings.HostName}"
                 : $"FAILED {s_error}";
-            string background = s_backgroundFramesLeft > 0 ? "learning..."
-                : s_tracker != null && s_tracker.HasBackground ? "learned" : "none";
             string heart = !LidarActive ? "-"
                 : _detected ? $"aligned ({_mapper.ToAligned(_positionM).x:F3}, {_mapper.ToAligned(_positionM).y:F3}) m -> {_mapper.ToNormalized(_positionM):F2}"
                 : "lost";
-            GUI.Box(new Rect(10, 10, 620, 110), GUIContent.none);
-            GUI.Label(new Rect(20, 15, 600, 100),
-                $"LiDAR: {lidar}\nBackground: {background}\nHeart: {heart}\n[B] learn background (remove heart)  [1] bottom-left  [2] top-right  [F1] hide");
+            GUI.Box(new Rect(10, 10, 620, 90), GUIContent.none);
+            GUI.Label(new Rect(20, 15, 600, 80),
+                $"LiDAR: {lidar}\nHeart: {heart}\n[1] bottom-left  [2] top-right  [F1] hide");
         }
     }
 }

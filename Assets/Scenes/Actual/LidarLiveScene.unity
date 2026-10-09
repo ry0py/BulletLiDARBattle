@@ -285,7 +285,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 985d5e98d0f29c14ea88d12c73c85029, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::LidarBattle.Sim.LidarLiveView
-  _settings: {fileID: 0}
+  _settings: {fileID: 11400000, guid: 5a45cd1803929df4d9c2e92f15113c25, type: 2}
   _view: {fileID: 689160194}
   _marker: {fileID: 896623129}
   _label: {fileID: 116405453}
