@@ -27,9 +27,6 @@ namespace LidarBattle.Input
         private static string s_error;
         private static bool s_showStatus; // 展示中は出さない。[F1] で表示（シーンをまたいで保持）
 
-        /// <summary>ViewPoints に入れる範囲。盤面（正規化座標 0..1）をこれだけ広げる。</summary>
-        private const float ViewMargin = 0.3f;
-
         private RectCoordinateMapper _mapper;
         private int _lastScanCount = -1;
         private bool _detected;
@@ -45,10 +42,13 @@ namespace LidarBattle.Input
 
         // 別の PC の「LiDAR の視界」（live.html）用（Flow/LiveFeed）。座標はどれも盤面の正規化座標（盤面の外は 0..1 の外）。
         public bool IsActive => LidarActive;
-        /// <summary>最新のスキャンの点のうち盤面の付近のもの（背景も含む生の点）。</summary>
+        /// <summary>最新のスキャンの全部の点（背景も含む生の点。盤面の外も捨てない）。</summary>
         public IReadOnlyList<Vector2> ViewPoints => _viewPoints;
         public bool HasHeart => LidarActive && _detected;
-        public Vector2 HeartNormalized => _mapper.ToNormalized(_positionM);
+        /// <summary>ゲームが検出している円の中心（SOUL の目標と同じ位置。盤面の外でもクランプしない）。</summary>
+        public Vector2 HeartNormalized => _mapper.ToNormalizedUnclamped(_positionM);
+        /// <summary>検出する円の半径（盤面の縦を 1 とした長さ）。</summary>
+        public float HeartRadiusNormalized => _mapper.ToNormalizedLength(_settings.HeartRadiusM);
         public Vector2 SensorNormalized => _mapper.ToNormalizedUnclamped(Vector2.zero);
         public float BoardAspect => _mapper.Aspect;
 
@@ -124,11 +124,7 @@ namespace LidarBattle.Input
         {
             _viewPoints.Clear();
             for (int i = 0; i < scan.Count; i++)
-            {
-                Vector2 n = _mapper.ToNormalizedUnclamped(scan[i].ToCartesian());
-                if (n.x >= -ViewMargin && n.x <= 1f + ViewMargin && n.y >= -ViewMargin && n.y <= 1f + ViewMargin)
-                    _viewPoints.Add(n);
-            }
+                _viewPoints.Add(_mapper.ToNormalizedUnclamped(scan[i].ToCartesian()));
         }
 
         public bool TryReadTarget(Vector2 currentNormalized, float deltaTime, out Vector2 target)

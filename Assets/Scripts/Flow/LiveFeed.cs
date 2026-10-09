@@ -56,6 +56,8 @@ namespace LidarBattle.Flow
                 {
                     _sb.Append(",\"heart\":");
                     AppendPoint(_sb, _lidar.HeartNormalized);
+                    _sb.Append(",\"heartR\":");
+                    AppendInt(_sb, Mathf.RoundToInt(_lidar.HeartRadiusNormalized * 1000f));
                 }
                 _sb.Append(",\"points\":[");
                 var points = _lidar.ViewPoints;

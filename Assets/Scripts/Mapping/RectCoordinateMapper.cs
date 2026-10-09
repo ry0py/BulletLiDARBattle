@@ -64,6 +64,9 @@ namespace LidarBattle.Mapping
             return new Vector2(nx, ny);
         }
 
+        /// <summary>物理の長さ[m] を盤面の縦を 1 とした長さにする（円の半径の表示用）。</summary>
+        public float ToNormalizedLength(float lengthM) => lengthM / Mathf.Abs(_size.y);
+
         /// <summary>キャリブレーション矩形の横 / 縦（物理の長さの比）。</summary>
         public float Aspect => Mathf.Abs(_size.x / _size.y);
     }

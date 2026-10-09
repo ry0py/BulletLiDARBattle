@@ -46,12 +46,13 @@
   <span id="status"></span>
 </header>
 <canvas></canvas>
-<p class="legend"><span style="color: #4dc3ff">● LiDAR が見ている点</span><span style="color: var(--new)">◯ 見つけたハート</span><span style="color: var(--fg)">● SOUL</span><span style="color: #ff5aa0">■ LiDAR</span></p>
+<p class="legend"><span style="color: #4dc3ff">● LiDAR が見ている点</span><span style="color: var(--new)">◯ ゲームが検出している円</span><span style="color: var(--fg)">● SOUL</span><span style="color: #ff5aa0">■ LiDAR</span></p>
 
 <script>
   // Unity の Flow/LiveFeed がバトル中だけ書く live.json を出す。座標は盤面の正規化座標 × 1000。
   const LIVE_POLL_MS = 100;
-  const VIEW_MARGIN = 0.3; // Unity が点を送ってくる範囲（盤面の外側にこれだけ）
+  const VIEW_PAD = 0.03;   // 見せる範囲のふち（範囲の大きさに対する割合）
+  const VIEW_SHRINK = 0.05; // 見せる範囲を狭めるときに 1 回で近づく割合
   const COLORS = { Easy: "var(--easy)", Medium: "var(--medium)", Hard: "var(--hard)" };
   const canvas = document.querySelector("canvas");
 
@@ -63,6 +64,16 @@
     return [canvas.getContext("2d"), w, h, dpr];
   }
 
+  // 見せる範囲 [u0, u1, v0, v1]。広げるのはすぐ、狭めるのはゆっくり
+  let view = null;
+  function followView(target) {
+    if (!view) return view = target;
+    const ease = (cur, tgt, widen) => widen ? tgt : cur + (tgt - cur) * VIEW_SHRINK;
+    view = [ease(view[0], target[0], target[0] < view[0]), ease(view[1], target[1], target[1] > view[1]),
+            ease(view[2], target[2], target[2] < view[2]), ease(view[3], target[3], target[3] > view[3])];
+    return view;
+  }
+
   function message(g, w, h, dpr, text) {
     g.fillStyle = "#8a8a8a"; g.font = `${3 * innerHeight / 100 * dpr}px "BIZ UDGothic", "MS Gothic", monospace`;
     g.textAlign = "center"; g.textBaseline = "middle";
@@ -71,6 +82,7 @@
 
   function drawIdle() {
     document.querySelector(".info").innerHTML = "";
+    view = null;
     const [g, w, h, dpr] = fitCanvas();
     g.clearRect(0, 0, w, h);
     message(g, w, h, dpr, "バトルが始まると LiDAR の点群が出ます");
@@ -87,12 +99,21 @@
     const pt = ([x, y]) => [x / 1000, y / 1000];
     const sensor = d.sensor && pt(d.sensor);
 
-    // 見せる範囲: 盤面の周りと LiDAR の位置。横は物理の長さの比（aspect）で伸ばす
-    let u0 = -VIEW_MARGIN, u1 = 1 + VIEW_MARGIN, v0 = -VIEW_MARGIN, v1 = 1 + VIEW_MARGIN;
+    // 見せる範囲: 盤面・LiDAR の位置・すべての点が入るように。横は物理の長さの比（aspect）で伸ばす。
+    // 点はスキャンごとに少し変わるので、広げるときはすぐ、狭めるときはゆっくり合わせる（ガタつかないように）
+    let u0 = 0, u1 = 1, v0 = 0, v1 = 1;
     if (sensor) {
-      u0 = Math.min(u0, sensor[0] - 0.05); u1 = Math.max(u1, sensor[0] + 0.05);
-      v0 = Math.min(v0, sensor[1] - 0.05); v1 = Math.max(v1, sensor[1] + 0.05);
+      u0 = Math.min(u0, sensor[0]); u1 = Math.max(u1, sensor[0]);
+      v0 = Math.min(v0, sensor[1]); v1 = Math.max(v1, sensor[1]);
     }
+    const pts = d.points || [];
+    for (let i = 0; i < pts.length; i += 2) {
+      const u = pts[i] / 1000, v = pts[i + 1] / 1000;
+      if (u < u0) u0 = u; else if (u > u1) u1 = u;
+      if (v < v0) v0 = v; else if (v > v1) v1 = v;
+    }
+    const pad = VIEW_PAD * Math.max(u1 - u0, v1 - v0);
+    [u0, u1, v0, v1] = followView([u0 - pad, u1 + pad, v0 - pad, v1 + pad]);
     const scale = Math.min(w / ((u1 - u0) * aspect), h / (v1 - v0));
     const ox = (w - (u1 - u0) * aspect * scale) / 2, oy = (h - (v1 - v0) * scale) / 2;
     const X = u => ox + (u - u0) * aspect * scale, Y = v => oy + (v1 - v) * scale;
@@ -107,7 +128,6 @@
     g.strokeRect(X(0), Y(1), X(1) - X(0), Y(0) - Y(1));
 
     if (d.lidar) {
-      const pts = d.points;
       // LiDAR から点へのレーザー（うすく）と点
       g.strokeStyle = "rgba(77, 195, 255, .08)"; g.lineWidth = dpr;
       g.beginPath();
@@ -121,9 +141,11 @@
       g.fillRect(X(sensor[0]) - 8 * dpr, Y(sensor[1]) - 8 * dpr, 16 * dpr, 16 * dpr);
 
       if (d.heart) {
+        // ゲームが検出している円を、その位置と実際の大きさで（小さすぎると見えないので最低 6px）
         const [u, v] = pt(d.heart);
+        const r = Math.max((d.heartR || 0) / 1000 * scale, 6 * dpr);
         g.strokeStyle = "#ffe14d"; g.lineWidth = 3 * dpr;
-        g.beginPath(); g.arc(X(u), Y(v), 22 * dpr, 0, Math.PI * 2); g.stroke();
+        g.beginPath(); g.arc(X(u), Y(v), r, 0, Math.PI * 2); g.stroke();
       }
     } else {
       message(g, w, h, dpr, "LiDAR につながっていません");
