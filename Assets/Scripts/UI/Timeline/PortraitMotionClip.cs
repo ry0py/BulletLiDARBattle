@@ -5,7 +5,7 @@ using UnityEngine.Timeline;
 namespace LidarBattle.UI
 {
     /// <summary>立ち絵の動き方。</summary>
-    public enum PortraitMotion { Float, Sway, Shake, Roam }
+    public enum PortraitMotion { Float, Sway, Shake, Roam, Climb }
 
     /// <summary>
     /// クリップの間だけ、立ち絵を元の位置のまわりで動かす。Ease In/Out を付けると動きが滑らかに始まる・終わる。
@@ -13,7 +13,7 @@ namespace LidarBattle.UI
     /// </summary>
     public class PortraitMotionClip : PlayableAsset, ITimelineClipAsset
     {
-        [Tooltip("Float = ふわふわ上下, Sway = 左右に往復, Shake = 小刻みに震える, Roam = 左右を大きく行き来しながら跳ねる")]
+        [Tooltip("Float = ふわふわ上下, Sway = 左右に往復, Shake = 小刻みに震える, Roam = 左右を大きく行き来しながら跳ねる, Climb = Roam の上下版")]
         [SerializeField] private PortraitMotion _motion = PortraitMotion.Float;
         [Tooltip("動く幅（px、1920×1080 基準）")]
         [SerializeField] private float _amplitude = 12f;
@@ -58,6 +58,9 @@ namespace LidarBattle.UI
                 PortraitMotion.Roam => new Vector2(
                     (0.75f * Mathf.Sin(phase) + 0.25f * Mathf.Sin(2.3f * phase + 1f)) * Amplitude,
                     Mathf.Abs(Mathf.Sin(3f * phase)) * Amplitude * 0.04f),
+                PortraitMotion.Climb => new Vector2(
+                    Mathf.Abs(Mathf.Sin(3f * phase)) * Amplitude * 0.04f,
+                    (0.75f * Mathf.Sin(phase) + 0.25f * Mathf.Sin(2.3f * phase + 1f)) * Amplitude),
                 // 乱数ではなく Perlin ノイズなので、同じ時刻なら毎回同じ揺れになる。
                 _ => new Vector2(Mathf.PerlinNoise(t * Frequency, 0.3f) - 0.5f,
                                  Mathf.PerlinNoise(0.7f, t * Frequency) - 0.5f) * (2f * Amplitude),

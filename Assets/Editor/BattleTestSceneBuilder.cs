@@ -50,9 +50,11 @@ namespace LidarBattle.EditorTools
                 Object.DestroyImmediate(battle);
                 go.name = nameof(BattleTestFlow);
 
-                // 技の名前が収まるよう、左下のテキストを横に広げる。
+                // 技の名前が収まるよう、左下のテキストを横に広げて上の帯（会話ボックスの場所。ここでは出さない）に移す。
                 label.textWrappingMode = TextWrappingModes.NoWrap;
-                label.rectTransform.offsetMax = new Vector2(1400f, label.rectTransform.offsetMax.y);
+                label.rectTransform.anchorMin = label.rectTransform.anchorMax = new Vector2(0f, 1f);
+                label.rectTransform.offsetMin = new Vector2(560f, -84f); // 左上のドロップダウンの右
+                label.rectTransform.offsetMax = new Vector2(1520f, -20f);
                 Object.FindFirstObjectByType<DialogueBox>(FindObjectsInactive.Include).gameObject.SetActive(false);
                 Object.FindFirstObjectByType<PortraitView>(FindObjectsInactive.Include)?.gameObject.SetActive(false);
 

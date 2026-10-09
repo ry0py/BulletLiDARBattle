@@ -139,6 +139,10 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
     （`Assets/Editor/ScannerSetupBuilder.cs`）。紺色の背景にシアンの方眼、盤面の上の敵「スキャナー」が扇ビームで盤面を掃く。
     SOUL は琥珀色のハートで、輪がグレイズ範囲。アセットは `Assets/Art/Scanner/`・`Assets/Settings/Scanner/`・`Assets/Timelines/Scanner/`。
     弾は `Assets/Art/Bullets/` の素材（Kenney, CC0）を着色し、Bloom/Vignette（`Assets/Settings/Scanner/ScannerVolume.asset`）で発光させる。
+- 盤面（2026-10-09）: 実物のフィールド（横 30 cm × 縦 20 cm）に合わせて 3:2（ワールドで 4.8 × 3.2）。技は盤面のワールドの大きさに合わせて
+  作ってあるので盤面は広げず、バトルのカメラを寄せて（`orthographicSize` 1.905、盤面が画面の高さの 84%）画面の上で大きく見せている
+  （実物を動かした量より SOUL が小さく動くと感度が悪く感じるため）。バトルの会話ボックスは上端の細い帯、立ち絵は盤面の左の列で上下に歩き回る
+  （`PortraitMotion.Climb`）。LiDAR の `PhysicalMin/Max` も 30 × 20 cm。
 - 結果（2026-10-08）: スコアはやめて被弾回数だけ（`ScoreKeeper`）。被弾回数はドキドキ感のためプレイ中は出さず、終了時の会話で「被弾は ○ 回でした」とだけ出す。バトル中の左下は今の難易度。
 - 運用ショートカット（`Flow/OperatorShortcuts`、キー 5 秒長押し・表示なし。円柱用・ハート用それぞれの組の中で移る）: バトルは R でやり直し・P で選択へ、
   選択は E/M/H で難易度を選んでバトルへ・L で `LidarLiveScene` へ・U で `UserSettingsScene` へ・T（デバッグモードのときだけ、2 秒）で `BattleTestScene` へ、

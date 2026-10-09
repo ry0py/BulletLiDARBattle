@@ -106,7 +106,7 @@ namespace LidarBattle.EditorTools
         }
 
         /// <summary>
-        /// セリフ（最初・半ば・終わり近く）と立ち絵の表情・動き。セリフの無い間は立ち絵が画面の上を歩き回る。
+        /// セリフ（最初・半ば・終わり近く）と立ち絵の表情・動き。セリフの無い間は立ち絵が盤面の左の列を上下に歩き回る。
         /// 口調は Easy がやさしく、Medium はやわらかいけれど少し厳しく、Hard は厳しく。
         /// </summary>
         private static void AddTalk(TimelineAsset timeline, Difficulty d)
@@ -132,7 +132,7 @@ namespace LidarBattle.EditorTools
             }
             Attack(p, shake, 3, 2);
             Attack(p, shake, 35, 2);
-            Roam(timeline, d switch { Difficulty.Easy => 0.1f, Difficulty.Medium => 0.15f, _ => 0.2f }, (5, 27), (30, 51), (54, 60));
+            Climb(timeline, d switch { Difficulty.Easy => 0.1f, Difficulty.Medium => 0.15f, _ => 0.2f }, (5, 27), (30, 51), (54, 60));
         }
     }
 }
