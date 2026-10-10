@@ -143,6 +143,7 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
 - 運用ショートカット（`Flow/OperatorShortcuts`、キー 5 秒長押し・表示なし。円柱用・ハート用それぞれの組の中で移る）: バトルは R でやり直し・P で選択へ、
   選択は E/M/H で難易度を選んでバトルへ・L で `LidarLiveScene` へ・U で `UserSettingsScene` へ・T（デバッグモードのときだけ、2 秒）で `BattleTestScene` へ、
   `LidarLiveScene`/`UserSettingsScene`/`BattleTestScene` は P で直前の選択へ。
+  F11 はどのシーンでも押した瞬間に全画面⇔ウィンドウを切り替える（ビルドはウィンドウ 1280×720 で起動。Player 設定）。
 - 音（2026-10-08）: `GameAudio` が鳴らす。BGM はセレクト用（ポップ）とバトル用（ポップ＋緊迫感、全難易度共通）。
   SE は被弾・選択中（ゲージが溜まるほど高く）・難易度決定・バトル開始・敵のセリフ音（アンダーテール風の「ポポポ」。
   ピッチは Easy 1.0 / Medium 0.85 / Hard 0.7）。音源はすべて `python Tools/AudioGen/generate_audio.py` で合成した自作。

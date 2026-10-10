@@ -15,6 +15,7 @@ namespace LidarBattle.Flow
     /// LidarLiveScene・UserSettingsScene・BattleTestScene: [P] 直前に使っていた選択シーンへ。
     /// 選択とバトルのシーンは組（円柱用 SelectScene/BattleScene、ハート用 HeartSelectScene/HeartBattleScene）で扱い、
     /// 組の中だけで移る。
+    /// どのシーンでも [F11] で全画面とウィンドウを切り替える（長押し不要）。起動はウィンドウ（Player 設定）。
     /// </summary>
     public sealed class OperatorShortcuts : MonoBehaviour
     {
@@ -23,6 +24,8 @@ namespace LidarBattle.Flow
         private const string DebugScene = "LidarLiveScene";
         private const string SettingsScene = "UserSettingsScene";
         private const string TestScene = "BattleTestScene";
+        private const int WindowWidth = 1280; // F11 でウィンドウに戻したときの大きさ（Player 設定の既定と同じ）
+        private const int WindowHeight = 720;
 
         // (選択シーン, バトルシーン) の組。
         private static readonly (string Select, string Battle)[] ScenePairs =
@@ -52,6 +55,8 @@ namespace LidarBattle.Flow
             Keyboard keyboard = Keyboard.current;
             if (keyboard == null) return;
 
+            if (keyboard.f11Key.wasPressedThisFrame) ToggleFullscreen();
+
             // 離すまでは同じキーを数え続ける。発動後も離すまでは次を数えない（R の連続リスタートを防ぐ）。
             if (_heldKey != Key.None)
             {
@@ -79,6 +84,19 @@ namespace LidarBattle.Flow
             Action action = _action;
             _action = null;
             action();
+        }
+
+        private static void ToggleFullscreen()
+        {
+            if (Screen.fullScreenMode == FullScreenMode.Windowed)
+            {
+                Resolution desktop = Screen.currentResolution;
+                Screen.SetResolution(desktop.width, desktop.height, FullScreenMode.FullScreenWindow);
+            }
+            else
+            {
+                Screen.SetResolution(WindowWidth, WindowHeight, FullScreenMode.Windowed);
+            }
         }
 
         private static Action ActionFor(string scene, Key key)
