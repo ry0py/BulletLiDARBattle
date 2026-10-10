@@ -55,7 +55,7 @@ namespace LidarBattle.Config
         [Header("キャリブレーション (Mapping: 物理[m] → 正規化0..1)")]
         [Tooltip("画面の左下に対応する物理座標 [m] (回転補正後)。実行中に [1] で記録できる")] public Vector2 PhysicalMin = new Vector2(-0.3f, 0.3f);
         [Tooltip("画面の右上に対応する物理座標 [m] (回転補正後)。実行中に [2] で記録できる")] public Vector2 PhysicalMax = new Vector2(0.3f, 0.9f);
-        [Tooltip("センサー取付の回転補正 [deg]。センサーが盤面の下辺から上を向くなら -90")] public float RotationDeg = 0f;
+        [Tooltip("センサー取付の回転補正 [deg]。センサーが盤面の左端から右を向くなら 0、右端から左を向くなら 180、下辺から上を向くなら -90")] public float RotationDeg = 0f;
         public bool InvertX = false;
         public bool InvertY = false;
     }

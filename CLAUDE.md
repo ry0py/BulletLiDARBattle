@@ -114,8 +114,8 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
 
 - Unity 6 プロジェクト。URP/2D/Input System/Timeline/URG-Unity 導入済み。
 - Battle/Input 層を bullet-system.md の方針で作り直した（Timeline 発射・BulletSystem 集約・キーボード入力）。
-- LiDAR 入力は `LidarInputSource`（UST-20LX, Ethernet）で接続済み。本番ではセンサーを盤面の左端に置き、
-  右（盤面側）を向ける（`RotationDeg` 0）。
+- LiDAR 入力は `LidarInputSource`（UST-20LX, Ethernet）で接続済み。本番ではセンサーを盤面の右端に置き、
+  左（盤面側）を向ける（`RotationDeg` 180。`PhysicalMin/Max` もこの回転後の座標で測る）。
 - LiDAR で検出する物体は 2 種類。どちらも既知の半径の円を当てはめる（`CircleFitTracker`）。
   - 円柱（今の主）: `SelectScene`/`BattleScene`、設定 `LidarSettings.asset`（`HeartRadiusM` 0.02）。
   - 以前の 3D プリントのハート: `HeartSelectScene`/`HeartBattleScene`、設定 `LidarSettings_Heart.asset`（`HeartRadiusM` 0.04）。
