@@ -2,7 +2,7 @@
 
 Unity が書く plays.jsonl・replays/<id>.json・live.json（Application.persistentDataPath）と index.html を配る。
 同じ PC なら http://localhost:8000/ 、別の PC からは表示される http://<IP>:8000/ を開く。
-LiDAR の点群（プレイ中の視界）は別の PC で http://<IP>:8000/live を開いて出す（live.html）。
+LiDAR の点群（難易度選択中とプレイ中の視界）は別の PC で http://<IP>:8000/live を開いて出す（live.html）。
 記録の編集・削除・仮データの作成は管理画面 http://localhost:8000/admin.html （別の PC からは http://<IP>:8000/admin.html）から。
 
     python Tools/ScoreBoard/serve.py                 # 既定の場所の plays.jsonl を配る
@@ -30,7 +30,7 @@ PLAY_API = re.compile(r"^/api/plays/(\d{8}-\d{6}|new|delete)$")  # id は編集�
 DIFFICULTIES = ("Easy", "Medium", "Hard")
 LOCK = threading.Lock()
 # Unity の Application.persistentDataPath（Company/Product は ProjectSettings の値）
-# live.json（プレイ中の点群）がこれより古ければプレイしていないとみなす（Unity が落ちたときなど）
+# live.json（難易度選択中・プレイ中の点群）がこれより古ければゲームが動いていないとみなす（Unity が落ちたときなど）
 LIVE_STALE_SECONDS = 3
 IDLE = b'{"state":"idle"}'
 DEFAULT_LOG = Path(os.environ.get("USERPROFILE", "~")).expanduser() / "AppData/LocalLow/DefaultCompany/LidarBattle/plays.jsonl"
@@ -248,7 +248,7 @@ def make_handler(log_path: Path):
             self.wfile.write(body)
 
         def send_live(self, file: Path):
-            """プレイ中の様子。無い・古いときはプレイしていない扱い。
+            """難易度選択中・プレイ中の様子。無い・古いときは待機扱い。
             Unity が置き換えている最中で読めなければ 503（live.html は前の表示のままにする）。"""
             try:
                 fresh = time.time() - file.stat().st_mtime < LIVE_STALE_SECONDS

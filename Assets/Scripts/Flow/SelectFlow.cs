@@ -1,5 +1,7 @@
 using System.Collections;
 using LidarBattle.Audio;
+using LidarBattle.Battle;
+using LidarBattle.Input;
 using LidarBattle.UI;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -22,8 +24,18 @@ namespace LidarBattle.Flow
         [Tooltip("決定音を聞かせてからバトルへ移るまでの秒数")]
         [SerializeField] private float _decideWaitSeconds = 0.6f;
 
+        private LiveFeed _live;
+
+        // 別の PC の「LiDAR の視界」（live.html）に、選択中も点群を出す。
+        private void Update() => _live?.Tick();
+
         private IEnumerator Start()
         {
+            var soul = FindAnyObjectByType<SoulController>();
+            var board = FindAnyObjectByType<BulletBoard>();
+            if (soul != null && board != null)
+                _live = new LiveFeed(FindAnyObjectByType<LidarInputSource>(), soul, null, board.Size.x / board.Size.y);
+
             _optionsRoot.SetActive(false);
             GameAudio.PlayBgm(Bgm.Select);
             yield return _dialogue.PlayAuto(_openingLines, _lineHoldSeconds);

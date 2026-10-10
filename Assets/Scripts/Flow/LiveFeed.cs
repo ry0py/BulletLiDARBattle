@@ -8,7 +8,7 @@ using UnityEngine;
 namespace LidarBattle.Flow
 {
     /// <summary>
-    /// プレイ中の様子（LiDAR の点群・検出したハート・SOUL・残り時間）を live.json に書く。
+    /// 難易度選択中とプレイ中の様子（LiDAR の点群・検出したハート・SOUL・プレイ中は残り時間も）を live.json に書く。
     /// スコアボードのサーバーが配り、別の PC の live.html（「LiDAR の視界」）がこれが新しい間だけ点群を出す。
     /// 座標は盤面の正規化座標を 1000 倍した整数（文字列を作らずに書くため）。
     /// </summary>
@@ -20,12 +20,13 @@ namespace LidarBattle.Flow
 
         private readonly LidarInputSource _lidar; // 無ければ点群なし
         private readonly SoulController _soul;
-        private readonly Difficulty _difficulty;
+        private readonly Difficulty? _difficulty; // null なら難易度選択中
         private readonly float _boardAspect; // LiDAR が無いときの盤面の横 / 縦
         private readonly StringBuilder _sb = new(16 * 1024);
         private float _nextTime;
 
-        public LiveFeed(LidarInputSource lidar, SoulController soul, Difficulty difficulty, float boardAspect)
+        /// <param name="difficulty">プレイ中はその難易度、難易度選択中は null。</param>
+        public LiveFeed(LidarInputSource lidar, SoulController soul, Difficulty? difficulty, float boardAspect)
         {
             _lidar = lidar;
             _soul = soul;
@@ -33,16 +34,23 @@ namespace LidarBattle.Flow
             _boardAspect = boardAspect;
         }
 
-        /// <summary>毎フレーム呼ぶ。Interval ごとに書く。</summary>
-        public void Tick(float remainingSeconds)
+        /// <summary>毎フレーム呼ぶ。Interval ごとに書く。残り時間はプレイ中だけ使う。</summary>
+        public void Tick(float remainingSeconds = 0f)
         {
             if (Time.unscaledTime < _nextTime) return;
             _nextTime = Time.unscaledTime + Interval;
 
             bool lidar = _lidar != null && _lidar.IsActive;
-            _sb.Clear().Append("{\"state\":\"playing\",\"difficulty\":\"").Append(DifficultyName(_difficulty))
-               .Append("\",\"remaining\":");
-            AppendInt(_sb, Mathf.CeilToInt(Mathf.Max(0f, remainingSeconds)));
+            if (_difficulty is { } difficulty)
+            {
+                _sb.Clear().Append("{\"state\":\"playing\",\"difficulty\":\"").Append(DifficultyName(difficulty))
+                   .Append("\",\"remaining\":");
+                AppendInt(_sb, Mathf.CeilToInt(Mathf.Max(0f, remainingSeconds)));
+            }
+            else
+            {
+                _sb.Clear().Append("{\"state\":\"selecting\"");
+            }
             _sb.Append(",\"aspect\":");
             AppendInt(_sb, Mathf.RoundToInt((lidar ? _lidar.BoardAspect : _boardAspect) * 1000f));
             _sb.Append(",\"lidar\":").Append(lidar ? "true" : "false");
@@ -73,7 +81,7 @@ namespace LidarBattle.Flow
             Write(_sb.Append('}').ToString());
         }
 
-        /// <summary>プレイが終わったら呼ぶ。live.html がすぐ待機の表示に戻る（呼ばれなくても数秒で戻る）。</summary>
+        /// <summary>プレイが終わったら呼ぶ。live.html がすぐ待機の表示に戻る（難易度選択から別のシーンへ移るときのように呼ばれなくても数秒で戻る）。</summary>
         public static void WriteIdle() => Write("{\"state\":\"idle\"}");
 
         private static void Write(string json)

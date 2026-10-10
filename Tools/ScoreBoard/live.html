@@ -49,7 +49,7 @@
 <p class="legend"><span style="color: #4dc3ff">● LiDAR が見ている点</span><span style="color: var(--new)">◯ ゲームが検出している円</span><span style="color: var(--fg)">● SOUL</span><span style="color: #ff5aa0">■ LiDAR</span></p>
 
 <script>
-  // Unity の Flow/LiveFeed がバトル中だけ書く live.json を出す。座標は盤面の正規化座標 × 1000。
+  // Unity の Flow/LiveFeed が難易度選択中とバトル中に書く live.json を出す。座標は盤面の正規化座標 × 1000。
   const LIVE_POLL_MS = 100;
   const VIEW_PAD = 0.03;   // 見せる範囲のふち（範囲の大きさに対する割合）
   const VIEW_SHRINK = 0.05; // 見せる範囲を狭めるときに 1 回で近づく割合
@@ -85,13 +85,14 @@
     view = null;
     const [g, w, h, dpr] = fitCanvas();
     g.clearRect(0, 0, w, h);
-    message(g, w, h, dpr, "バトルが始まると LiDAR の点群が出ます");
+    message(g, w, h, dpr, "ゲームが始まると LiDAR の点群が出ます");
   }
 
   function drawLive(d) {
-    document.querySelector(".info").innerHTML =
-      `<span class="difficulty" style="color: ${COLORS[d.difficulty]}">${d.difficulty.toUpperCase()}</span>`
-      + `<span>プレイ中</span><span>残り <b>${d.remaining}</b> 秒</span>`;
+    document.querySelector(".info").innerHTML = d.state === "selecting"
+      ? `<span>難易度えらび中</span>`
+      : `<span class="difficulty" style="color: ${COLORS[d.difficulty]}">${d.difficulty.toUpperCase()}</span>`
+        + `<span>プレイ中</span><span>残り <b>${d.remaining}</b> 秒</span>`;
 
     const [g, w, h, dpr] = fitCanvas();
     g.clearRect(0, 0, w, h);
@@ -161,7 +162,7 @@
       const res = await fetch("live.json", { cache: "no-store" });
       if (res.ok) { // 503 は Unity が書き換え中なので今の表示のまま
         const d = await res.json();
-        if (d.state === "playing") drawLive(d);
+        if (d.state === "playing" || d.state === "selecting") drawLive(d);
         else drawIdle();
       }
       document.getElementById("status").textContent = "";
