@@ -3,7 +3,7 @@
 Unity が書く plays.jsonl・replays/<id>.json・live.json（Application.persistentDataPath）と index.html を配る。
 同じ PC なら http://localhost:8000/ 、別の PC からは表示される http://<IP>:8000/ を開く。
 LiDAR の点群（プレイ中の視界）は別の PC で http://<IP>:8000/live を開いて出す（live.html）。
-記録の編集・削除・仮データの作成は管理画面 http://localhost:8000/admin.html から（この PC からだけ）。
+記録の編集・削除・仮データの作成は管理画面 http://localhost:8000/admin.html （別の PC からは http://<IP>:8000/admin.html）から。
 
     python Tools/ScoreBoard/serve.py                 # 既定の場所の plays.jsonl を配る
     python Tools/ScoreBoard/serve.py --log <path>    # 別の場所のファイルを配る
@@ -28,8 +28,6 @@ REPLAY_PATH = re.compile(r"^/replays/\d{8}-\d{6}\.json$")
 PLAY_ID = re.compile(r"^\d{8}-\d{6}$")
 PLAY_API = re.compile(r"^/api/plays/(\d{8}-\d{6}|new|delete)$")  # id は編集・削除、new は仮データ、delete はまとめて削除
 DIFFICULTIES = ("Easy", "Medium", "Hard")
-# 管理画面と編集 API はこの PC からだけ受け付ける（スコアボードは LAN に出ているため）
-LOCAL_HOSTS = {"127.0.0.1", "::1"}
 LOCK = threading.Lock()
 # Unity の Application.persistentDataPath（Company/Product は ProjectSettings の値）
 # live.json（プレイ中の点群）がこれより古ければプレイしていないとみなす（Unity が落ちたときなど）
@@ -164,8 +162,10 @@ def make_handler(log_path: Path):
                 self.send_response(302)  # LiDAR の視界は live.html
                 self.send_header("Location", "/live.html")
                 self.end_headers()
-            elif path == "/admin.html" and not self.is_local():
-                self.send_error(403)
+            elif path.rstrip("/") == "/admin":
+                self.send_response(302)  # 管理画面は admin.html
+                self.send_header("Location", "/admin.html")
+                self.end_headers()
             else:
                 super().do_GET()
 
@@ -210,16 +210,11 @@ def make_handler(log_path: Path):
                 discard_replay(replays / f"{play_id}.json")
             return found
 
-        def is_local(self) -> bool:
-            return self.client_address[0] in LOCAL_HOSTS
-
         def play_api(self):
-            """編集 API の宛先（プレイ id か new / delete）。この PC からの JSON の要求でなければ断って None。"""
+            """編集 API の宛先（プレイ id か new / delete）。JSON の要求でなければ断って None。"""
             match = PLAY_API.match(self.path)
             if match is None:
                 self.send_error(404)
-            elif not self.is_local():
-                self.send_error(403)
             elif self.command == "POST" and self.headers.get_content_type() != "application/json":
                 self.send_error(415)  # 他のサイトからのフォーム送信で書き換えられないように
             else:
@@ -295,9 +290,9 @@ def main():
 
     print(f"記録ファイル: {args.log}" + ("" if args.log.exists() else "（まだ無い。最初のプレイで作られる）"))
     print(f"このPC:     http://localhost:{args.port}/")
-    print(f"管理画面:   http://localhost:{args.port}/admin.html （この PC からだけ）")
+    print(f"管理画面:   http://localhost:{args.port}/admin.html")
     for ip in lan_addresses():
-        print(f"別のPCから: http://{ip}:{args.port}/")
+        print(f"別のPCから: http://{ip}:{args.port}/ （管理画面は http://{ip}:{args.port}/admin.html）")
 
     server = http.server.ThreadingHTTPServer(("0.0.0.0", args.port), make_handler(args.log))
     try:

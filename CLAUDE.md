@@ -91,7 +91,7 @@ LiDAR シミュレーション（実機なしで検出手法を真値と比較�
 - カメラ検出スクリプト: `Tools/CameraTracker/`（Unity の外で動かす Python。`Assets/` には置かない）
 - スコアボード: `Tools/ScoreBoard/`（`python Tools/ScoreBoard/serve.py` で LAN に配信。同じ PC は localhost:8000）。
   `localhost:8000/` は本番のプレイだけ、`localhost:8000/debug`（`/?debug` と同じ）はデバッグモードのプレイだけを出す。
-  記録の編集・削除（チェックでまとめて削除）・仮データの作成・QR の表示は管理画面 `localhost:8000/admin.html`（`admin.html`。この PC からだけ開ける）。
+  記録の編集・削除（チェックでまとめて削除）・仮データの作成・QR の表示は管理画面 `localhost:8000/admin.html`（`admin.html`。別の PC からも `<IP>:8000/admin.html` で開ける）。
   ユーザー設定シーンの S でサーバーを起動（ブラウザで開く）、C でカメラ検出（`aruco_tracker.py`）を起動する。
   起動中は 5 秒長押しで止まり、ゲームを終えると一緒に止まる（`Flow/ToolProcess`。`python` が PATH にあること）。
 
