@@ -480,8 +480,11 @@ namespace LidarBattle.EditorTools
             var text = new GameObject("Label").AddComponent<TextMeshPro>();
             text.transform.SetParent(go.transform, false);
             text.rectTransform.sizeDelta = size;
-            text.text = label;
-            text.fontSize = 4f;
+            text.text = difficulty.Label();
+            // 「むずかしい」は枠に収まりきらないので、はみ出すときだけ縮める。
+            text.enableAutoSizing = true;
+            text.fontSizeMin = 2f;
+            text.fontSizeMax = 4f;
             text.alignment = TextAlignmentOptions.Center;
             text.sortingOrder = 5;
 

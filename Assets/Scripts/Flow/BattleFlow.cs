@@ -53,7 +53,7 @@ namespace LidarBattle.Flow
         [SerializeField] private string _timeFormat = "残り {0} 秒";
         [Tooltip("今の難易度を出すテキスト（任意）")]
         [SerializeField] private TMP_Text _difficultyLabel;
-        [Tooltip("{0} に難易度名（Easy, Medium, Hard）が入る。リッチテキスト可")]
+        [Tooltip("{0} に難易度名（かんたん, 中くらい, むずかしい）が入る。リッチテキスト可")]
         [SerializeField] private string _difficultyFormat = "難易度 {0}";
         [Header("エンディングの会話（{0} = 被弾回数）。口調は Easy がやさしく、Medium は少し厳しく、Hard は厳しく")]
         [SerializeField, TextArea] private string[] _easyEndingLines = { "遊んでくれてありがとウ！" };
@@ -108,7 +108,7 @@ namespace LidarBattle.Flow
             _dialogue.Hide();
             _dialogue.VoicePitch = _voicePitches[(int)GameSession.Difficulty];
             if (_portrait != null) _portrait.UseSet(_portraitSets[(int)GameSession.Difficulty]);
-            if (_difficultyLabel != null) _difficultyLabel.text = string.Format(_difficultyFormat, GameSession.Difficulty);
+            if (_difficultyLabel != null) _difficultyLabel.text = string.Format(_difficultyFormat, GameSession.Difficulty.Label());
             GameAudio.PlayBgm(Bgm.Battle, restart: true);
             GameAudio.PlaySe(Se.BattleStart);
             var timeline = PickTimeline(GameSession.Difficulty);
