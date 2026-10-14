@@ -83,7 +83,8 @@ switch に分岐を 1 つ足す。Inspector には全パラメータが並ぶが
 - 1 つの「技」は `AttackLibraryBuilder` の関数で、「開始時刻と難易度を受け取って 8 秒分のクリップを並べる」。難易度で発射間隔
   （Easy ×1.7・Hard ×0.75）や、技によっては弾の数・速さ・すき間の幅が変わる（難易度で変わる FirePattern は名前の末尾に難易度が付く）。
   `Tools > LiDAR Battle > Build Attack Library` は技を 1 つずつ 8 秒の Timeline（Medium）にする（`Assets/Timelines/Attacks/`、確認用）。
-  技用の FirePattern は `Assets/Settings/Bullets/Attacks/`。弾の種類は White/Yellow に Big（大きい赤）を足した。
+  技用の FirePattern は `Assets/Settings/Bullets/Attacks/`。弾の種類は White/Yellow に Blue と Big（大きい赤）を足した。
+  色の役割: **黄色はホーミング・自機狙い（`Homing`・`Aimed`・`StopAndAim`、花火の追いかける破片）だけ**。それ以外の差し色は青、主弾は白。
 - 上からだけ撃つと盤面の下に居座れてしまうので、本番では盤面の全体を動き回らせる技だけを使う（`AttackLibraryBuilder.BattleAttacks`）:
   `SafeZone`（安置。半透明の緑のシートに「あんぜん」を先に出し、少したつとシートの外を `Fill` の弾で埋める（1 秒で消える）。
   安置は毎回離れた場所へ移る。シートは盤面の子の `SafeZoneView` で、Timeline の `SafeZoneTrack`/`SafeZoneClip` がクリップの間だけ出す。見た目だけで当たり判定は無い）・

@@ -16,6 +16,7 @@ namespace LidarBattle.EditorTools
     /// Build Attack Library は技を 1 つずつ 8 秒の Timeline（Medium）にする（Assets/Timelines/Attacks/。弾幕テストシーンで確かめる用）。
     /// FirePattern は Assets/Settings/Bullets/Attacks/、弾の種類は Assets/Settings/Bullets/ に置く
     /// （White/Yellow は Rebuild Game Setup が作ったものを使う）。既存の同名アセットは上書きする。
+    /// 弾の色: 黄色はホーミング・自機狙い（自機へ向かってくる弾）だけに使う。それ以外の差し色は青。
     /// </summary>
     public static class AttackLibraryBuilder
     {
@@ -67,7 +68,7 @@ namespace LidarBattle.EditorTools
         private static readonly Vector2 BottomRight = new(0.9f, -0.15f);
         private static readonly Vector2[] Corners = { TopLeft, BottomRight, TopRight, BottomLeft };
 
-        private static BulletType _white, _yellow, _big;
+        private static BulletType _white, _yellow, _blue, _big;
 
         [MenuItem("Tools/LiDAR Battle/Build Attack Library")]
         public static void Build()
@@ -87,12 +88,13 @@ namespace LidarBattle.EditorTools
             }
         }
 
-        /// <summary>技を使う前に 1 回呼ぶ。White/Yellow を読み、Big（大きい赤）を作る。</summary>
+        /// <summary>技を使う前に 1 回呼ぶ。White/Yellow を読み、Blue（差し色）と Big（大きい赤）を作る。</summary>
         internal static void LoadBulletTypes()
         {
             Directory.CreateDirectory(AttackPatternDir);
             _white = LoadBulletType("White");
             _yellow = LoadBulletType("Yellow");
+            _blue = MakeBulletType("Blue", new Color(0.35f, 0.65f, 1f), 0.25f, 0.09f);
             _big = MakeBulletType("Big", new Color(1f, 0.45f, 0.3f), 0.5f, 0.2f);
         }
 
@@ -193,7 +195,7 @@ namespace LidarBattle.EditorTools
             const float speed = 1.4f;
             var walls = P($"CorridorSide{d}", ("_shape", ShotShape.GapWall), ("_count", 13), ("_angle", 180f), ("_width", 3.6f),
                 ("_gap", gap), ("_gapMode", GapMode.Wave), ("_spiralStep", step), ("_speed", speed));
-            Shot(l.Next(), t, 7, _yellow, walls, Right, 0.3f / speed);
+            Shot(l.Next(), t, 7, _blue, walls, Right, 0.3f / speed);
         }
 
         /// <summary>四隅から順に、一定秒で消えるホーミング。逃げ回らせる。</summary>
@@ -217,7 +219,7 @@ namespace LidarBattle.EditorTools
             var up = GapWall($"GapWallUp{d}", 90f, 15, 5.4f, gap, speed, d);
             var down = GapWall($"GapWallDown{d}", -90f, 15, 5.4f, gap, speed, d);
             Fire(l.Next(), t, 6, _white, up, new Vector2(0.5f, -0.08f), 2.4f, d);
-            Fire(l.Next(), t + 1.2 * Pace(d), 6 - 1.2 * Pace(d), _yellow, down, new Vector2(0.5f, 1.08f), 2.4f, d);
+            Fire(l.Next(), t + 1.2 * Pace(d), 6 - 1.2 * Pace(d), _blue, down, new Vector2(0.5f, 1.08f), 2.4f, d);
         }
 
         /// <summary>すき間のある壁が左右から。GapWalls と同じく、Medium/Hard はすき間が上下の端寄りに交互に空く。</summary>
@@ -227,7 +229,7 @@ namespace LidarBattle.EditorTools
             var toRight = GapWall($"GapWallRight{d}", 0f, 10, 3.4f, gap, speed, d);
             var toLeft = GapWall($"GapWallLeft{d}", 180f, 10, 3.4f, gap, speed, d);
             Fire(l.Next(), t, 6, _white, toRight, Left, 2.4f, d);
-            Fire(l.Next(), t + 1.2 * Pace(d), 6 - 1.2 * Pace(d), _yellow, toLeft, Right, 2.4f, d);
+            Fire(l.Next(), t + 1.2 * Pace(d), 6 - 1.2 * Pace(d), _blue, toLeft, Right, 2.4f, d);
         }
 
         /// <summary>花火。上の縁で弾けて放物線を描いた破片が、少したつと自機を追いかけ（ホーミング）、一定秒で消える。</summary>
@@ -249,8 +251,8 @@ namespace LidarBattle.EditorTools
         {
             var down = FreezePattern(d == Difficulty.Easy ? "FreezeAimEasy" : "FreezeAim", -90f, d);
             var up = FreezePattern(d == Difficulty.Easy ? "FreezeAimUpEasy" : "FreezeAimUp", 90f, d);
-            Fire(l.Next(), t, 6, _white, down, Top, 3f, d);
-            Fire(l.Next(), t + 1.5 * Pace(d), 6 - 1.5 * Pace(d), _white, up, Bottom, 3f, d);
+            Fire(l.Next(), t, 6, _yellow, down, Top, 3f, d);
+            Fire(l.Next(), t + 1.5 * Pace(d), 6 - 1.5 * Pace(d), _yellow, up, Bottom, 3f, d);
         }
 
         /// <summary>上の隅と左右からゆっくりのホーミング。Easy はもっと遅く、一定秒で消える。</summary>
@@ -273,7 +275,7 @@ namespace LidarBattle.EditorTools
             var wallL = P($"WallFromLeft{suffix}", ("_shape", ShotShape.Line), ("_count", countL), ("_angle", 0f), ("_width", 3.2f), ("_speed", 1.6f));
             var wallR = P($"WallFromRight{suffix}", ("_shape", ShotShape.Line), ("_count", countR), ("_angle", 180f), ("_width", 3.2f), ("_speed", 1.6f));
             Fire(l.Next(), t, 6, _white, wallL, Left, 1.4f, d);
-            Fire(l.Next(), t + 0.7, 5.3, _yellow, wallR, Right, 1.4f, d);
+            Fire(l.Next(), t + 0.7, 5.3, _blue, wallR, Right, 1.4f, d);
         }
 
         /// <summary>左回り・右回りに曲がる輪を重ねて格子にする。Easy は弾が少なく遅い。</summary>
@@ -286,7 +288,7 @@ namespace LidarBattle.EditorTools
             var curveR = P($"CurveRingRight{suffix}", ("_shape", ShotShape.Ring), ("_count", count), ("_move", MoveType.Curve),
                 ("_speed", speed), ("_angularVelocity", -50f));
             Fire(l.Next(), t, 7, _white, curveL, Top, 1f, d);
-            Fire(l.Next(), t, 7, _yellow, curveR, Top, 1f, d);
+            Fire(l.Next(), t, 7, _blue, curveR, Top, 1f, d);
         }
 
         // ───────── 本番では使わない技（上から撃つだけ） ─────────
@@ -305,24 +307,24 @@ namespace LidarBattle.EditorTools
         {
             var stream = P("AimedStream", ("_shape", ShotShape.Aimed), ("_count", 1), ("_speed", 4.5f));
             var track = l.Next();
-            for (int i = 0; i < 4; i++) Fire(track, t + i * 1.8, 1, _white, stream, i % 2 == 0 ? TopLeft : TopRight, 0.1f, d);
+            for (int i = 0; i < 4; i++) Fire(track, t + i * 1.8, 1, _yellow, stream, i % 2 == 0 ? TopLeft : TopRight, 0.1f, d);
         }
 
-        private static void AimedFan(Lanes l, double t, Difficulty d) => Fire(l.Next(), t, 7, _white, Fan5(), Top, 0.9f, d);
+        private static void AimedFan(Lanes l, double t, Difficulty d) => Fire(l.Next(), t, 7, _yellow, Fan5(), Top, 0.9f, d);
 
         private static void ArcCurtain(Lanes l, double t, Difficulty d)
         {
             var arc9 = P("ArcDown9", ("_shape", ShotShape.Arc), ("_count", 9), ("_angle", -90f), ("_spread", 14f), ("_speed", 2f));
             var arc8 = P("ArcDown8", ("_shape", ShotShape.Arc), ("_count", 8), ("_angle", -90f), ("_spread", 14f), ("_speed", 2f));
             Fire(l.Next(), t, 7, _white, arc9, Top, 1.2f, d);
-            Fire(l.Next(), t + 0.6, 6.4, _yellow, arc8, Top, 1.2f, d);
+            Fire(l.Next(), t + 0.6, 6.4, _blue, arc8, Top, 1.2f, d);
         }
 
         private static void BigBalls(Lanes l, double t, Difficulty d)
         {
             var bigRing = P("BigRing", ("_shape", ShotShape.Ring), ("_count", 8), ("_speed", 1.2f));
             Fire(l.Next(), t, 7, _big, bigRing, Top, 1.8f, d);
-            Fire(l.Next(), t + 0.9, 6, _white, Fan5(), Top, 1.8f, d);
+            Fire(l.Next(), t + 0.9, 6, _yellow, Fan5(), Top, 1.8f, d);
         }
 
         private static void WaveCurtain(Lanes l, double t, Difficulty d)
