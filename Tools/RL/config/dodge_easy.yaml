@@ -1,0 +1,44 @@
+# 弾よけ AI の学習設定（Easy の技 1 つ）。使い方と各値の意味は .claude/docs/rl-training.md。
+#   mlagents-learn Tools/RL/config/dodge_easy.yaml --run-id=easy_safezone_01 --results-dir=Tools/RL/results
+# 「Dodge」は Unity の Behavior Parameters の Behavior Name と同じにする。
+
+behaviors:
+  Dodge:
+    trainer_type: ppo            # 方策勾配法の定番。まずはこれだけ使う
+    hyperparameters:
+      batch_size: 256            # 1 回の勾配計算に使う経験の数
+      buffer_size: 4096          # これだけ経験がたまったら学習する（batch_size の倍数）
+      learning_rate: 3.0e-4      # 学習率。大きいと速いが不安定
+      learning_rate_schedule: linear  # max_steps に向けて学習率を 0 へ下げる
+      beta: 5.0e-3               # エントロピー正則化。大きいほど色々な行動を試す（探索）
+      epsilon: 0.2               # PPO の「1 回でどれだけ方策を変えてよいか」
+      lambd: 0.95                # GAE の λ。報酬の見積もりのばらつきと偏りのバランス
+      num_epoch: 3               # 1 つのバッファを何周学習に使うか
+    network_settings:
+      normalize: false           # 観測は Unity 側で -1..1 程度にそろえているので不要
+      hidden_units: 128          # ネットワークの幅
+      num_layers: 2              # ネットワークの深さ
+    reward_signals:
+      extrinsic:
+        gamma: 0.99              # 割引率。1 秒に 15 回決めるので、およそ 6〜7 秒先まで気にする
+        strength: 1.0
+    max_steps: 500000            # ここまで来たら終わる（1 ステップ = 1 回の判断 = 1/15 秒）
+    time_horizon: 64             # 何ステップごとに経験を区切って学習に回すか
+    summary_freq: 5000           # TensorBoard に書く間隔
+    checkpoint_interval: 50000   # 途中の .onnx を残す間隔
+    keep_checkpoints: 5
+
+# Unity 側（DodgeAgent / DodgeArena）が読む値。YAML だけ変えればよく、Unity のビルドし直しは要らない。
+environment_parameters:
+  difficulty: 0      # 0 = Easy, 1 = Medium, 2 = Hard
+  attack: 0          # 技の番号（下の一覧）。-1 なら毎回ランダム
+                     # 0 SafeZone, 1 Corridor, 2 CorridorSide, 3 HomingFade, 4 Converge, 5 GapWalls,
+                     # 6 GapWallsSide, 7 Fireworks, 8 FreezeAim, 9 HomingSwarm, 10 SideWalls, 11 CurveLattice
+  hit_penalty: 1.0   # 被弾 1 回の罰（報酬 -1）
+  alive_reward: 0.0  # 1 回の判断ごとの「生きている」報酬（end_on_hit: 1 のときだけ意味がある。docs 参照）
+  near_penalty: 0.0  # グレイズ範囲に弾がある間、判断ごとに与える罰（弾から離れる癖をつける）
+  end_on_hit: 0      # 1 なら被弾したらその場でエピソード終了
+  random_start: 1    # 1 なら SOUL の開始位置をランダムにする（0 なら盤面の真ん中）
+
+engine_settings:
+  time_scale: 1      # 必ず 1。速さは「1 フレーム = 1/60 秒に固定して全力で回す」ことで出している

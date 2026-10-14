@@ -107,3 +107,9 @@ InitTestScene*.unity*
 # Unity CLI Loop (uLoop)
 /.uloop/outputs/
 /.uloop/tools.json
+
+# 強化学習の結果（mlagents-learn --results-dir）
+/Tools/RL/results/
+# ML-Agents が実行のたびに書き出す計測ファイル
+/Assets/ML-Agents/
+/Assets/ML-Agents.meta

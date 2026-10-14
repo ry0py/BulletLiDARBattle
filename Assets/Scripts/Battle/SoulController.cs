@@ -27,6 +27,13 @@ namespace LidarBattle.Battle
 
         public void StartInvincibility() => _invincibleTimer = _invincibleDuration;
 
+        /// <summary>正規化座標 (0..1) の位置へ置き直し、無敵も解く（強化学習でエピソードを始めるとき用）。</summary>
+        public void Place(Vector2 normalized)
+        {
+            transform.position = _board.NormalizedToWorld(normalized, _halfSize);
+            _invincibleTimer = 0f;
+        }
+
         private void Awake()
         {
             _input = _inputSource as IHeartInputSource;

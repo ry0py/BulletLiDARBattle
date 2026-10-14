@@ -9,6 +9,8 @@ namespace LidarBattle.Battle
         public FirePattern Pattern;
         public Vector2 Origin;
         public Vector2 Position;
+        /// <summary>直前のステップでの速度（ワールド単位/秒）。見た目には使わず、AI の観測用。</summary>
+        public Vector2 Velocity;
         public float Angle;
         public float Speed;
         public float Age;

@@ -51,6 +51,7 @@ namespace LidarBattle.Battle
                 b.Pattern = pattern;
                 b.Origin = origin + offset;
                 b.Position = b.Origin;
+                b.Velocity = Vector2.zero;
                 b.Angle = angle;
                 b.Speed = pattern.Speed;
                 b.Age = 0f;
@@ -87,7 +88,9 @@ namespace LidarBattle.Battle
             {
                 var b = _active[i];
                 b.Age += dt;
+                var before = b.Position;
                 b.Pattern.Move(b, dt, target);
+                b.Velocity = (b.Position - before) / dt;
                 SwitchPattern(b);
 
                 // 寿命のある弾は寿命で消す（盤面の外から入ってくる Converge の輪などを途中で消さないため）。

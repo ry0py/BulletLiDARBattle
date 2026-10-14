@@ -71,11 +71,13 @@
 | Audio | `LidarBattle.Audio` | BGM・SE・セリフ音の再生（常駐・自動生成） | `GameAudio` |
 | Config | `LidarBattle.Config` | 接続/キャリブレーションの設定 | `LidarSettings` |
 | Sim | `LidarBattle.Sim` | LiDAR シミュレーションと検出手法の評価（開発用） | `LidarSimulator`, `HeartTarget`, `PointCloudView`, `TrackerEvaluator` |
+| Training | `LidarBattle.Training` | 弾をよける AI の強化学習（ML-Agents。開発用） | `DodgeAgent`（`IHeartInputSource` でもある）, `DodgeArena` |
 
 詳細は [.claude/docs/architecture.md](.claude/docs/architecture.md)。
 弾幕システム（Battle 層の弾まわり）の設計は [.claude/docs/bullet-system.md](.claude/docs/bullet-system.md) に従う。
 ゲーム全体の流れ（開始〜難易度選択〜バトル〜結果）は [.claude/docs/game-flow.md](.claude/docs/game-flow.md)。
 LiDAR シミュレーション（実機なしで検出手法を真値と比較）は [.claude/docs/lidar-simulation.md](.claude/docs/lidar-simulation.md)。
+弾をよける AI の強化学習（ML-Agents。学習は別の GPU 付き PC で回す）は [.claude/docs/rl-training.md](.claude/docs/rl-training.md)。
 
 ## ディレクトリ規約
 
@@ -159,3 +161,5 @@ YAML を直接編集する場合は、Unity Editor で該当シーンを開い�
   列で前のプレイを見て覚えられないよう `BattleFlow` が毎回ランダムに 1 本選ぶ（前回と同じものは避ける。どれを選んだかは記録の `timeline`）。
   作り直しは `Tools > LiDAR Battle > Build Battle Timelines`（技の 8 秒版は `Build Attack Library`）。技も 12 本も弾幕テストシーン（`BattleTestScene`、
   `Tools > LiDAR Battle > Build Battle Test Scene`）でドロップダウンから選んで確かめる。詳細は bullet-system.md。
+- 強化学習（2026-10-14）: ML-Agents 4.0 で弾をよける AI を学習させる準備をした（`RLTrainingScene`、`Tools > LiDAR Battle > Build RL Training Scene`/`Build RL Training Exe`、
+  設定は `Tools/RL/config/`）。学習は別の GPU 付き PC で回す。まず Easy の技 1 つずつ。ゲーム本体にはまだ組み込まない。手順は rl-training.md。
