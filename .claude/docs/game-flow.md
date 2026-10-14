@@ -55,7 +55,8 @@
   バトル中のセリフは難易度の Timeline（`BattleTimelineBuilder.AddTalk`）、エンディングは `BattleFlow` の
   `_easyEndingLines`/`_mediumEndingLines`/`_hardEndingLines`。会話の最後の 1 行は被弾回数で選ぶ
   （`_easyLastLines` など。上から順に見て、被弾が `MaxHits` 回以下の最初の行。既定は 0 回・5 回以下・10 回以下・それ以上の 4 段階）。
-- 会話が終わったらゲーム終了。
+- 会話が終わったら画面全体を黒で覆い、お礼と「スコアと軌跡が右側の PC に表示されている QR コードから読み取れる」案内を 5 秒出して終了
+  （`BattleFlow._thanksText`/`_thanksSeconds`。シーンを作り直さなくて済むよう実行時に作る）。
 
 ## シーン構成
 
@@ -92,7 +93,7 @@
 | 2. オープニング会話 | `SelectFlow` + `DialogueBox.PlayAuto` | 1 行ずつ自動で送る |
 | 3. 難易度選択 | `DifficultyOption` ×3 | SOUL を 2 秒置くと決定。ゲージ表示あり。`GameSession` に保存 |
 | 4〜5. バトル | `BattleFlow` | 難易度の Timeline の候補（`Assets/Timelines/Battle/Easy1〜4` など）からランダムに 1 本再生。セリフは `DialogueTrack`。右上に残り秒数（スキャナー版は左上でバー付き）。元の版は左下に今の難易度（被弾回数はドキドキ感のためプレイ中は出さない） |
-| 6. エンディング | `BattleFlow` | 60 秒で弾を消し、会話で被弾回数を出して選択シーンへ戻る |
+| 6. エンディング | `BattleFlow` | 60 秒で弾を消し、会話で被弾回数を出し、お礼の画面を 5 秒出して選択シーンへ戻る |
 
 - スコアは出さない。結果は被弾回数だけ（`ScoreKeeper` が数える）。グレイズは点にしない。
   エンディングの会話で「被弾は ○ 回」と出す（言い方は難易度ごと）。

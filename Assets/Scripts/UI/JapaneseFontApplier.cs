@@ -36,7 +36,8 @@ namespace LidarBattle.UI
             }
         }
 
-        private static TMP_FontAsset LoadJpFont()
+        /// <summary>日本語の TMP フォント。実行時に作る TMP_Text 用（見つからなければ null）。</summary>
+        public static TMP_FontAsset LoadJpFont()
         {
             if (_cached != null)
             {

@@ -82,6 +82,9 @@ namespace LidarBattle.Flow
             new(int.MaxValue, "被弾は {0} 回。出直してくるがお"),
         };
         [SerializeField] private float _lineHoldSeconds = 2f;
+        [Tooltip("会話のあとに画面全体に出すお礼の文")]
+        [SerializeField, TextArea] private string _thanksText = "プレイしてくれてありがとうございました！\n自分のスコアと動いた軌跡が\n右側のPCに表示されているQRコードから読み取れます。";
+        [SerializeField] private float _thanksSeconds = 5f;
         [SerializeField] private string _selectSceneName = "SelectScene";
         [Tooltip("敵のセリフ音のピッチ。Difficulty の順（Easy, Medium, Hard）。Easy を基準に下げていく")]
         [SerializeField] private float[] _voicePitches = { 1f, 0.85f, 0.7f };
@@ -137,7 +140,46 @@ namespace LidarBattle.Flow
 
             yield return _dialogue.PlayAuto(EndingLines(GameSession.Difficulty, _score.Hits), _lineHoldSeconds);
 
+            ShowThanks();
+            yield return new WaitForSeconds(_thanksSeconds);
             SceneManager.LoadScene(_selectSceneName);
+        }
+
+        /// <summary>画面全体を黒で覆ってお礼の文を出す。シーンを作り直さなくて済むよう実行時に作る（シーン遷移で消える）。</summary>
+        private void ShowThanks()
+        {
+            var canvasGo = new GameObject("ThanksCanvas");
+            var canvas = canvasGo.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvas.sortingOrder = 100;
+            var scaler = canvasGo.AddComponent<CanvasScaler>();
+            scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+            scaler.referenceResolution = new Vector2(1280f, 720f);
+            scaler.matchWidthOrHeight = 0.5f;
+
+            var bg = new GameObject("Background", typeof(RectTransform)).AddComponent<Image>();
+            bg.transform.SetParent(canvasGo.transform, false);
+            bg.color = Color.black;
+            Stretch(bg.rectTransform, 0f);
+
+            var text = new GameObject("Text", typeof(RectTransform)).AddComponent<TextMeshProUGUI>();
+            text.transform.SetParent(canvasGo.transform, false);
+            Stretch(text.rectTransform, 40f);
+            var font = JapaneseFontApplier.LoadJpFont();
+            if (font != null) text.font = font;
+            text.text = _thanksText;
+            text.fontSize = 40f;
+            text.lineSpacing = 30f;
+            text.color = Color.white;
+            text.alignment = TextAlignmentOptions.Center;
+        }
+
+        private static void Stretch(RectTransform rect, float margin)
+        {
+            rect.anchorMin = Vector2.zero;
+            rect.anchorMax = Vector2.one;
+            rect.offsetMin = new Vector2(margin, margin);
+            rect.offsetMax = new Vector2(-margin, -margin);
         }
 
         /// <summary>エンディングの会話。難易度ごとの行のあとに、被弾回数で選んだ 1 行を足す。</summary>
