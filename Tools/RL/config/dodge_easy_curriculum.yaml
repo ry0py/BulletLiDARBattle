@@ -1,0 +1,87 @@
+# 弾よけ AI の学習設定（Easy の 12 技を順に学習し、最後に全部を混ぜる。1 つの .onnx で全部よけるのが目標）。
+# 使い方と各値の意味は .claude/docs/rl-training.md。値の意味は dodge_easy.yaml と同じ（ここは違うところだけコメント）。
+#   mlagents-learn Tools/RL/config/dodge_easy_curriculum.yaml --run-id=easy_all_01 --results-dir=Tools/RL/results
+# 技は 200,000 ステップずつ順に進み（カリキュラム。成績に関係なくステップ数で次へ）、
+# 最後の 1,200,000 ステップは全部の技を混ぜて、前の技を忘れないようおさらいする。合計 3,600,000 ステップ。
+# 「Dodge」は Unity の Behavior Parameters の Behavior Name と同じにする。
+
+behaviors:
+  Dodge:
+    trainer_type: ppo            # 方策勾配法の定番。まずはこれだけ使う
+    hyperparameters:
+      batch_size: 256            # 1 回の勾配計算に使う経験の数
+      buffer_size: 4096          # これだけ経験がたまったら学習する（batch_size の倍数）
+      learning_rate: 3.0e-4      # 学習率。大きいと速いが不安定
+      learning_rate_schedule: constant  # 一定。linear だと後の技ほど学習率が 0 に近く、覚えにくい
+      beta: 5.0e-3               # エントロピー正則化。大きいほど色々な行動を試す（探索）
+      epsilon: 0.2               # PPO の「1 回でどれだけ方策を変えてよいか」
+      lambd: 0.95                # GAE の λ。報酬の見積もりのばらつきと偏りのバランス
+      num_epoch: 3               # 1 つのバッファを何周学習に使うか
+    network_settings:
+      normalize: false           # 観測は Unity 側で -1..1 程度にそろえているので不要
+      hidden_units: 512          # 12 技を混ぜても忘れにくいよう広く（easy_all_01 の 256 では混ぜた段階でホーミング系を忘れた）
+      num_layers: 3              # 深さ（dodge_easy.yaml は 2）
+    reward_signals:
+      extrinsic:
+        gamma: 0.99              # 割引率。1 秒に 15 回決めるので、およそ 6〜7 秒先まで気にする
+        strength: 1.0
+    max_steps: 3600000           # 技 200,000 × 12 ＋ 混ぜる 1,200,000。変えたら下の threshold も直す
+    time_horizon: 64             # 何ステップごとに経験を区切って学習に回すか
+    summary_freq: 5000           # TensorBoard に書く間隔
+    checkpoint_interval: 50000   # 途中の .onnx を残す間隔（技 1 つにつき 4 回）。あとで順に再生して上達の様子を見る
+    keep_checkpoints: 80         # 途中経過を全部残す（3,600,000 / 50,000 = 72 個）
+
+# Unity 側（DodgeAgent / DodgeArena）が読む値。YAML だけ変えればよく、Unity のビルドし直しは要らない。
+environment_parameters:
+  difficulty: 0      # 0 = Easy
+  attack:            # 技の番号。progress = 今のステップ数 / max_steps が threshold を超えたら次の技へ
+    curriculum:
+      - name: 00_SafeZone
+        value: 0
+        completion_criteria: { measure: progress, behavior: Dodge, threshold: 0.055556 }  # 200,000 ステップまで
+      - name: 01_Corridor
+        value: 1
+        completion_criteria: { measure: progress, behavior: Dodge, threshold: 0.111111 }  # 400,000 ステップまで
+      - name: 02_CorridorSide
+        value: 2
+        completion_criteria: { measure: progress, behavior: Dodge, threshold: 0.166667 }  # 600,000 ステップまで
+      - name: 03_HomingFade
+        value: 3
+        completion_criteria: { measure: progress, behavior: Dodge, threshold: 0.222222 }  # 800,000 ステップまで
+      - name: 04_Converge
+        value: 4
+        completion_criteria: { measure: progress, behavior: Dodge, threshold: 0.277778 }  # 1,000,000 ステップまで
+      - name: 05_GapWalls
+        value: 5
+        completion_criteria: { measure: progress, behavior: Dodge, threshold: 0.333333 }  # 1,200,000 ステップまで
+      - name: 06_GapWallsSide
+        value: 6
+        completion_criteria: { measure: progress, behavior: Dodge, threshold: 0.388889 }  # 1,400,000 ステップまで
+      - name: 07_Fireworks
+        value: 7
+        completion_criteria: { measure: progress, behavior: Dodge, threshold: 0.444444 }  # 1,600,000 ステップまで
+      - name: 08_FreezeAim
+        value: 8
+        completion_criteria: { measure: progress, behavior: Dodge, threshold: 0.500000 }  # 1,800,000 ステップまで
+      - name: 09_HomingSwarm
+        value: 9
+        completion_criteria: { measure: progress, behavior: Dodge, threshold: 0.555556 }  # 2,000,000 ステップまで
+      - name: 10_SideWalls
+        value: 10
+        completion_criteria: { measure: progress, behavior: Dodge, threshold: 0.611111 }  # 2,200,000 ステップまで
+      - name: 11_CurveLattice
+        value: 11
+        completion_criteria: { measure: progress, behavior: Dodge, threshold: 0.666667 }  # 2,400,000 ステップまで
+      - name: 12_All
+        value: -1          # 毎回ランダムに技を選ぶ（最後まで）
+  hit_penalty: 1.0
+  alive_reward: 0.0
+  near_penalty: 0.0
+  end_on_hit: 0
+  random_start: 1
+
+env_settings:
+  num_areas: 16
+
+engine_settings:
+  time_scale: 1      # 必ず 1（dodge_easy.yaml の説明）

@@ -11,7 +11,7 @@ namespace LidarBattle.Training
 {
     /// <summary>
     /// 弾をよける強化学習のエージェント。SOUL の入力源（IHeartInputSource）として SoulController につなぐ。
-    /// 観測: 自分（位置・無敵中か・技の進み具合）と、盤面のすべての弾（近い順、最大 Max Num Observables 個）。
+    /// 観測: 自分（位置・無敵中か・技の進み具合）、安置のシート、盤面のすべての弾（近い順、最大 Max Num Observables 個）。
     /// 行動: 9 方向（0 = 止まる、1〜8 = 上から時計回り）。速さはキーボードと同じ。
     /// 報酬・技の選び方は mlagents-learn の YAML（environment_parameters）で変えられる。詳細は .claude/docs/rl-training.md。
     /// </summary>
@@ -20,8 +20,11 @@ namespace LidarBattle.Training
     {
         /// <summary>弾 1 発ぶんの観測の数: 相対位置 2・速度 2・半径 1・弾の種類 (one-hot)。</summary>
         public static int BulletObservationSize(int typeCount) => 5 + typeCount;
-        /// <summary>自分の観測の数: 位置 2・無敵中か 1・技の進み具合 1。</summary>
-        public const int SelfObservationSize = 4;
+        /// <summary>
+        /// 弾以外の観測の数: 位置 2・無敵中か 1・技の進み具合 1・安置のシート 5（出ているか 1・自分からの相対位置 2・大きさ 2）。
+        /// 安置の技はシートの外が一度に弾で埋まるので、弾だけ見ていては間に合わない。シートを見て先に入っておけるように見せる。
+        /// </summary>
+        public const int SelfObservationSize = 9;
         public const int ActionCount = 9;
 
         // 0 = 止まる、1〜8 = 上から時計回り。斜めはキーボードと同じく正規化しない（同じ速さで比べるため）。
@@ -89,9 +92,17 @@ namespace LidarBattle.Training
             sensor.AddObservation(soul.IsInvincible);
             sensor.AddObservation(_arena.Progress);
 
-            // 弾は近い順に入れる（上限を超えたら遠い弾を落とす）。位置と速度は盤面の大きさで割って -1..1 程度にそろえる。
+            // 位置・速度・大きさは盤面の大きさで割って -1..1 程度にそろえる。
             var size = _arena.Bullets.Board.Size;
             _soulPosition = soul.Position;
+
+            // 安置のシート（出ていなければ全部 0）。
+            var zone = _arena.SafeZone;
+            sensor.AddObservation(zone.IsShown);
+            sensor.AddObservation(zone.IsShown ? ((Vector2)zone.transform.position - _soulPosition) / size : Vector2.zero);
+            sensor.AddObservation(zone.IsShown ? zone.Size / size : Vector2.zero);
+
+            // 弾は近い順に入れる（上限を超えたら遠い弾を落とす）。
             _sorted.Clear();
             _sorted.AddRange(_arena.Bullets.Active);
             _sorted.Sort(_byDistance);

@@ -13,10 +13,15 @@ namespace LidarBattle.Battle
         [SerializeField] private SpriteRenderer _sheet;
         [SerializeField] private TMP_Text _label;
 
+        public bool IsShown => gameObject.activeSelf;
+        /// <summary>今の安置の大きさ（ワールド単位）。中心は transform.position。</summary>
+        public Vector2 Size { get; private set; }
+
         /// <summary>center は盤面の正規化座標、size はワールド単位の大きさ。</summary>
         public void Show(Vector2 center, Vector2 size)
         {
             transform.position = _board.NormalizedToWorld(center);
+            Size = size;
             _sheet.transform.localScale = new Vector3(size.x, size.y, 1f);
             _label.rectTransform.sizeDelta = size * 0.9f;
             gameObject.SetActive(true);

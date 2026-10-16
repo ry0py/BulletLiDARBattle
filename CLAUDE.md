@@ -71,7 +71,7 @@
 | Audio | `LidarBattle.Audio` | BGM・SE・セリフ音の再生（常駐・自動生成） | `GameAudio` |
 | Config | `LidarBattle.Config` | 接続/キャリブレーションの設定 | `LidarSettings` |
 | Sim | `LidarBattle.Sim` | LiDAR シミュレーションと検出手法の評価（開発用） | `LidarSimulator`, `HeartTarget`, `PointCloudView`, `TrackerEvaluator` |
-| Training | `LidarBattle.Training` | 弾をよける AI の強化学習（ML-Agents。開発用） | `DodgeAgent`（`IHeartInputSource` でもある）, `DodgeArena` |
+| Training | `LidarBattle.Training` | 弾をよける AI の強化学習（ML-Agents。開発用） | `DodgeAgent`（`IHeartInputSource` でもある）, `DodgeArena`, `DodgeTrainingRunner`（盤面を並べる） |
 
 詳細は [.claude/docs/architecture.md](.claude/docs/architecture.md)。
 弾幕システム（Battle 層の弾まわり）の設計は [.claude/docs/bullet-system.md](.claude/docs/bullet-system.md) に従う。

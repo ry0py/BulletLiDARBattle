@@ -40,5 +40,8 @@ environment_parameters:
   end_on_hit: 0      # 1 なら被弾したらその場でエピソード終了
   random_start: 1    # 1 なら SOUL の開始位置をランダムにする（0 なら盤面の真ん中）
 
+env_settings:
+  num_areas: 16      # 1 つの Unity（Editor / exe）に並べる盤面の数。exe を複数動かす --num-envs と掛け算になる
+
 engine_settings:
   time_scale: 1      # 必ず 1。速さは「1 フレーム = 1/60 秒に固定して全力で回す」ことで出している

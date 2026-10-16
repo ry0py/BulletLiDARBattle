@@ -22,6 +22,7 @@ namespace LidarBattle.EditorTools
     /// 強化学習（ML-Agents）で弾をよける AI を学習させるためのシーンと exe を作る。詳細は .claude/docs/rl-training.md。
     /// - Build RL Training Scene: 本番の 12 技を難易度ごとに 8 秒の Timeline にし（Assets/Timelines/Training/）、
     ///   BattleScene のコピーから会話・入力源を外して DodgeArena/DodgeAgent を置いたシーンを作る。
+    ///   盤面 1 つ分は DodgeArea にまとめ、DodgeTrainingRunner が実行時に格子状に複製する。
     /// - Build RL Training Exe: そのシーンだけの exe を Builds/RLTraining/ に作る（複数同時に回す用）。
     /// BattleScene や技を作り直したら、これも作り直す。既存の同名シーン・Timeline は上書きする。
     /// </summary>
@@ -32,6 +33,7 @@ namespace LidarBattle.EditorTools
         private const string TimelineDir = "Assets/Timelines/Training";
         private const string ExePath = "Builds/RLTraining/BulletDodge.exe";
         private const string BehaviorName = "Dodge";
+        private const string AreaName = "DodgeArea";
         private const int MaxBullets = 128;
         private const int DecisionPeriod = 4; // 60 fps で 1 秒に 15 回決める
 
@@ -129,6 +131,7 @@ namespace LidarBattle.EditorTools
             Object.DestroyImmediate(inputObject.GetComponent<KeyboardInputSource>());
             Object.DestroyImmediate(inputObject.GetComponent<LidarInputSource>());
             Object.DestroyImmediate(inputObject.GetComponent<CameraInputSource>());
+            if (inputObject.GetComponents<Component>().Length == 1) Object.DestroyImmediate(inputObject); // Transform だけ残った
 
             var soul = bullets.Soul;
             var arena = go.AddComponent<DodgeArena>();
@@ -155,6 +158,18 @@ namespace LidarBattle.EditorTools
             requester.TakeActionsBetweenDecisions = false;
 
             GameSetupBuilder.Set(soul, ("_inputSource", agent));
+
+            // 盤面 1 つ分を 1 つにまとめ、DodgeTrainingRunner が格子状に複製する。
+            // 画面全体の UI・カメラを揺らす被弾表示・デバッグキーは盤面 1 つ向けなので外す。
+            Object.DestroyImmediate(Object.FindFirstObjectByType<HitFeedback>().gameObject);
+            Object.DestroyImmediate(Object.FindFirstObjectByType<BattleDebug>().gameObject);
+            Object.DestroyImmediate(Object.FindFirstObjectByType<Canvas>(FindObjectsInactive.Include).gameObject);
+            var area = new GameObject(AreaName);
+            foreach (var t in new Component[] { arena, agent, director, clock, bullets, bullets.Board, soul })
+                t.transform.SetParent(area.transform, true);
+            var runner = new GameObject(nameof(DodgeTrainingRunner)).AddComponent<DodgeTrainingRunner>();
+            GameSetupBuilder.Set(runner, ("_area", area), ("_camera", Camera.main));
+
             EditorUtility.SetDirty(behavior);
             EditorUtility.SetDirty(sensor);
             EditorUtility.SetDirty(requester);

@@ -3,17 +3,18 @@
 弾幕を自動でよける AI を Unity ML-Agents の強化学習（PPO）で作る。
 学習は GPU 付きの別の Windows PC で行う。このドキュメントだけを見て、その PC で学習を回せることを目標にする。
 
-## 決まっていること（2026-10-14）
+## 決まっていること（2026-10-14、10-15 に追記）
 
 | 項目 | 決めたこと | 理由・メモ |
 |---|---|---|
-| 目的 | **まず学習できるか試す**。ゲーム本体（展示）には組み込まない | 強化学習の基本を学びながら進める |
+| 目的 | **勉強用**（2026-10-15 に決定）。まず学習できるか試す。ゲーム本体（展示）には組み込まない | 強化学習の基本を学びながら進める。難しさの物差しにはしないので、AI を人に近づける（反応の遅れ・観測の誤差）ことはしない |
 | 学習用 PC | Windows ＋ Unity 6000.3.4f1。このリポジトリを clone して開く | 報酬などを直してすぐ学習し直せる |
 | 観測（AI に見せるもの） | **盤面のすべての弾**（位置・速度・大きさ・種類）＋自分の位置など | AI は弾の情報を正確に知っている前提（メタ認知）。ML-Agents の BufferSensor で可変個を扱う |
 | 行動 | 9 方向（止まる＋8 方向）。速さはキーボードと同じ。1 秒に 15 回決める | 離散行動がいちばん学習しやすい |
 | 学習の順番 | **Easy から、技 1 つずつ**。慣れたら技を混ぜる・難易度を上げる | 最初から全部ランダムだと学習が進みにくい |
 | 報酬 | 被弾 1 回 -1 だけ（ほかは 0）から始める | 他の報酬は実験で足す（下の「レッスン」） |
 | 手法 | PPO（ML-Agents の既定） | |
+| 道順の丸暗記 | **構わない**（2026-10-15 に決定）。弾の乱数の種は固定のまま | 初めて見る弾幕でよけられるか（汎化）は目指さない |
 
 ## 強化学習の基本（このゲームに当てはめて）
 
@@ -33,11 +34,13 @@
 | ファイル | 役割 |
 |---|---|
 | `Assets/Scripts/Training/DodgeAgent.cs` | エージェント。観測・行動・報酬。`IHeartInputSource` として SOUL を動かす |
-| `Assets/Scripts/Training/DodgeArena.cs` | 技を流し、エピソードの始めに SOUL を置き直す。学習中は 1 フレーム = 1/60 秒に固定して全力で回す |
+| `Assets/Scripts/Training/DodgeArena.cs` | 盤面 1 つの場。技を流し、エピソードの始めに SOUL を置き直す |
+| `Assets/Scripts/Training/DodgeTrainingRunner.cs` | 盤面 1 つ分（`DodgeArea`）を格子状に複製して同時に学習させる。ML-Agents を 1 フレーム 1 回進め、学習中は 1 フレーム = 1/60 秒に固定して全力で回す |
 | `Assets/Editor/DodgeTrainingBuilder.cs` | メニュー `Tools > LiDAR Battle > Build RL Training Scene` / `Build RL Training Exe` |
 | `Assets/Scenes/Test/RLTrainingScene.unity` | 学習用シーン（BattleScene のコピーから会話・人の入力源を外したもの） |
 | `Assets/Timelines/Training/{Easy,Medium,Hard}/` | 本番の 12 技を難易度ごとに 8 秒にした Timeline |
 | `Tools/RL/config/dodge_easy.yaml` | 学習の設定（ハイパーパラメータと、Unity 側に渡す値） |
+| `Tools/RL/config/dodge_easy_curriculum.yaml` | Easy の 12 技を順に学習し、最後に全部混ぜる設定（1 つの `.onnx` で全部よけるのが目標。下の「レッスン」5） |
 | `Tools/RL/results/` | 学習結果（git には入れない） |
 
 ゲーム側の変更は最小限: `Bullet.Velocity`（弾の速度。観測用）と `SoulController.Place`（置き直し）を足しただけ。
@@ -45,6 +48,8 @@
 ### 観測の中身
 
 - 自分（4 個）: 位置 x, y（盤面で 0〜1）、無敵中か（0/1）、技の進み具合（0〜1）
+- 安置のシート（5 個。2026-10-15 に追加）: 出ているか（0/1）、自分からの相対位置 x, y、大きさ x, y（盤面の大きさで割る。出ていなければ 0）。
+  安置の技はシートの外が一度に弾で埋まるので、弾だけ見ていては間に合わない（`easy_all_01` は安置だけまったく覚えなかった）。
 - 弾 1 発ごと（9 個 × 最大 128 発、近い順）: 自分からの相対位置 x, y、速度 x, y（盤面の大きさで割る）、
   半径、種類（White / Yellow / Blue / Big の one-hot）。128 発を超えたら遠い弾から捨てる。
 
@@ -75,6 +80,12 @@
    conda env config vars set PYTHONUTF8=1   # YAML の日本語コメントを読めるようにする（下の注意）
    conda activate mlagents                  # 設定を反映するため入り直す
    ```
+   conda の代わりに **uv** でもよい（2026-10-15、RTX 3060 Ti の PC でこの手順で動いた）。以降の `pip install` は `uv pip install` に読み替える:
+   ```powershell
+   uv venv $HOME\venvs\mlagents --python 3.10.12
+   & $HOME\venvs\mlagents\Scripts\Activate.ps1
+   [Environment]::SetEnvironmentVariable("PYTHONUTF8", "1", "User")   # 一度だけ。ターミナルを開き直すと効く
+   ```
 3. **PyTorch（GPU 版）**: GPU に合うものを先に入れる。`nvidia-smi` で GPU を確認する。
    - RTX 20/30/40 系: `pip install torch~=2.2.1 --index-url https://download.pytorch.org/whl/cu121`（ML-Agents の公式手順）
    - RTX 50 系: 古い PyTorch は動かないので新しいものにする: `pip install torch --index-url https://download.pytorch.org/whl/cu128`
@@ -95,6 +106,7 @@
 
 > 速さの目安（2026-10-14、開発用ノート PC・CPU だけで測った値）:
 > - 弾幕を動かす側（Unity）: exe 1 つで実時間の約 4 倍。`--num-envs` で並列にすると CPU のコア数に応じて増える。
+> - 2026-10-15、盤面を 16 面並べた（RTX 3060 Ti・i5-13400F の PC）: **Editor だけで 5000 ステップ約 18 秒**（盤面 1 つのときの約 20 倍）。
 > - 学習の更新（Python）: 4096 ステップごとに約 70 秒かかった。弾を最大 128 発ぶんアテンションで見ているので重い。
 >   ここは **GPU がよく効く**はず。学習用 PC で `--torch-device cuda`（既定で GPU があれば使う）と `cpu` を比べるとよい。
 >   それでも遅ければ `Build RL Training Scene` の `MaxBullets`（`DodgeTrainingBuilder`）を 64 などに減らす。
@@ -103,12 +115,21 @@
 
 1. Unity で `Assets/Scenes/Test/RLTrainingScene` を開いて Play。
 2. Python につながっていないので、AI の代わりに**キーボード（矢印 / WASD）**で SOUL が動く（`DodgeAgent.Heuristic`）。
+   盤面は `DodgeTrainingRunner` の `Editor Areas`（既定 16）の数だけ並び、全部が同じキーで動く。1 にすると 1 面だけ。
 3. 8 秒ごとに技が最初からやり直されれば OK。Inspector の `DodgeAgent` の `Difficulty` / `Attack` で流す技を変えられる
    （YAML から学習するときは YAML の値が優先）。
 
 ## 学習を回す
 
 作業フォルダはリポジトリの一番上。`conda activate mlagents` してから。
+
+### 盤面を並べる（`num_areas`）
+
+1 つの Unity（Editor でも exe でも）の中に盤面を何面も並べ、全部のエージェントの経験をまとめて学習する（ロボットの学習動画で
+たくさんのロボットが同時に歩いているのと同じ考え方）。面の数は YAML の `env_settings.num_areas`（既定 16）か、コマンドの `--num-areas`。
+盤面 1 つ分は `DodgeArea`（盤面・SOUL・弾・Timeline・エージェント）にまとまっていて、`DodgeTrainingRunner` が Play の始めに右・下へ複製し、
+カメラを全体が映るよう合わせる（ML-Agents の `TrainingAreaReplicator` は奥行き方向にも並べて 2D カメラで重なるので使わない）。
+exe を並べる `--num-envs` と掛け算になる（例: 16 面 × exe 4 つ = 64 面）。
 
 ### A. Unity Editor で回す（最初はこちら。様子が見える）
 
@@ -117,8 +138,8 @@ mlagents-learn Tools/RL/config/dodge_easy.yaml --run-id=easy_a0_01 --results-dir
 ```
 「Listening on port 5004. Start training by pressing the Play button」と出たら、Unity で RLTrainingScene の **Play** を押す。
 止めるときはターミナルで Ctrl+C（そこまでの `.onnx` が保存される）。
-Editor は描画もするので遅い（開発用ノート PC では 50 fps ほどで、実時間より遅かった）。Unity のウィンドウが裏に回ると
-さらに遅くなるので、前に出しておく（または Preferences > General > Interaction Mode を No Throttling に）。動作確認用と割り切る。
+Editor は描画もするので exe より遅い。盤面を 16 面並べればこれだけでもそれなりに速い（上の速さの目安）。Unity のウィンドウが裏に回ると
+遅くなるので、前に出しておく（または Preferences > General > Interaction Mode を No Throttling に）。
 
 ### B. exe で並列に回す（速い。本格的に回すとき）
 
@@ -155,8 +176,8 @@ tensorboard --logdir Tools/RL/results
 ## 学習した AI を見る
 
 1. `Tools/RL/results/<run-id>/Dodge.onnx` を `Assets/ML/` などにコピーする（Unity が読み込む）。
-2. RLTrainingScene の `DodgeAgent` の **Behavior Parameters > Model** にドラッグ。
-3. Python を動かさずに Play → AI が動く（実時間で再生される）。
+2. RLTrainingScene の `DodgeArea/DodgeAgent` の **Behavior Parameters > Model** にドラッグ（複製される面にも同じモデルが入る）。
+3. Python を動かさずに Play → AI が動く（実時間で再生される）。1 面だけじっくり見たいときは `DodgeTrainingRunner` の `Editor Areas` を 1 に。
 
 ## パラメータの意味
 
@@ -203,6 +224,14 @@ YAML は実験ごとにコピーして（例 `dodge_easy_a5.yaml`）、run-id �
 3. **ハイパーパラメータを 1 つずつ変える**: `beta`、`learning_rate`、`hidden_units`。
 4. **ほかの技**: Easy の 1〜11 を 1 つずつ。ホーミング（3, 7, 9）や縮む輪（4）が難しいはず。
 5. **技を混ぜる**: Easy で `attack: -1`。前の結果から `--initialize-from` で始めてもよい。`Dodge/Hits by attack/` で苦手な技を見る。
+   **今の本命（2026-10-15）**: `dodge_easy_curriculum.yaml` で、技 0〜11 を 20 万ステップずつ順に学習し、最後の 120 万ステップは全部を混ぜる
+   （合計 360 万ステップ、1 つの `.onnx`）。次の技へは成績に関係なくステップ数で移る（`measure: progress`）。
+   順に学習するだけだと前の技を忘れやすいので、最後に混ぜておさらいする。学習率は後の技でも下がらないよう `constant`。
+   今どの技かは TensorBoard の `Environment/Lesson Number/attack`、技ごとの成績は `Dodge/Hits by attack/<技>`。
+   1 技あたりのステップ数を変えたら `max_steps` と各 `threshold`（= そこまでのステップ数 / `max_steps`）も直す。
+   - `easy_all_01`（256×2 層、シートを見せない）: 約 55 分。技 1 つずつなら安置以外は被弾 0.0〜0.2 回まで下がったが、
+     安置は 2 回のまま、混ぜた段階でホーミング系（3, 9）と横の壁（6）を忘れた。全体で技 1 回あたり 0.77 回・被弾 0 回は 54%。
+   - `easy_all_02`: シートを観測に足し、ネットワークを 512×3 層に。
 6. **難易度を上げる**: Medium / Hard。カリキュラム学習（うまくなったら自動で次へ）は次のように書く:
    ```yaml
    environment_parameters:
@@ -222,7 +251,7 @@ YAML は実験ごとにコピーして（例 `dodge_easy_a5.yaml`）、run-id �
 ## 注意・制約
 
 - **time_scale は必ず 1**（YAML の `engine_settings`）。速さは「1 フレーム = 1/60 秒に固定して全力で回す」ことで出している。
-  ML-Agents の既定の 20 だと 1 フレームが長くなり SOUL の動きが粗くなるので、`DodgeArena` が学習中は 1 に戻す。
+  ML-Agents の既定の 20 だと 1 フレームが長くなり SOUL の動きが粗くなるので、`DodgeTrainingRunner` が学習中は 1 に戻す。
 - 技の弾は乱数の種が固定（`ShotClip` の `_useFixedSeed`）なので、自機狙い以外は毎回同じ弾幕になる。
   AI が「道順を丸暗記」しやすい。`random_start: 1` で少し防いでいる。本当によけられるかは、学習に使っていない技で試すとわかる。
 - AI は弾の位置・速度を正確に知っていて、反応の遅れも無いので、人より有利。速さだけはキーボードと同じ。
